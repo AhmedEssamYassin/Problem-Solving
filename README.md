@@ -80,7 +80,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 >   - Hopcroft_Karp
 >   - Artificial Network Solution (Max Flow) 
 - [Suffix arrays](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Suffix%20Array)
-- Trees
+- [Trees](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Trees)
 > - DFS
 > - BFS
 > - Tree Diameter
@@ -159,9 +159,9 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - Inverse of ETF
 ## How to follow up with this?
 Just make sure to try solving each problem first and do not see the solutions until you do your best.
+If you download the PDF of problem statement and press `ctrl` then click on the contest/gym name on the right, it will redirect you the link where this problem exists.
+
+![How to open the link](images/How%20to%20open%20a%20link%20to%20a%20problem.PNG)
+
 Good luck!
 
-## Contributing
-
-Pull requests are welcomed. For major changes, please open an issue first
-to discuss what you would like to change.

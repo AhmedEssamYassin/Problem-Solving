@@ -31,27 +31,29 @@ struct Edge
 struct DSU
 {
     vector<ll> parent, size; // Representative
+    int N;
     // The leader should be the parent of itself
-    DSU(int n)
+    DSU(int _N)
     {
-        parent.resize(n + 1);
-        size.resize(n + 1, 1); // Each component if of size 1 initially
+        N = _N;
+        parent.resize(N + 1);
+        size.resize(N + 1, 1); // Each component if of size 1 initially
         iota(parent.begin(), parent.end(), 0);
     }
-    ll representative(ll node)
+    ll Find(ll node)
     {
-        // Small to large technique
         if (parent[node] == node)
             return node;
 
-        return parent[node] = representative(parent[node]); // Path compression
+        return parent[node] = Find(parent[node]); // Path compression
     }
     void Union(ll u, ll v)
     {
-        ll rep1 = representative(u);
-        ll rep2 = representative(v);
+        ll rep1 = Find(u);
+        ll rep2 = Find(v);
         if (rep1 == rep2)
             return;
+        // Small-to-large technique
         if (size[rep1] > size[rep2])
             swap(rep1, rep2); // representative of smaller set comes first
         parent[rep1] = rep2;
@@ -59,17 +61,16 @@ struct DSU
     }
     bool isSameComponent(ll u, ll v)
     {
-        return (representative(u) == representative(v));
+        return (Find(u) == Find(v));
     }
-    map<ll, ll> findConnectedComponents(int N)
+    set<ll> findConnectedComponents()
     {
-        map<ll, ll> components;
+        set<ll> st;
+        // Traverse all vertices
         for (int i = 1; i <= N; i++)
-        {
-            ll root = representative(i);
-            components[root]++;
-        }
-        return components;
+            st.insert(Find(parent[i]));
+
+        return st;
     }
 };
 

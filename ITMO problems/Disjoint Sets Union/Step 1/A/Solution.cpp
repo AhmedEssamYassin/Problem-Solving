@@ -17,7 +17,6 @@ struct DSU
 	}
 	ll Find(ll node)
 	{
-		// Small to large technique
 		if (parent[node] == node)
 			return node;
 

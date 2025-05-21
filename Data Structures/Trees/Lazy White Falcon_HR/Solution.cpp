@@ -3,7 +3,21 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-// Flattening binary trees is useful to do subtree queries.
+/*
+A heavy child of a node is the child with the largest subtree size rooted at the child.
+A light child of a node is any child that is not a heavy child.
+A heavy edge connects a node to its heavy child.
+A light edge connects a node to any of its light children.
+A heavy path is the path formed by a collection heavy edges.
+A light path is the path formed by a collection light edges.
+*/
+
+struct Node
+{
+	ll value;
+	Node() {}
+	Node(const ll &N) : value(N) {}
+};
 
 struct LazySegmentTree
 {
@@ -11,12 +25,6 @@ struct LazySegmentTree
 #define R (2 * node + 2)
 #define mid ((left + right) >> 1)
 private:
-	struct Node
-	{
-		ll value;
-		Node() {}
-		Node(const ll &N) : value(N) {}
-	};
 	struct LazyNode
 	{
 		ll value;
@@ -31,11 +39,7 @@ private:
 	int size;
 	vector<Node> seg;
 	vector<LazyNode> lazy;
-	Node merge(const Node &leftNode, const Node &rightNode)
-	{
-		Node res = (leftNode.value + rightNode.value);
-		return res;
-	}
+
 	void build(int left, int right, int node, const vector<ll> &arr)
 	{
 		// If the segment has only one element, leaf node
@@ -107,15 +111,20 @@ private:
 	}
 
 public:
-	LazySegmentTree(const vector<ll> &arr)
+	LazySegmentTree(const vector<ll> &arr = vector<ll>())
 	{
 		size = 1;
 		int n = arr.size();
 		while (size < n)
 			size <<= 1;
 		seg = vector<Node>(2 * size, 0);
-		lazy = vector<LazyNode>(2 * size, 0); // Initialize the LazyNode with a Not-possible value
+		lazy = vector<LazyNode>(2 * size, 0); // Initialize with a Not-possible value
 		build(0, size - 1, 0, arr);
+	}
+	Node merge(const Node &leftNode, const Node &rightNode)
+	{
+		Node res = (leftNode.value + rightNode.value);
+		return res;
 	}
 	void update(int left, int right, const ll &val)
 	{
@@ -132,160 +141,148 @@ public:
 #undef mid
 };
 
-template <typename T>
-T mult64(T a, T b, T mod)
+struct HeavyLightDecomposition
 {
-	return (__int128_t)a * b % mod;
-}
+private:
+	int timer = 0;
+	vector<int> parent, depth, heavy, head, in, out, size;
+	LazySegmentTree segTree;
 
-template <typename T>
-T modBinExp(T N, T power, T mod) //(N^power) % mod
-{
-	if (N % mod == 0 || N == 0)
-		return 0;
-	if (N == 1 || power == 0)
-		return 1;
-
-	if (N >= mod)
-		N -= mod;
-
-	T res{1};
-	while (power)
+	int dfsSize(const vector<vector<ll>> &Tree, int u)
 	{
-		if (power & 1) // ODD
-			res = mult64(res, N, mod);
-
-		N = mult64(N, N, mod);
-		power >>= 1;
+		size[u] = 1;
+		int maxSubtree = 0;
+		for (const auto &v : Tree[u])
+		{
+			if (v == parent[u])
+				continue;
+			parent[v] = u;
+			depth[v] = depth[u] + 1;
+			size[u] += dfsSize(Tree, v);
+			if (size[v] > maxSubtree)
+			{
+				heavy[u] = v;
+				maxSubtree = size[v];
+			}
+		}
+		return size[u];
 	}
-	return res;
-}
 
-template <typename T>
-bool Check_Composite(T N, T a, T d, int s)
-{
-	T X = modBinExp(a, d, N);
-	if (X == 1 || X == N - 1)
-		return false; // Not composite
-
-	for (int r = 1; r < s; r++)
+	void dfsHld(const vector<vector<ll>> &Tree, const vector<ll> &values, vector<ll> &baseArray, int u, int h)
 	{
-		X = mult64(X, X, N);
-		if (X == 1 || X == N - 1)
-			return false; // Not composite
+		head[u] = h;
+		in[u] = timer++;
+		baseArray[in[u]] = values[u];
+		if (heavy[u] != -1)
+			dfsHld(Tree, values, baseArray, heavy[u], h);
+		for (const auto &v : Tree[u])
+		{
+			if (v != parent[u] && v != heavy[u])
+				dfsHld(Tree, values, baseArray, v, v);
+		}
+		out[u] = timer - 1;
 	}
-	return true; // Composite
-}
 
-template <typename T>
-bool Miller_Rabin(T N, int K = 5) // k is the number of trials (bases). If k increases the accuracy increases
-{
-	T d = N - 1;
-	int s{};
-	while (~s & 1)
-		d >>= 1, ++s;
-
-	for (const T &a : {11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61})
+public:
+	HeavyLightDecomposition(const vector<vector<ll>> &Tree, int root, const vector<ll> &values)
 	{
-		if (N == a)
-			return true;
-		if (Check_Composite(N, a, d, s))
-			return false;
+		int N = Tree.size();
+		parent.assign(N, -1);
+		depth.resize(N);
+		heavy.assign(N, -1);
+		head.resize(N);
+		in.resize(N);
+		out.resize(N);
+		size.resize(N);
+
+		dfsSize(Tree, root);
+		vector<ll> baseArray(N);
+		dfsHld(Tree, values, baseArray, root, 0);
+		segTree = LazySegmentTree(baseArray);
 	}
-	return true;
-}
 
-template <typename T>
-bool isPrime(T N)
-{
-	if (N < 2)
-		return false;
+	void updateNode(int u, ll val)
+	{
+		segTree.update(in[u], in[u], val);
+	}
 
-	if (N <= 3)
-		return true;
-	if (N == 5 || N == 7)
-		return true;
+	void updateSubtree(int u, ll val)
+	{
+		segTree.update(in[u], out[u], val);
+	}
 
-	if (!(N & 1) || N % 3 == 0 || N % 5 == 0 || N % 7 == 0)
-		return false;
+	void updatePath(int u, int v, ll val)
+	{
+		while (head[u] != head[v])
+		{
+			if (depth[head[u]] < depth[head[v]])
+				swap(u, v);
+			segTree.update(in[head[u]], in[u], val);
+			u = parent[head[u]];
+		}
+		if (depth[u] > depth[v])
+			swap(u, v);
+		segTree.update(in[u], in[v], val);
+	}
 
-	return Miller_Rabin(N);
-}
+	ll queryPath(int u, int v)
+	{
+		Node res = 0;
+		while (head[u] != head[v])
+		{
+			if (depth[head[u]] < depth[head[v]])
+				swap(u, v);
+			res = segTree.merge(res, segTree.query(in[head[u]], in[u]));
+			u = parent[head[u]];
+		}
+		if (depth[u] > depth[v])
+			swap(u, v);
+		res = segTree.merge(res, segTree.query(in[u], in[v]));
+		return res.value;
+	}
 
-bool isSumOf2Primes(ll N)
-{
-	if (!(N & 1) && N > 2) // GoldBach Conjecture
-		return true;
-	else
-		return isPrime(N - 2);
-}
+	ll querySubtree(int u)
+	{
+		return segTree.query(in[u], out[u]);
+	}
+};
 
 int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
-	freopen("input.txt", "r", stdin);
-	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+
 	int t = 1;
-	ll N;
+	ll N, Q;
 	// cin >> t;
 	while (t--)
 	{
-		cin >> N;
-		vector<ll> a(N + 1);
-		for (int i{1}; i <= N; i++)
-			cin >> a[i];
+		cin >> N >> Q;
 		vector<vector<ll>> Tree(N + 1);
-		int anyNode = 1;
 		for (int i{}; i < N - 1; i++)
 		{
 			ll u, v;
 			cin >> u >> v;
-			anyNode = u;
+			u++, v++;
 			Tree[u].push_back(v);
 			Tree[v].push_back(u);
 		}
 		ll root = 1;
-		// If the tree is not rooted
-		// root = anyNode;
-		int currTime = 0;
-		vector<ll> in(N + 1), out(N + 1);
-		function<void(int, int)> eulerTour = [&](int u, int prev) -> void
-		{
-			in[u] = currTime++;
-			for (const ll &v : Tree[u])
-			{
-				if (v != prev)
-					eulerTour(v, u);
-			}
-			out[u] = currTime - 1;
-		};
-		eulerTour(root, -1);
-		vector<ll> nodes(N);
-		for (int u = 1; u <= N; u++)
-			nodes[in[u]] = a[u];
+		HeavyLightDecomposition hld(Tree, root, vector<ll>(N + 1, 0));
 
-		LazySegmentTree segTree(nodes);
-		ll Q;
-		cin >> Q;
 		while (Q--)
 		{
-			ll type, u, val;
+			ll type, u, v, x;
 			cin >> type;
 			if (type == 1)
 			{
-				cin >> u >> val;
-				segTree.update(in[u], out[u], val);
+				cin >> u >> x;
+				hld.updateNode(++u, x);
 			}
 			else
 			{
-				cin >> u;
-				if (isSumOf2Primes(segTree.query(in[u], out[u])))
-					cout << "YES\n";
-				else
-					cout << "NO\n";
+				cin >> u >> v;
+				cout << hld.queryPath(++u, ++v) << endl;
 			}
 		}
 	}
