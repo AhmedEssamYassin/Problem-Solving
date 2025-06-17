@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-struct segmentTree
+struct LazySegmentTree
 {
 #define L (2 * node + 1)
 #define R (2 * node + 2)
@@ -99,7 +99,7 @@ private:
 	}
 
 public:
-	segmentTree(const vector<ll> &arr)
+	LazySegmentTree(const vector<ll> &arr)
 	{
 		size = 1;
 		int n = arr.size();
@@ -594,7 +594,7 @@ int main()
 		map<char, set<int>> pos;
 		vector<ll> vc(N);
 		iota(vc.begin(), vc.end(), 1);
-		segmentTree segTree(vc);
+		LazySegmentTree segTree(vc);
 
 		pos[str[0]].insert(1);
 		SplayTree *spTree = new SplayTree(1);

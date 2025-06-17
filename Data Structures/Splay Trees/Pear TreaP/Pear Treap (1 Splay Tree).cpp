@@ -3,14 +3,20 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-auto random_address = []
-{ char *p = new char; delete p; return uint64_t(p); };
+function<uint64_t()> random_address = []() -> uint64_t
+{
+	char *p = new char;
+	delete p;
+	return uint64_t(p);
+};
 const uint64_t SEED = chrono::steady_clock::now().time_since_epoch().count() * (random_address() | 1);
 std::mt19937 rnd(SEED);
 #define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
+
 /*
 Large Primes for hash
 1000000007
+For all coming primes use __int128_t in mult64()
 10000000019
 100000000003
 1000000000039
@@ -19,19 +25,42 @@ Large Primes for hash
 1000000000000037
 10000000000000061
 2305843009213693951 = (1LL << 61) - 1
+
+Larger primes take more time
+1e9 + 7 is usually sufficient for most of the hashing problems
 */
 
-constexpr ll mod = (1LL << 61) - 1; // Large prime,
-// Takes more time, choose a smaller prime and omit mult64() for faster code but higher probability of collision
-// constexpr ll mod = 1e9 + 7; // Is usually sufficient for most of the hashing problems
+const ll mod = (1LL << 61) - 1;
+
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
+
+inline ll add64(const ll &a, const ll &b)
+{
+	double_size_t res = double_size_t(a) + b;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
+
+inline ll sub64(const ll &a, const ll &b)
+{
+	double_size_t res = double_size_t(a) - b;
+	if (res < 0)
+		res += mod;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
 
 inline ll mult64(const ll &a, const ll &b)
 {
-	return __int128_t(a) * b % mod;
+	return double_size_t(a) * b % mod;
 }
+
 ll modPow(ll N, ll power, ll mod)
 {
 	ll res{1};
+	N %= mod;
 	while (power)
 	{
 		if (power & 1)
@@ -41,30 +70,29 @@ ll modPow(ll N, ll power, ll mod)
 	}
 	return res;
 }
-ll b1 = rng(128, 1000000), b2 = rng(b1 + 1, 10000000);
+ll b1 = rng(100, 1000000000), b2 = rng(b1 + 10, 1000000000);
 ll b1I = modPow(b1, mod - 2, mod), b2I = modPow(b2, mod - 2, mod);
 vector<ll> Pb1, Pb2, sumB1, sumB2;
-void pre(ll maxSize)
+void precompute(ll maxSize)
 {
 	Pb1 = Pb2 = sumB1 = sumB2 = vector<ll>(maxSize + 1, 1);
 	for (int i = 1; i <= maxSize; i++)
 	{
 		Pb1[i] = mult64(Pb1[i - 1], b1);
 		Pb2[i] = mult64(Pb2[i - 1], b2);
-		sumB1[i] = ((sumB1[i - 1] + Pb1[i]) % mod);
-		sumB2[i] = ((sumB2[i - 1] + Pb2[i]) % mod);
+		sumB1[i] = add64(sumB1[i - 1], Pb1[i]);
+		sumB2[i] = add64(sumB2[i - 1], Pb2[i]);
 	}
 }
+
+static int autoCall = (precompute(7e5), 0);
+
 class Hash
 {
 	using pll = pair<ll, ll>;
-	ll plus(const ll &x, const ll &y)
-	{
-		return ((__int128_t(x) + y + mod) % mod);
-	}
+	ll size{};
 
 public:
-	ll size{};
 	pll code{};
 
 	explicit Hash(pair<ll, ll> x = {}, ll sz = {}) : code(std::move(x)), size(sz) {}
@@ -79,8 +107,8 @@ public:
 
 	void pop_front(int x)
 	{
-		code.first = (code.first - mult64(Pb1[--size], x) + mod) % mod;
-		code.second = (code.second - mult64(Pb2[size], x) + mod) % mod;
+		code.first = sub64(code.first, mult64(Pb1[--size], x));
+		code.second = sub64(code.second, mult64(Pb2[size], x));
 	}
 
 	void pop_back(int x)
@@ -96,15 +124,15 @@ public:
 	Hash operator+(const Hash &o)
 	{
 		Hash ans;
-		ans.code = {plus(mult64(code.first, Pb1[o.size]), o.code.first),
-					plus(mult64(code.second, Pb2[o.size]), o.code.second)};
+		ans.code = {add64(mult64(code.first, Pb1[o.size]), o.code.first),
+					add64(mult64(code.second, Pb2[o.size]), o.code.second)};
 		ans.size = size + o.size;
 		return ans;
 	}
 	friend Hash operator+(const Hash &f, const Hash &o)
 	{
-		return Hash({((mult64(f.code.first, Pb1[o.size]) + o.code.first) % mod),
-					 ((mult64(f.code.second, Pb2[o.size]) + o.code.second) % mod)},
+		return Hash({add64(mult64(f.code.first, Pb1[o.size]), o.code.first),
+					 add64(mult64(f.code.second, Pb2[o.size]), o.code.second)},
 					f.size + o.size);
 	}
 	bool operator<(const Hash &o) const
@@ -580,8 +608,6 @@ inline void shift(SplayTree *x)
 	auto [L, R] = SplayTree::split(x, N - rotationT);
 	x = SplayTree::merge(R, L);
 }
-
-static int autoPre = (pre(7e5), 0);
 
 int main()
 {

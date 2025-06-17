@@ -4,14 +4,11 @@ using namespace std;
 #define endl "\n"
 
 const ll mod = 1e9 + 7;
-inline ll mult64(const ll &a, const ll &b)
-{
-    return __int128_t(a) * b % mod;
-}
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
 
 inline ll add64(const ll &a, const ll &b)
 {
-    ll res = a + b;
+    double_size_t res = double_size_t(a) + b;
     if (res >= mod)
         res -= mod;
     return res;
@@ -19,12 +16,17 @@ inline ll add64(const ll &a, const ll &b)
 
 inline ll sub64(const ll &a, const ll &b)
 {
-    ll res = a - b;
+    double_size_t res = double_size_t(a) - b;
     if (res < 0)
         res += mod;
     if (res >= mod)
         res -= mod;
     return res;
+}
+
+inline ll mult64(const ll &a, const ll &b)
+{
+    return double_size_t(a) * b % mod;
 }
 
 ll modPow(ll N, ll power, ll mod)

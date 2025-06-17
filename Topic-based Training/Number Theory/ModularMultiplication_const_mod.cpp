@@ -4,20 +4,19 @@ using namespace std;
 #define endl "\n"
 
 const auto mod = 1000000007; // 1e9 + 7
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
 
-template <typename T>
-inline T add64(const T &a, const T &b)
+inline ll add64(const ll &a, const ll &b)
 {
-    ll res = (ll)a + b;
+    double_size_t res = double_size_t(a) + b;
     if (res >= mod)
         res -= mod;
     return res;
 }
 
-template <typename T>
-inline T sub64(const T &a, const T &b)
+inline ll sub64(const ll &a, const ll &b)
 {
-    ll res = (ll)a - b;
+    double_size_t res = double_size_t(a) - b;
     if (res < 0)
         res += mod;
     if (res >= mod)
@@ -25,27 +24,10 @@ inline T sub64(const T &a, const T &b)
     return res;
 }
 
-template <typename T>
-inline T mult32(const T &a, const T &b)
+inline ll mult64(const ll &a, const ll &b)
 {
-    return (long long)(a)*b % mod;
+    return double_size_t(a) * b % mod;
 }
-
-template <typename T>
-inline T mult64(const T &a, const T &b)
-{
-    return __int128_t(a) * b % mod;
-}
-
-template <typename T>
-using MulFuncT = T (*)(const T &, const T &);
-
-template <typename T>
-MulFuncT<T> getModMultFunc()
-{
-    return mod < (1LL << 31) ? mult32<T> : mult64<T>;
-}
-#define modMult(a, b) getModMultFunc<std::decay_t<decltype(a)>>()(a, b)
 
 int main()
 {

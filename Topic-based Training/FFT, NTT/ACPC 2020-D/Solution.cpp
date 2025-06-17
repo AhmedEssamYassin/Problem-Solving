@@ -14,79 +14,60 @@ p                   | deg | g
 1000000000949747713   26    2
 */
 const ll NTT_MOD = 132120577;
-const decltype(NTT_MOD) PRIMITIVE_ROOT = 5; // Primitive root for 132120577
+const ll PRIMITIVE_ROOT = 5; // Primitive root for 132120577
 
-template <typename T>
-inline T add64(const T &a, const T &b)
+#define double_size_t std::conditional_t<(NTT_MOD > (1LL << 31)), __int128_t, long long>
+
+inline ll add64(const ll &a, const ll &b, const ll &mod)
 {
-	ll res = (ll)a + b;
-	if (res >= NTT_MOD)
-		res -= NTT_MOD;
+	double_size_t res = double_size_t(a) + b;
+	if (res >= mod)
+		res -= mod;
 	return res;
 }
 
-template <typename T>
-inline T sub64(const T &a, const T &b)
+inline ll sub64(const ll &a, const ll &b, const ll &mod)
 {
-	ll res = (ll)a - b;
+	double_size_t res = double_size_t(a) - b;
 	if (res < 0)
-		res += NTT_MOD;
-	if (res >= NTT_MOD)
-		res -= NTT_MOD;
+		res += mod;
+	if (res >= mod)
+		res -= mod;
 	return res;
 }
 
-template <typename T>
-inline T mult32(const T &a, const T &b)
+inline ll mult64(const ll &a, const ll &b, const ll &mod)
 {
-	return (long long)(a)*b % NTT_MOD;
+	return double_size_t(a) * b % mod;
 }
 
-template <typename T>
-inline T mult64(const T &a, const T &b)
+ll modPow(ll N, ll power, ll mod)
 {
-	return __int128_t(a) * b % NTT_MOD;
-}
-
-template <typename T>
-using MulFuncT = T (*)(const T &, const T &);
-
-template <typename T>
-MulFuncT<T> getModMultFunc()
-{
-	return NTT_MOD < (1LL << 31) ? mult32<T> : mult64<T>;
-}
-#define modMult(a, b) getModMultFunc<std::decay_t<decltype(a)>>()(a, b)
-
-template <typename T>
-T modPow(T N, T power)
-{
-	if (N % NTT_MOD == 0 || N == 0)
+	if (N % mod == 0 || N == 0)
 		return 0;
 	if (N == 1 || power == 0)
 		return 1;
 
-	T res{1};
+	ll res{1};
 	while (power)
 	{
 		if (power & 1)
-			res = modMult(res, N);
-		N = modMult(N, N);
+			res = mult64(res, N, mod);
+		N = mult64(N, N, mod);
 		power >>= 1;
 	}
 	return res;
 }
 
 // Find primitive root (generator) for modulus of form 2^a * b + 1
-template <typename T>
-T findPrimitiveRoot(T modulus)
+ll findPrimitiveRoot(ll mod)
 {
-	vector<T> primeFactors;
-	T phi = modulus - 1; // Euler's totient for prime modulus
-	T temp = phi;
+	vector<ll> primeFactors;
+	ll phi = mod - 1; // Euler's totient for prime modulus
+	ll temp = phi;
 
 	// Find all prime factors of phi
-	for (T i = 2; i * i <= temp; ++i)
+	for (ll i = 2; i * i <= temp; i++)
 	{
 		if (temp % i == 0)
 		{
@@ -99,13 +80,13 @@ T findPrimitiveRoot(T modulus)
 		primeFactors.push_back(temp);
 
 	// Check each potential generator
-	for (T candidate = 2; candidate <= modulus; ++candidate)
+	for (ll candidate = 2; candidate <= mod; candidate++)
 	{
 		bool isPrimitiveRoot = true;
 		for (size_t i = 0; i < primeFactors.size() && isPrimitiveRoot; ++i)
 		{
-			// Check if candidate^(phi/p) % modulus = 1 for any prime factor p
-			isPrimitiveRoot &= modPow(candidate, phi / primeFactors[i], modulus) != 1;
+			// Check if candidate^(phi/p) % mod = 1 for any prime factor p
+			isPrimitiveRoot &= modPow(candidate, phi / primeFactors[i], mod) != 1;
 		}
 		if (isPrimitiveRoot)
 			return candidate;
@@ -121,17 +102,17 @@ void NTT(vector<T> &coeff, bool inverse = false)
 	T logSize = 31 - __builtin_clz(n); // log2(arraySize)
 
 	// Precompute roots of unity for efficient NTT
-	vector<T> w(2, 1);
+	vector<ll> w(2, 1);
 	for (T len = 2, s = 2; len < n; len <<= 1, s++)
 	{
 		w.resize(n);
 		// Generate primitive (len)-th roots of unity
-		T root = modPow(PRIMITIVE_ROOT, NTT_MOD >> s);
+		ll root = modPow(PRIMITIVE_ROOT, NTT_MOD >> s, NTT_MOD);
 		if (inverse)
-			root = modPow(root, NTT_MOD - 2);
-		T wp[] = {1, root};
+			root = modPow(root, NTT_MOD - 2, NTT_MOD);
+		ll wp[] = {1, root};
 		for (T i = len; i < 2 * len; ++i)
-			w[i] = modMult(w[i >> 1], wp[i & 1]);
+			w[i] = mult64(w[i >> 1], wp[i & 1], NTT_MOD);
 	}
 
 	// Bit-reversal permutation for Cooley-Tukey algorithm
@@ -149,7 +130,7 @@ void NTT(vector<T> &coeff, bool inverse = false)
 		{
 			for (T j = 0; j < len; ++j)
 			{
-				T u = modMult(w[j + len], coeff[st + j + len]);
+				T u = mult64(w[j + len], coeff[st + j + len], NTT_MOD);
 				T &v = coeff[st + j];
 				coeff[st + j + len] = v - u + (u > v ? NTT_MOD : 0);
 				v += (v + u >= NTT_MOD ? u - NTT_MOD : u);
@@ -167,9 +148,9 @@ vector<T> convolute(vector<T> P1, vector<T> P2)
 
 	T resultSize = (T)P1.size() + (T)P2.size() - 1;
 	// T paddedSize = __bit_ceil(resultSize);           // Next power of 2
-	T logSize = 32 - __builtin_clz(resultSize - 1);	 // Ceiling of log2(resultSize)
-	T paddedSize = 1 << logSize;					 // Next power of 2
-	T inverseSize = modPow(paddedSize, NTT_MOD - 2); // Modular inverse
+	T logSize = 32 - __builtin_clz(resultSize - 1);			  // Ceiling of log2(resultSize)
+	T paddedSize = 1 << logSize;							  // Next power of 2
+	T inverseSize = modPow(paddedSize, NTT_MOD - 2, NTT_MOD); // Modular inverse
 
 	// Prepare padded copies for NTT
 	P1.resize(paddedSize);
@@ -181,7 +162,7 @@ vector<T> convolute(vector<T> P1, vector<T> P2)
 
 	// Point-wise multiplication in frequency domain
 	for (T i = 0; i < paddedSize; ++i)
-		P1[i] = modMult(modMult(P1[i], P2[i]), inverseSize);
+		P1[i] = mult64(mult64(P1[i], P2[i], NTT_MOD), inverseSize, NTT_MOD);
 
 	// Inverse NTT to get final result
 	NTT(P1, true);
@@ -209,9 +190,9 @@ const ll root3 = 11;
 ll CRT(ll a, ll b, ll c, ll m1, ll m2, ll m3)
 {
 	__int128 M = (__int128)m1 * m2 * m3;
-	ll M1 = (ll)m2 * m3;
-	ll M2 = (ll)m1 * m3;
-	ll M3 = (ll)m2 * m1;
+	ll M1 = m2 * m3;
+	ll M2 = m1 * m3;
+	ll M3 = m2 * m1;
 
 	ll M_1 = modPow(M1 % m1, m1 - 2, m1);
 	ll M_2 = modPow(M2 % m2, m2 - 2, m2);
@@ -266,13 +247,13 @@ int main()
 		}
 		vector<ll> ans = convolute(Poly1, Poly2);
 		for (int i{1}; i < ans.size(); i++)
-			ans[i] = add64(ans[i], ans[i - 1]);
+			ans[i] = add64(ans[i], ans[i - 1], NTT_MOD);
 		cin >> Q;
 		while (Q--)
 		{
 			ll L, R;
 			cin >> L >> R;
-			cout << sub64(ans[R + shift], ans[L + shift - 1]) << endl;
+			cout << sub64(ans[R + shift], ans[L + shift - 1], NTT_MOD) << endl;
 		}
 	}
 	return 0;
