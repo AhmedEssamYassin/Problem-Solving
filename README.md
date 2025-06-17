@@ -103,7 +103,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 ---
 
 ## Miscellaneous Topics
-- [Number Theory]() (Too deep topics, detailed in separate point)
+- [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory) (Too deep topics, detailed in separate point)
 - [Dynamic programming]()
 - [Game Theory (Nim game and Sprague-Grundy numbers)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Game%20Theory)
 - [Matrix binary exponentiation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Matrix%20Exponentiation)
