@@ -4,14 +4,11 @@ using namespace std;
 #define endl "\n"
 
 const ll mod = 1e9 + 7;
-inline ll mult64(const ll &a, const ll &b)
-{
-    return __int128_t(a) * b % mod;
-}
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
 
 inline ll add64(const ll &a, const ll &b)
 {
-    ll res = a + b;
+    double_size_t res = double_size_t(a) + b;
     if (res >= mod)
         res -= mod;
     return res;
@@ -19,12 +16,17 @@ inline ll add64(const ll &a, const ll &b)
 
 inline ll sub64(const ll &a, const ll &b)
 {
-    ll res = a - b;
+    double_size_t res = double_size_t(a) - b;
     if (res < 0)
         res += mod;
     if (res >= mod)
         res -= mod;
     return res;
+}
+
+inline ll mult64(const ll &a, const ll &b)
+{
+    return double_size_t(a) * b % mod;
 }
 
 ll modPow(ll N, ll power, ll mod)
@@ -44,145 +46,181 @@ ll modPow(ll N, ll power, ll mod)
     return res;
 }
 
-template <typename T>
-T modInv(T N, T mod)
+ll modInv(ll N, ll mod)
 {
     return N <= 1 ? N : mod - (mod / N) * modInv(mod % N, mod) % mod;
 }
 
-vector<tuple<ll, ll, ll>> floorRange(ll N)
+// Generate sieve of Eratosthenes for prime numbers up to given limit
+vector<ll> &generatePrimeTable(int upperLimit)
 {
-    vector<tuple<ll, ll, ll>> ranges;
-    ll L = 1;
-    while (L <= N)
+    ++upperLimit;
+    const int SEGMENT_SIZE = 32768;
+    static int processedLimit = 2;
+    static vector<ll> primeNumbers = {2};
+    static vector<ll> sieveArray(SEGMENT_SIZE + 1);
+
+    if (processedLimit >= upperLimit)
+        return primeNumbers;
+    processedLimit = upperLimit;
+
+    primeNumbers = {2};
+    sieveArray.assign(SEGMENT_SIZE + 1, 0);
+    const int halfLimit = upperLimit / 2;
+    primeNumbers.reserve(int(upperLimit / log(upperLimit) * 1.1));
+
+    vector<pair<ll, ll>> candidatePrimes;
+    for (int i = 3; i <= SEGMENT_SIZE; i += 2)
     {
-        ll R = N / (N / L);
-        ranges.emplace_back(L, R, N / L);
-        L = R + 1;
+        if (!sieveArray[i])
+        {
+            candidatePrimes.emplace_back(i, i * i / 2);
+            for (int j = i * i; j <= SEGMENT_SIZE; j += 2 * i)
+                sieveArray[j] = 1;
+        }
     }
-    ranges.emplace_back(N + 1, N + 1, 0);
-    reverse(ranges.begin(), ranges.end());
-    return ranges;
+
+    for (int leftBound = 1; leftBound <= halfLimit; leftBound += SEGMENT_SIZE)
+    {
+        array<bool, SEGMENT_SIZE> blockSieve{};
+        for (auto &[prime, startIndex] : candidatePrimes)
+        {
+            for (int i = startIndex; i < SEGMENT_SIZE + leftBound; startIndex = (i += prime))
+                blockSieve[i - leftBound] = 1;
+        }
+        for (int i = 0; i < min(SEGMENT_SIZE, halfLimit - leftBound); i++)
+        {
+            if (!blockSieve[i])
+                primeNumbers.emplace_back((leftBound + i) * 2 + 1);
+        }
+    }
+    return primeNumbers;
 }
 
-void execOnBlocks(function<void(pair<ll, ll>, pair<ll, ll>, pair<ll, ll>)> func, ll N)
+// Calculate sum of primes up to N using Lucy-Hedgehog algorithm
+template <typename T>
+pair<vector<T>, vector<T>> calculatePrimeSumWithFunction(ll maxNumber, function<T(ll)> summationFunction)
 {
-    ll sqrtN = sqrt(N);
-    auto floors = floorRange(N);
-    ll numRanges = floors.size() - 1;
+    /*
+    Given N and a completely multiplicative function f with prefix sum function F,
+    calculate sum_{p <= n} f(p) for all n = floor(N/d).
 
-    auto toOrd = [&](ll k)
+    This can compute sums of p^k or sums of p^k modulo m.
+
+    Complexity: O(N^{3/4}/logN) time, O(N^{1/2}) space.
+    */
+    ll sqrtMaxNumber = sqrtl(maxNumber);
+    auto &primeList = generatePrimeTable(sqrtMaxNumber);
+
+    vector<T> lowSums(sqrtMaxNumber + 1), highSums(sqrtMaxNumber + 1);
+
+    // Initialize with F(i) - 1 (subtract 1 since we don't want to count 1)
+    for (int i = 1; i <= sqrtMaxNumber; i++)
+        lowSums[i] = summationFunction(i) - 1;
+    for (int i = 1; i <= sqrtMaxNumber; i++)
+        highSums[i] = summationFunction(double(maxNumber) / i) - 1;
+
+    // Lucy-Hedgehog sieve algorithm
+    for (auto &&currentPrime : primeList)
     {
-        return k <= sqrtN ? k : floors.size() - N / k;
+        ll primeSquared = currentPrime * currentPrime;
+        if (primeSquared > maxNumber)
+            break;
+
+        ll rightBound = min(sqrtMaxNumber, maxNumber / primeSquared);
+        ll middleBound = sqrtMaxNumber / currentPrime;
+        T previousSum = lowSums[currentPrime - 1];
+        T currentPrimeContribution = lowSums[currentPrime] - lowSums[currentPrime - 1];
+
+        for (int i = 1; i <= middleBound; i++)
+            highSums[i] -= currentPrimeContribution * (highSums[i * currentPrime] - previousSum);
+        for (int i = middleBound + 1; i <= rightBound; i++)
+            highSums[i] -= currentPrimeContribution * (lowSums[double(maxNumber) / (i * currentPrime)] - previousSum);
+        for (int n = sqrtMaxNumber; n >= primeSquared; n--)
+            lowSums[n] -= currentPrimeContribution * (lowSums[double(n) / currentPrime] - previousSum);
+    }
+    return {lowSums, highSums};
+}
+
+// Calculate count of primes up to N
+template <typename T>
+pair<vector<T>, vector<T>> calculatePrimeCount(ll maxNumber)
+{
+    auto identityFunction = [&](ll n) -> T
+    { return n; };
+    return calculatePrimeSumWithFunction<T>(maxNumber, identityFunction);
+}
+
+// Calculate sum of primes up to N
+template <typename T>
+pair<vector<T>, vector<T>> calculatePrimeSum(ll maxNumber)
+{
+    auto triangularFunction = [&](ll n) -> T
+    {
+        return (n & 1 ? T((n + 1) / 2) * T(n) : T(n / 2) * T(n + 1));
+    };
+    return calculatePrimeSumWithFunction<T>(maxNumber, triangularFunction);
+}
+
+// Main algorithm: Calculate sum of multiplicative function using Black's algorithm
+template <typename T, typename FUNC>
+T calculateMultiplicativeSum(ll maxNumber, FUNC multiplicativeFunction, vector<T> &lowSums, vector<T> &highSums)
+{
+    /*
+    Given F(p^e) function and precomputed prime sums,
+    calculate sum of multiplicative function over all positive integers up to N.
+
+    Uses Black's algorithm from:
+    http://baihacker.github.io/main/2020/The_prefix-sum_of_multiplicative_function_the_black_algorithm.html
+    */
+    ll sqrtMaxNumber = sqrtl(maxNumber);
+    auto &primeList = generatePrimeTable(sqrtMaxNumber);
+
+    auto getSumAtIndex = [&](ll divisor) -> T
+    {
+        return (divisor <= sqrtMaxNumber ? lowSums[divisor] : highSums[double(maxNumber) / divisor]);
     };
 
-    func({1, 1}, {1, 1}, {1, numRanges});
+    T totalSum = T(1) + getSumAtIndex(maxNumber); // Include 1 and all primes
 
-    for (ll k = 2; k < floors.size(); k++)
+    // DFS to handle prime powers and their products
+    // Parameters: (currentValue, primeIndex, exponent, f(currentValue), f(previousValue))
+    auto depthFirstSearch = [&](auto self, ll currentValue, ll primeIndex, ll exponent,
+                                T functionAtCurrent, T functionAtPrevious) -> void
     {
-        ll z = floors.size() - k;
+        T nextFunctionValue = functionAtPrevious * multiplicativeFunction(primeList[primeIndex], exponent + 1);
 
-        for (ll x = 2;; x++)
+        // Add contribution from current prime power
+        totalSum += nextFunctionValue;
+        totalSum += functionAtCurrent * (getSumAtIndex(double(maxNumber) / currentValue) - getSumAtIndex(primeList[primeIndex]));
+
+        ll upperLimit = sqrtl(double(maxNumber) / currentValue);
+
+        // Recurse with higher powers of the same prime
+        if (primeList[primeIndex] <= upperLimit)
+            self(self, currentValue * primeList[primeIndex], primeIndex, exponent + 1, nextFunctionValue, functionAtPrevious);
+
+        // Recurse with different primes
+        for (int nextPrimeIndex = primeIndex + 1; nextPrimeIndex < (int)primeList.size(); nextPrimeIndex++)
         {
-            ll yLo = max(toOrd(x), toOrd(z)) + 1;
-            ll yHi = toOrd(N / (x * z));
-            if (yHi < yLo)
+            if (primeList[nextPrimeIndex] > upperLimit)
                 break;
-            func({x, x}, {yLo, yHi}, {k, k});
-            func({yLo, yHi}, {x, x}, {k, k});
+            self(self, currentValue * primeList[nextPrimeIndex], nextPrimeIndex, 1,
+                 functionAtCurrent * multiplicativeFunction(primeList[nextPrimeIndex], 1), functionAtCurrent);
         }
-
-        func({1, 1}, {k, k}, {k, numRanges});
-        func({k, k}, {1, 1}, {k, numRanges});
-
-        ll x = k;
-        for (ll y = 2; y < k; y++)
-        {
-            ll zLo = toOrd(x * y);
-            ll zHi = toOrd(N / x);
-            if (zHi < zLo)
-                break;
-            func({x, x}, {y, y}, {zLo, zHi});
-            func({y, y}, {x, x}, {zLo, zHi});
-        }
-
-        ll zLo = toOrd(x * x);
-        func({x, x}, {x, x}, {zLo, numRanges});
-    }
-}
-
-vector<ll> dirichletMultiply(const vector<ll> &F, const vector<ll> &G, ll N)
-{
-    vector<ll> H(F.size() + 2, 0);
-
-    auto propagate = [&](pair<ll, ll> x, pair<ll, ll> y, pair<ll, ll> z)
-    {
-        ll deltaF = sub64(F[x.second], F[x.first - 1]);
-        ll deltaG = sub64(G[y.second], G[y.first - 1]);
-        ll prod = mult64(deltaF, deltaG);
-        H[z.first] = add64(H[z.first], prod);
-        H[z.second + 1] = sub64(H[z.second + 1], prod);
     };
 
-    execOnBlocks(propagate, N);
-
-    for (size_t i = 1; i < H.size(); i++)
-        H[i] = add64(H[i], H[i - 1]);
-
-    H.pop_back();
-    return H;
-}
-
-vector<ll> dirichletDivide(vector<ll> H, const vector<ll> &G, ll N)
-{
-    H.push_back(0);
-    vector<ll> H_diff(H.size());
-    H_diff[0] = 0;
-    for (int i = 1; i < (int)H.size(); i++)
-        H_diff[i] = sub64(H[i], H[i - 1]);
-    H = H_diff;
-
-    vector<ll> F(G.size(), -1);
-    F[0] = 0;
-
-    auto propagate = [&](pair<ll, ll> x, pair<ll, ll> y, pair<ll, ll> z)
+    // Start DFS for each prime
+    for (int i = 0; i < (int)primeList.size(); i++)
     {
-        ll deltaG = sub64(G[y.second], G[y.first - 1]);
-
-        // If F[x.second] is not set yet
-        if (F[x.second] == -1)
+        if (primeList[i] <= sqrtMaxNumber)
         {
-            // Use modular division: H[z.first] / deltaG (mod p)
-            ll quotient = mult64(H[z.first], modInv(deltaG, mod));
-            F[x.second] = add64(F[x.first - 1], quotient);
+            depthFirstSearch(depthFirstSearch, primeList[i], i, 1,
+                             multiplicativeFunction(primeList[i], 1), 1);
         }
-
-        // Now modify H using the computed F
-        ll deltaF = sub64(F[x.second], F[x.first - 1]);
-        ll delta = mult64(deltaF, deltaG);
-        H[z.first] = sub64(H[z.first], delta);
-        H[z.second + 1] = add64(H[z.second + 1], delta);
-    };
-
-    execOnBlocks(propagate, N);
-    return F;
-}
-
-ll phiSum(ll N)
-{
-    auto floors = floorRange(N);
-    vector<ll> H, G;
-
-    for (auto &[L, R, nk] : floors)
-    {
-        ll s = mult64(nk, nk + 1);
-        s = mult64(s, 500000004); // divide by 2 modulo (1e9 + 7)
-        H.push_back(s);
-        G.push_back(nk);
     }
 
-    vector<ll> F = dirichletDivide(H, G, N);
-    return F.back();
+    return totalSum;
 }
 
 int main()
@@ -199,7 +237,30 @@ int main()
     while (t--)
     {
         cin >> N;
-        cout << phiSum(N) << endl;
+        // Calculate prime counts and prime sums
+        auto [primeCountLow, primeCountHigh] = calculatePrimeCount<ll>(N);
+        auto [primeSumLow, primeSumHigh] = calculatePrimeSum<__int128_t>(N);
+
+        ll arraySize = primeCountLow.size();
+
+        // Adjust prime sums by subtracting prime counts (sum of p - sum of 1 for each prime)
+        for (int i = 0; i < arraySize; i++)
+            primeSumLow[i] -= primeCountLow[i];
+        for (int i = 0; i < arraySize; i++)
+            primeSumHigh[i] -= primeCountHigh[i];
+
+        // Define the multiplicative function: f(p^e) = (p-1) * p^(e-1) = phi(p^e)
+        auto eulerPhiFunction = [&](ll prime, ll exponent) -> __int128_t
+        {
+            ll result = prime - 1;
+            for (int i = 0; i < exponent - 1; i++)
+                result *= prime;
+            return result;
+        };
+
+        // Calculate the final answer
+        __int128_t phiSum = calculateMultiplicativeSum(N, eulerPhiFunction, primeSumLow, primeSumHigh);
+        cout << (long long)(phiSum % mod) << endl;
     }
     return 0;
 }
