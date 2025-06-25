@@ -3,8 +3,12 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-auto random_address = []
-{ char *p = new char; delete p; return uint64_t(p); };
+function<uint64_t()> random_address = []() -> uint64_t
+{
+	char *p = new char;
+	delete p;
+	return uint64_t(p);
+};
 const uint64_t SEED = chrono::steady_clock::now().time_since_epoch().count() * (random_address() | 1);
 std::mt19937 rnd(SEED);
 #define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
