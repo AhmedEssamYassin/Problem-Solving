@@ -65,7 +65,7 @@ struct XORBasis
 
         if (RHS.sz == BITS)
             return (RHS);
-        res += LHS;
+        res = LHS;
         for (int i = BITS - 1; i >= 0; i--)
         {
             if (RHS.basis[i].count())

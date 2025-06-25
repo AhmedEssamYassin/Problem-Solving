@@ -13,10 +13,11 @@ A light path is the path formed by a collection light edges.
 */
 
 const int BITS = 20;
+#define int_type std::conditional_t<(BITS > 31), long long, int>
 struct XORBasis
 {
 	int sz = 0;
-	array<int, BITS> basis{};
+	array<int_type, BITS> basis{};
 	XORBasis() {}
 	XORBasis(const ll &x)
 	{
@@ -69,7 +70,7 @@ struct XORBasis
 
 		if (RHS.sz == BITS)
 			return (RHS);
-		res += LHS;
+		res = LHS;
 		for (int i = 0; i < BITS; i++)
 		{
 			if (RHS.basis[i])

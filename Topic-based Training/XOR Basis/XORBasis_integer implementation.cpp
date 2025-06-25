@@ -4,10 +4,11 @@ using namespace std;
 #define endl "\n"
 
 const int BITS = 64;
+#define int_type std::conditional_t<(BITS > 31), long long, int>
 struct XORBasis
 {
     int sz = 0;
-    array<ll, BITS> basis{};
+    array<int_type, BITS> basis{};
     XORBasis() {}
     XORBasis(const ll &x)
     {
@@ -60,7 +61,7 @@ struct XORBasis
 
         if (RHS.sz == BITS)
             return (RHS);
-        res += LHS;
+        res = LHS;
         for (int i = 0; i < BITS; i++)
         {
             if (RHS.basis[i])

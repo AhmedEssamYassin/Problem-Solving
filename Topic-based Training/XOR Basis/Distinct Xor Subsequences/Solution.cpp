@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-const int BITS = 20;
+const int BITS = 61;
 #define int_type std::conditional_t<(BITS > 31), long long, int>
 struct XORBasis
 {
@@ -95,20 +95,6 @@ struct XORBasis
 	}
 };
 
-const int mod = 1e9 + 7;
-ll modPow(ll N, ll power)
-{
-	ll res{1};
-	while (power)
-	{
-		if (power & 1)
-			res = (res % mod * N % mod) % mod;
-		N = (N % mod * N % mod) % mod;
-		power >>= 1;
-	}
-	return res;
-}
-
 int main()
 {
 	ios_base::sync_with_stdio(false);
@@ -118,28 +104,16 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N, Q;
+	ll N;
 	// cin >> t;
 	while (t--)
 	{
-		cin >> N >> Q;
+		cin >> N;
 		vector<ll> vc(N);
+		XORBasis xb;
 		for (int i{}; i < N; i++)
-			cin >> vc[i];
-		vector<XORBasis> acc(N);
-		acc[0] = vc[0];
-		for (int i = 1; i < N; i++)
-			acc[i] = acc[i - 1] + vc[i];
-
-		ll ans{}, l, x;
-		while (Q--)
-		{
-			ans = 0;
-			cin >> l >> x;
-			if (acc[l - 1].canRepresent(x))
-				ans = (modPow(2, l - acc[l - 1].sz));
-			cout << ans << endl;
-		}
+			cin >> vc[i], xb.insertVector(vc[i]);
+		cout << (1LL << xb.sz);
 	}
 	return 0;
 }

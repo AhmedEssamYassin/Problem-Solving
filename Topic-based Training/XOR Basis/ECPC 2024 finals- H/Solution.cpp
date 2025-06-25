@@ -4,10 +4,11 @@ using namespace std;
 #define endl "\n"
 
 const int BITS = 19;
+#define int_type std::conditional_t<(BITS > 31), long long, int>
 struct XORBasis
 {
 	int sz = 0;
-	array<int, BITS> basis{};
+	array<int_type, BITS> basis{};
 	XORBasis() {}
 	XORBasis(const ll &x)
 	{
@@ -60,7 +61,7 @@ struct XORBasis
 
 		if (RHS.sz == BITS)
 			return (RHS);
-		res += LHS;
+		res = LHS;
 		for (int i = 0; i < BITS; i++)
 		{
 			if (RHS.basis[i])
@@ -94,7 +95,7 @@ struct XORBasis
 	}
 };
 
-struct SegmentTree
+struct LazySegmentTree
 {
 #define L (2 * node + 1)
 #define R (2 * node + 2)
@@ -125,10 +126,10 @@ private:
 	int size;
 	vector<Node> seg;
 	vector<LazyNode> lazy;
-	Node merge(Node leftNode, const Node &rightNode)
+	Node merge(const Node leftNode, const Node &rightNode)
 	{
 		Node res;
-		res.xB = (leftNode.xB += rightNode.xB);
+		res.xB = (leftNode.xB + rightNode.xB);
 		return res;
 	}
 	void build(int left, int right, int node, const vector<ll> &arr)
@@ -217,7 +218,7 @@ private:
 		push(left, right, node);
 		// If the range is invalid, return a value that does NOT to affect other queries
 		if (left > rightQuery || right < leftQuery)
-			return 0;
+			return Node();
 
 		// If the range matches the segment
 		if (left >= leftQuery && right <= rightQuery)
@@ -229,7 +230,7 @@ private:
 	}
 
 public:
-	SegmentTree(const vector<ll> &arr)
+	LazySegmentTree(const vector<ll> &arr)
 	{
 		size = 1;
 		int n = arr.size();
@@ -274,7 +275,7 @@ int main()
 		vector<ll> A(N);
 		for (int i{}; i < N; i++)
 			cin >> A[i];
-		SegmentTree segTree(A);
+		LazySegmentTree segTree(A);
 
 		while (M--)
 		{
