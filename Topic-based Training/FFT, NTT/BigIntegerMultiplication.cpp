@@ -97,6 +97,70 @@ vector<T> PolyModPow(vector<T> P, ll power)
     return res;
 }
 
+/**
+ * Big integer multiplication using convolute function
+ * Leverages existing FFT infrastructure for number multiplication
+ * Handles negative numbers correctly
+ * Time: O(n log n), Space: O(n)
+ */
+string multiplyBigInt(const string &num1, const string &num2)
+{
+    if (num1 == "0" || num2 == "0")
+        return "0";
+
+    // Handle sign
+    bool isNegative = false;
+    string n1 = num1, n2 = num2;
+
+    if (n1[0] == '-')
+    {
+        isNegative = !isNegative;
+        n1 = n1.substr(1);
+    }
+    if (n2[0] == '-')
+    {
+        isNegative = !isNegative;
+        n2 = n2.substr(1);
+    }
+
+    // Convert to digit vectors (reverse order)
+    vector<int> a, b;
+    for (int i = n1.length() - 1; i >= 0; i--)
+        a.push_back(n1[i] - '0');
+    for (int i = n2.length() - 1; i >= 0; i--)
+        b.push_back(n2[i] - '0');
+
+    // Use your convolute function
+    vector<int> result = convolute(a, b);
+
+    // Handle carries
+    int carry = 0;
+    for (int i = 0; i < result.size(); i++)
+    {
+        result[i] += carry;
+        carry = result[i] / 10;
+        result[i] %= 10;
+    }
+
+    // Add remaining carries
+    while (carry)
+    {
+        result.push_back(carry % 10);
+        carry /= 10;
+    }
+
+    // Convert to string (reverse order)
+    string res = "";
+    for (int i = result.size() - 1; i >= 0; i--)
+        res += to_string(result[i]);
+
+    // Add negative sign if needed
+    if (isNegative && res != "0")
+        res = "-" + res;
+
+    return res.empty() ? "0" : res;
+}
+
 int main()
 {
     ios_base::sync_with_stdio(false);
@@ -110,37 +174,9 @@ int main()
     // cin >> t;
     while (t--)
     {
-        int n, m;
-        string S, T;
-        cin >> S >> T;
-        n = S.length(), m = T.length();
-        unordered_map<char, int> pos;
-        int i = 0;
-        for (char c : {'A', 'C', 'G', 'T'})
-            pos[c] = i++;
-        vector<vector<int>> PolyS(4, vector<int>(n, 0));
-        vector<vector<int>> PolyT(4, vector<int>(m, 0));
-
-        for (int i{}; i < n; i++)
-            PolyS[pos[S[i]]][i] = 1;
-        for (int i = 0; i < m; i++)
-            PolyT[pos[T[m - i - 1]]][i] = 1; // Reversed T
-
-        vector<int> match(n + m - 1, 0);
-        for (char c : {'A', 'C', 'G', 'T'})
-        {
-            vector<int> conv = convolute(PolyS[pos[c]], PolyT[pos[c]]);
-            for (int i = 0; i < match.size(); i++)
-                match[i] += conv[i];
-        }
-        int minHamming = 1e9;
-        for (int i = m - 1; i < n; i++) // i is the ending position of pattern in S
-        {
-            int matches = match[i];
-            int mismatches = m - matches;
-            minHamming = min(minHamming, mismatches);
-        }
-        cout << minHamming;
+        string a, b;
+        cin >> a >> b;
+        cout << multiplyBigInt(a, b);
     }
     return 0;
 }

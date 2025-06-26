@@ -113,34 +113,66 @@ int main()
         int n, m;
         string S, T;
         cin >> S >> T;
-        n = S.length(), m = T.length();
-        unordered_map<char, int> pos;
-        int i = 0;
-        for (char c : {'A', 'C', 'G', 'T'})
-            pos[c] = i++;
-        vector<vector<int>> PolyS(4, vector<int>(n, 0));
-        vector<vector<int>> PolyT(4, vector<int>(m, 0));
+        n = S.length();
+        m = T.length();
+        vector<ll> S1(n);
+        for (int i = 0; i < n; i++)
+        {
+            if (S[i] == '*')
+                S1[i] = 0;
+            else
+                S1[i] = (S[i] - 'a' + 1);
+        }
 
-        for (int i{}; i < n; i++)
-            PolyS[pos[S[i]]][i] = 1;
+        vector<ll> T1(m);
         for (int i = 0; i < m; i++)
-            PolyT[pos[T[m - i - 1]]][i] = 1; // Reversed T
+        {
+            if (T[i] == '*')
+                T1[i] = 0;
+            else
+                T1[i] = (T[i] - 'a' + 1);
+        }
+        reverse(T1.begin(), T1.end());
 
-        vector<int> match(n + m - 1, 0);
-        for (char c : {'A', 'C', 'G', 'T'})
+        vector<ll> S2 = S1;
+        vector<ll> T2 = T1;
+
+        vector<ll> S3 = S1;
+        vector<ll> T3 = T1;
+
+        auto square = [](vector<ll> &v)
         {
-            vector<int> conv = convolute(PolyS[pos[c]], PolyT[pos[c]]);
-            for (int i = 0; i < match.size(); i++)
-                match[i] += conv[i];
-        }
-        int minHamming = 1e9;
-        for (int i = m - 1; i < n; i++) // i is the ending position of pattern in S
+            for (int i = 0; i < v.size(); i++)
+                v[i] = v[i] * v[i];
+        };
+
+        auto cube = [](vector<ll> &v)
         {
-            int matches = match[i];
-            int mismatches = m - matches;
-            minHamming = min(minHamming, mismatches);
+            for (int i = 0; i < v.size(); i++)
+                v[i] = v[i] * v[i] * v[i];
+        };
+
+        square(S2);
+        square(T2);
+        cube(S3);
+        cube(T3);
+
+        auto S3T1 = convolute(S3, T1);
+        auto S2T2 = convolute(S2, T2);
+        auto S1T3 = convolute(S1, T3);
+
+        string ans("");
+        for (int i = 0; i < n - m + 1; i++)
+        {
+            int a = S3T1[i + m - 1];
+            int b = S2T2[i + m - 1];
+            int c = S1T3[i + m - 1];
+            if (a - 2 * b + c == 0)
+                ans += "1";
+            else
+                ans += "0";
         }
-        cout << minHamming;
+        cout << ans << endl;
     }
     return 0;
 }

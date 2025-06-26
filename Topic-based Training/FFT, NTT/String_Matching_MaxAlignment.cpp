@@ -11,7 +11,7 @@ const double PI = acos(-1);
  * Transforms between coefficient and point-value representation
  * Time: O(n log n), Space: O(n)
  */
-void FFT(vector<cd> &coeff)
+void FFT(vector<cd> &coeff, bool inverse = false)
 {
     int n = coeff.size();
 
@@ -29,7 +29,7 @@ void FFT(vector<cd> &coeff)
     // Iterative FFT with on-the-fly root computation
     for (int k = 1; k < n; k *= 2)
     {
-        double ang = PI / k;
+        double ang = PI / k * (inverse ? -1 : 1);
         cd wlen(cos(ang), sin(ang));
         for (int i = 0; i < n; i += 2 * k)
         {
@@ -42,6 +42,11 @@ void FFT(vector<cd> &coeff)
                 w *= wlen;
             }
         }
+    }
+    if (inverse)
+    {
+        for (cd &x : coeff)
+            x /= n;
     }
 }
 
@@ -58,7 +63,7 @@ vector<T> convolute(const vector<T> &a, const vector<T> &b)
 
     vector<T> res(a.size() + b.size() - 1);
     int L = 32 - __builtin_clz(res.size()), n = 1 << L;
-    vector<cd> in(n), out(n);
+    vector<cd> in(n);
 
     // Convert template type to double for FFT
     for (int i = 0; i < a.size(); i++)
@@ -69,13 +74,11 @@ vector<T> convolute(const vector<T> &a, const vector<T> &b)
     FFT(in);
     for (cd &x : in)
         x *= x;
-    for (int i = 0; i < n; i++)
-        out[i] = in[-i & (n - 1)] - conj(in[i]);
-    FFT(out);
+    FFT(in, true);
 
     // Convert back to template type with proper rounding
     for (int i = 0; i < res.size(); i++)
-        res[i] = static_cast<T>(round(out[i].imag() / (4 * n)));
+        res[i] = static_cast<T>(round(in[i].imag() / 2.0));
 
     return res;
 }
