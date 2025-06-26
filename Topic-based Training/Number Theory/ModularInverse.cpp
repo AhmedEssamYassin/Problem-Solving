@@ -28,7 +28,7 @@ ll modPow(ll N, ll power, ll mod)
 ll modInverse(ll N, ll mod) // N and mod must be co-primes, i.e., gcd (N, mod) = 1
 {
     // If the mod is guaranteed to be prime, then the mod inverse is just:
-    // modPow(N, mod - 2, mod);
+    // return modPow(N, mod - 2, mod);
     return 1 < N ? mod - modInverse(mod % N, N) * mod / N : 1;
 }
 
