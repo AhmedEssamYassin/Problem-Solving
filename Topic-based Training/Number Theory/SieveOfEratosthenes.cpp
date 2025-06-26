@@ -8,12 +8,12 @@ void SieveOfEratosthenes(int N)
 {
     vector<bool> isPrime(N + 1, true); // Initially Assuming all numbers to be primes
     isPrime[0] = isPrime[1] = 0;       // 0 and 1 are NOT primes
-    for (int i{2}; i <= N; i++)
+    for (ll i{2}; i <= N; i++)
     {
         if (isPrime[i])
         {
             Prime.push_back(i);
-            for (int j = i * i; j <= N; j += i)
+            for (ll j = i * i; j <= N; j += i)
                 isPrime[j] = false;
         }
     }

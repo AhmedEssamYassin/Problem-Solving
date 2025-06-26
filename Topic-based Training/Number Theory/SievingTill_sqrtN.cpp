@@ -13,7 +13,7 @@ void SieveOfEratosthenes(int N)
     {
         if (isPrime[i])
         {
-            for (int j = i * i; j <= N; j += i)
+            for (ll j = i * i; j <= N; j += i)
                 isPrime[j] = false;
         }
     }

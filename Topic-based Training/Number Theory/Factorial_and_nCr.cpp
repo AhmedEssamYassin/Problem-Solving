@@ -5,9 +5,19 @@ using namespace std;
 
 const ll mod = (119 << 23) + 1; // = 998244353
 
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
+
+inline ll add64(const ll &a, const ll &b)
+{
+    double_size_t res = double_size_t(a) + b;
+    if (res >= mod)
+        res -= mod;
+    return res;
+}
+
 inline ll sub64(const ll &a, const ll &b)
 {
-    ll res = a - b;
+    double_size_t res = double_size_t(a) - b;
     if (res < 0)
         res += mod;
     if (res >= mod)
@@ -17,8 +27,9 @@ inline ll sub64(const ll &a, const ll &b)
 
 inline ll mult64(const ll &a, const ll &b)
 {
-    return __int128_t(a) * b % mod;
+    return double_size_t(a) * b % mod;
 }
+
 ll modPow(ll N, ll power, ll mod)
 {
     if (N % mod == 0 || N == 0)

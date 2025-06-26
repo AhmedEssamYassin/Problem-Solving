@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-const auto mod = 1000000007; // 1e9 + 7
+const ll mod = 1000000007; // 1e9 + 7
 #define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
 
 inline ll add64(const ll &a, const ll &b)
