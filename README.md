@@ -1,6 +1,6 @@
 <div align = "center" >
     
-# Problem solving roadmap for beginners to REALLY Advanced!
+# Problem solving roadmap for beginners to Advanced!
 ![GitHub Repo stars](https://img.shields.io/github/stars/AhmedEssamYassin/Problem-Solving?style=flat?labelColor=#697689)
 ![GitHub top language](https://img.shields.io/github/languages/top/AhmedEssamYassin/Problem-Solving?style=flat)
 </div>
@@ -95,6 +95,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 ---
 
 ## Advanced Data Structures
+- [Fast Fourier Transform (FFT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/FFT%2C%20NTT)
 - [Merge Sort Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Merge%20Sort%20Tree)
 - Segment Tree Beats
 - [Persistent Segment Trees](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Persistent%20Segment%20Tree)
