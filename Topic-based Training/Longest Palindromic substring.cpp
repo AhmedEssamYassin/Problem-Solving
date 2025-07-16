@@ -1,37 +1,45 @@
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
-bool Pal(string s)
+#define ll long long int
+#define endl "\n"
+
+bool isPalindrome(const string &s)
 {
-    int j=s.size()-1;
-    for(int i=0;i<s.size();i++)
+    for (int i = 0, j = s.size() - 1; i < j; i++, j--)
     {
-        if(s[i]!=s[j])
-        return false;
-        j--;
+        if (s[i] != s[j])
+            return false;
     }
     return true;
 }
-int main() 
+
+int main()
 {
     ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    
-    string s,r,t="";
-    cin>>s;
-    for(int i=0;i<s.length();i++)
+    cin.tie(nullptr);
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+    freopen("Output.txt", "w", stdout);
+#endif //! ONLINE_JUDGE
+    int t = 1;
+    // cin >> t;
+    while (t--)
     {
-        
-        for(int j=i+1;j<=s.length();j++)
+        string S, ans = "";
+        cin >> S;
+        for (int i = 0; i < S.length(); i++)
         {
-            r=s.substr(i,j-i);
-            if(Pal(r))
+            for (int j = i + 1; j < S.length(); j++)
             {
-                if(r.size()>t.size())
-                t=r;
+                string temp = S.substr(i, j - i + 1);
+                if (isPalindrome)
+                {
+                    if (temp.size() > ans.size())
+                        ans = temp;
+                }
             }
         }
+        cout << ans;
     }
-    cout<<t;
     return 0;
 }
