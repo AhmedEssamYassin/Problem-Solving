@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-// Works fine for N <= 1e5
+// Works fine for N <= 1e6
 vector<vector<int>> divisors;
 void precomputeDivisors(int N)
 {
@@ -14,7 +14,7 @@ void precomputeDivisors(int N)
             divisors[j].push_back(i);
     }
 }
-static int autoCall = (precomputeDivisors(100000), 0);
+static int autoCall = (precomputeDivisors(1000000), 0);
 
 int main()
 {
