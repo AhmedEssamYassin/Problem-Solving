@@ -27,15 +27,15 @@ inline ll mult64(const ll &a, const ll &b)
 	return a * b % mod;
 }
 
-struct Matrix2D
+struct Matrix2by2
 {
 	ll a[2][2] = {{0, 0}, {0, 0}};
 	// ==================== CONSTRUCTORS ====================
 	// Empty constructor
-	Matrix2D() {}
+	Matrix2by2() {}
 
 	// Value constructor
-	Matrix2D(ll a00, ll a01, ll a10, ll a11)
+	Matrix2by2(ll a00, ll a01, ll a10, ll a11)
 	{
 		a[0][0] = a00;
 		a[0][1] = a01;
@@ -44,7 +44,7 @@ struct Matrix2D
 	}
 
 	// Deep Copy constructor
-	Matrix2D(const Matrix2D &other)
+	Matrix2by2(const Matrix2by2 &other)
 	{
 		(*this)[0][0] = other[0][0];
 		(*this)[0][1] = other[0][1];
@@ -53,7 +53,7 @@ struct Matrix2D
 	}
 
 	// ==================== ASSIGNMENT OPERATOR ====================
-	Matrix2D &operator=(const Matrix2D &other)
+	Matrix2by2 &operator=(const Matrix2by2 &other)
 	{
 		(*this)[0][0] = other[0][0];
 		(*this)[0][1] = other[0][1];
@@ -77,10 +77,10 @@ struct Matrix2D
 	}
 
 	// ==================== ARITHMETIC OPERATORS ====================
-	// Matrix2D multiplication
-	Matrix2D operator*(const Matrix2D &other) const
+	// Matrix2by2 multiplication
+	Matrix2by2 operator*(const Matrix2by2 &other) const
 	{
-		Matrix2D product(0, 0, 0, 0);
+		Matrix2by2 product(0, 0, 0, 0);
 		for (int i = 0; i < 2; i++)
 		{
 			for (int j = 0; j < 2; j++)
@@ -92,14 +92,14 @@ struct Matrix2D
 		return product;
 	}
 
-	Matrix2D &operator*=(const Matrix2D &other)
+	Matrix2by2 &operator*=(const Matrix2by2 &other)
 	{
 		*this = *this * other;
 		return *this;
 	}
 
 	// Input stream operator
-	friend istream &operator>>(istream &is, Matrix2D &matrix)
+	friend istream &operator>>(istream &is, Matrix2by2 &matrix)
 	{
 		for (int i{}; i < 2; i++)
 			for (int j{}; j < 2; j++)
@@ -116,7 +116,7 @@ struct SegmentTree
 private:
 	struct Node
 	{
-		Matrix2D matrix;
+		Matrix2by2 matrix;
 		// Constructors
 		Node()
 		{
@@ -125,7 +125,7 @@ private:
 			matrix[1][0] = 0;
 			matrix[1][1] = 1;
 		}
-		Node(const Matrix2D &other) : matrix(other) {}
+		Node(const Matrix2by2 &other) : matrix(other) {}
 	};
 	int size;
 	vector<Node> seg;
@@ -135,7 +135,7 @@ private:
 		res.matrix = (leftNode.matrix * rightNode.matrix);
 		return res;
 	}
-	void build(int left, int right, int node, const vector<Matrix2D> &arr)
+	void build(int left, int right, int node, const vector<Matrix2by2> &arr)
 	{
 		if (left == right)
 		{
@@ -153,7 +153,7 @@ private:
 		// Returning to parent nodes
 		seg[node] = merge(seg[L], seg[R]);
 	}
-	void update(int left, int right, int node, int idx, const Matrix2D &other)
+	void update(int left, int right, int node, int idx, const Matrix2by2 &other)
 	{
 		if (left == right)
 		{
@@ -182,7 +182,7 @@ private:
 	}
 
 public:
-	SegmentTree(const vector<Matrix2D> &arr)
+	SegmentTree(const vector<Matrix2by2> &arr)
 	{
 		size = 1;
 		int n = arr.size();
@@ -191,11 +191,11 @@ public:
 		seg = vector<Node>(2 * size, Node());
 		build(0, size - 1, 0, arr);
 	}
-	void update(int idx, const Matrix2D &val)
+	void update(int idx, const Matrix2by2 &val)
 	{
 		update(0, size - 1, 0, idx, val);
 	}
-	Matrix2D query(int left, int right)
+	Matrix2by2 query(int left, int right)
 	{
 		Node ans = query(0, size - 1, 0, left, right);
 		return ans.matrix;
@@ -216,7 +216,7 @@ int main()
 #endif //! ONLINE_JUDGE
 	int N, M, L, R;
 	cin >> ::mod >> N >> M;
-	vector<Matrix2D> vc(N);
+	vector<Matrix2by2> vc(N);
 	for (int i{}; i < N; i++)
 		cin >> vc[i];
 	SegmentTree segTree(vc);
@@ -224,7 +224,7 @@ int main()
 	{
 		cin >> L >> R;
 		L--, R--; // To be 0-based
-		Matrix2D ans = segTree.query(L, R);
+		Matrix2by2 ans = segTree.query(L, R);
 		cout << ans[0][0] << " " << ans[0][1] << endl;
 		cout << ans[1][0] << " " << ans[1][1] << endl;
 		cout << endl;

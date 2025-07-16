@@ -28,15 +28,15 @@ inline ll mult64(const ll &a, const ll &b)
     return double_size_t(a) * b % mod;
 }
 
-struct Matrix2D
+struct Matrix2by2
 {
     ll a[2][2] = {{0, 0}, {0, 0}};
     // ==================== CONSTRUCTORS ====================
     // Empty constructor
-    Matrix2D() {}
+    Matrix2by2() {}
 
     // Value constructor
-    Matrix2D(ll a00, ll a01, ll a10, ll a11)
+    Matrix2by2(ll a00, ll a01, ll a10, ll a11)
     {
         a[0][0] = a00;
         a[0][1] = a01;
@@ -45,7 +45,7 @@ struct Matrix2D
     }
 
     // Deep Copy constructor
-    Matrix2D(const Matrix2D &other)
+    Matrix2by2(const Matrix2by2 &other)
     {
         (*this)[0][0] = other[0][0];
         (*this)[0][1] = other[0][1];
@@ -54,7 +54,7 @@ struct Matrix2D
     }
 
     // ==================== ASSIGNMENT OPERATOR ====================
-    Matrix2D &operator=(const Matrix2D &other)
+    Matrix2by2 &operator=(const Matrix2by2 &other)
     {
         (*this)[0][0] = other[0][0];
         (*this)[0][1] = other[0][1];
@@ -78,10 +78,10 @@ struct Matrix2D
     }
 
     // ==================== ARITHMETIC OPERATORS ====================
-    // Matrix2D multiplication
-    Matrix2D operator*(const Matrix2D &other) const
+    // Matrix2by2 multiplication
+    Matrix2by2 operator*(const Matrix2by2 &other) const
     {
-        Matrix2D product(0, 0, 0, 0);
+        Matrix2by2 product(0, 0, 0, 0);
         for (int i = 0; i < 2; i++)
         {
             for (int j = 0; j < 2; j++)
@@ -93,14 +93,14 @@ struct Matrix2D
         return product;
     }
 
-    Matrix2D &operator*=(const Matrix2D &other)
+    Matrix2by2 &operator*=(const Matrix2by2 &other)
     {
         *this = *this * other;
         return *this;
     }
 
     // Input stream operator
-    friend istream &operator>>(istream &is, Matrix2D &matrix)
+    friend istream &operator>>(istream &is, Matrix2by2 &matrix)
     {
         for (int i{}; i < 2; i++)
             for (int j{}; j < 2; j++)
@@ -109,9 +109,9 @@ struct Matrix2D
     }
 };
 
-Matrix2D matrixPow(Matrix2D mat, ll power)
+Matrix2by2 matrixPow(Matrix2by2 mat, ll power)
 {
-    Matrix2D res(1, 0, 0, 1); // Identity Matrix2D
+    Matrix2by2 res(1, 0, 0, 1); // Identity Matrix2by2
     while (power)
     {
         if (power & 1)
@@ -124,8 +124,8 @@ Matrix2D matrixPow(Matrix2D mat, ll power)
 
 ll F(ll N)
 {
-    Matrix2D fibMatrix(1, 1, 1, 0);
-    Matrix2D res = matrixPow(fibMatrix, N);
+    Matrix2by2 fibMatrix(1, 1, 1, 0);
+    Matrix2by2 res = matrixPow(fibMatrix, N);
     return res[0][1];
 }
 
