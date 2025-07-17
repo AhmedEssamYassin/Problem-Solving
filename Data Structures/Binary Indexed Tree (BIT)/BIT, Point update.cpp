@@ -4,33 +4,33 @@ using namespace std;
 #define endl "\n"
 
 // INVERSION COUNT IN AN ARRAY
-// Fenwick Tree: Binary Indexed Tree (BIT)
+
+/*
+Fenwick Tree: Binary Indexed Tree (BIT)
+1-based (because (0 & -0) would make an infinite loop)
+Works for invertible operations (such as Summation (+) and XOR (^))
+*/
 int N;
 int BIT[200010];
 
-int Low_bit(int X)
-{
-    return (X & -X);
-}
-
 void Update(int pos, const int &delta)
 {
-    for (int i = pos; i <= N; i += Low_bit(i))
+    for (int i = pos; i <= N; i += (i & -i))
         BIT[i] += delta;
 }
 
-ll Sum(int pos)
+ll query(int pos)
 {
     ll sum = 0;
-    for (int i = pos; i; i -= Low_bit(i))
+    for (int i = pos; i; i -= (i & -i))
         sum += BIT[i];
 
     return sum;
 }
 
-ll Range_sum(int L, int R)
+ll rangeQuery(int L, int R)
 {
-    return (Sum(R) - Sum(L));
+    return (query(R) - query(L));
 }
 
 int main()
@@ -41,7 +41,6 @@ int main()
     freopen("input.txt", "r", stdin);
     freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
-
     int t = 1;
     cin >> t;
     while (t--)
@@ -56,7 +55,7 @@ int main()
         ll ans = 0;
         for (int i = 1; i <= N; i++)
         {
-            ans += i - 1 - Sum(arr[i] - 1);
+            ans += i - 1 - query(arr[i] - 1);
             Update(arr[i], 1);
         }
         cout << ans << endl;

@@ -77,7 +77,7 @@ ll expFactor(ll N, int p)
 void factorialFactorize(ll N, map<ll, ll> &primeFactors)
 {
     ll ans{1};
-    for (const int &p : Prime)
+    for (const ll &p : Prime)
     {
         if (p > N)
             break;

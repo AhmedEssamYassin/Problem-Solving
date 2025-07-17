@@ -84,7 +84,6 @@ void precompute(ll maxSize)
 		sumB2[i] = add64(sumB2[i - 1], Pb2[i]);
 	}
 }
-
 static int autoCall = (precompute(1e5), 0);
 
 class Hash
