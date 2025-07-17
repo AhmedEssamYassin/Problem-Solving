@@ -12,7 +12,7 @@ inline T mult64(const T &a, const T &b, const T &mod)
 template <typename T>
 inline T add64(const T &a, const T &b, const T &mod)
 {
-    T res = a + b;
+    __int128_t res = __int128_t(a) + b;
     if (res >= mod)
         res -= mod;
     return res;

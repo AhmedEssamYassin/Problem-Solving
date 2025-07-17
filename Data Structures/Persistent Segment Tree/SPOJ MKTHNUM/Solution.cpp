@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-class compressedRange
+class CompressedRange
 {
 private:
 	vector<ll> init;
@@ -14,7 +14,7 @@ private:
 	}
 
 public:
-	compressedRange(vector<ll> &vec)
+	CompressedRange(vector<ll> &vec)
 	{
 		init = vec;
 		compress(init);
@@ -79,7 +79,7 @@ Node *merge(Node *leftNode, Node *rightNode, bool in_place = 0, Node *Current = 
 	}
 }
 
-Node *insert(Node *node, int left, int right, int i, int val) // Update for a single version
+Node *insert(Node *node, ll left, ll right, ll i, ll val) // Update for a single version
 {
 	if (left <= i && right >= i)
 	{
@@ -97,7 +97,7 @@ Node *insert(Node *node, int left, int right, int i, int val) // Update for a si
 	return node;
 }
 
-ll query(Node *Current, int left, int right, int leftQuery, int rightQuery)
+ll query(Node *Current, ll left, ll right, ll leftQuery, ll rightQuery)
 {
 	// [left, right] doesn't intersect with [leftQuery, rightQuery]
 	if (Current == nullptr || left > rightQuery || right < leftQuery)
@@ -114,18 +114,18 @@ ll query(Node *Current, int left, int right, int leftQuery, int rightQuery)
 
 // Interface
 
-Node *insert(Node *Current, int i, int val)
+Node *insert(Node *Current, ll i, ll val)
 {
 	return insert(Current, 0, N, i, val);
 }
 
-ll query(Node *Current, int left, int right)
+ll query(Node *Current, ll left, ll right)
 {
 	ll ans = query(Current, 0, N, left, right);
 	return ans;
 }
 
-ll ans(Node *f, Node *s, int k, int left = 0, int right = N)
+ll ans(Node *f, Node *s, ll k, ll left = 0, ll right = N)
 {
 	if (left == right)
 		return left;
@@ -154,7 +154,7 @@ int main()
 		vector<ll> vc(N);
 		for (int i{}; i < N; i++)
 			cin >> vc[i];
-		compressedRange comp(vc);
+		CompressedRange comp(vc);
 		Versions[0] = new Node(0); // To start Trees at index 1
 		for (int i{1}; i <= N; i++)
 			Versions[i] = insert(Versions[i - 1], comp.index(vc[i - 1]), 1);

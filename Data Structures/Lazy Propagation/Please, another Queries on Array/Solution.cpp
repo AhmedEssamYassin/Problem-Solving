@@ -6,14 +6,44 @@ using namespace std;
 const ll mod = 1e9 + 7;
 ll primes[100];
 map<int, int> pos;
-inline ll modBinExp(ll N, ll power, ll mod)
+
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
+inline ll add64(const ll &a, const ll &b)
 {
+	double_size_t res = double_size_t(a) + b;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
+
+inline ll sub64(const ll &a, const ll &b)
+{
+	double_size_t res = double_size_t(a) - b;
+	if (res < 0)
+		res += mod;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
+
+inline ll mult64(const ll &a, const ll &b)
+{
+	return double_size_t(a) * b % mod;
+}
+
+ll modPow(ll N, ll power)
+{
+	if (N % mod == 0 || N == 0)
+		return 0;
+	if (N == 1 || power == 0)
+		return 1;
+
 	ll res{1};
 	while (power)
 	{
 		if (power & 1)
-			res = (res * N) % mod;
-		N = (N * N) % mod;
+			res = mult64(res, N);
+		N = mult64(N, N);
 		power >>= 1;
 	}
 	return res;
@@ -54,7 +84,7 @@ void primeFactorize(ll N, ll &primeSet)
 {
 	if (N <= 1)
 		return;
-	if (not(N & 1))
+	if (!(N & 1))
 		Set_ith_bit(primeSet, pos[2]);
 
 	while (not(N & 1))
@@ -90,7 +120,7 @@ private:
 		}
 		Node operator*(const Node &RHS)
 		{
-			value = (value * RHS.value) % mod;
+			value = mult64(value, RHS.value);
 			primeSet |= RHS.primeSet;
 			return *this;
 		}
@@ -101,7 +131,7 @@ private:
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
-		res.value = (leftNode.value * rightNode.value) % mod;
+		res.value = mult64(leftNode.value, rightNode.value);
 		res.primeSet = (leftNode.primeSet | rightNode.primeSet);
 		return res;
 	}
@@ -129,8 +159,8 @@ private:
 		if (lazy[node].value == 1)
 			return;
 		// Propagate the value
-		ll val = modBinExp(lazy[node].value, right - left + 1, mod);
-		seg[node].value = (seg[node].value * val) % mod;
+		ll val = modPow(lazy[node].value, right - left + 1);
+		seg[node].value = mult64(seg[node].value, val);
 		seg[node].primeSet = (seg[node].primeSet | lazy[node].primeSet);
 		// If the node is not a leaf
 		if (left != right)
@@ -229,7 +259,7 @@ int main()
 			cin >> vc[i];
 		ll modInverse[63];
 		for (int i{}; i < 63; i++)
-			modInverse[i] = modBinExp(primes[i], mod - 2, mod);
+			modInverse[i] = modPow(primes[i], mod - 2); // mod inverse
 		LazySegmentTree segTree(vc);
 		while (Q--)
 		{
@@ -249,7 +279,7 @@ int main()
 				for (int i{}; i < 63; i++)
 				{
 					if ((primeSet & (1LL << i)))
-						res = (res * (primes[i] - 1) % mod * modInverse[i]) % mod;
+						res = mult64(res, mult64((primes[i] - 1), modInverse[i]));
 				}
 				cout << res << endl;
 			}

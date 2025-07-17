@@ -3,23 +3,22 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-const ll mod = 1e9 + 7;
-inline ll mult64(const ll &a, const ll &b)
+inline ll mult64(const ll &a, const ll &b, const ll &mod)
 {
     return __int128_t(a) * b % mod;
 }
 
-inline ll add64(const ll &a, const ll &b)
+inline ll add64(const ll &a, const ll &b, const ll &mod)
 {
-    ll res = a + b;
+    __int128_t res = __int128_t(a) + b;
     if (res >= mod)
         res -= mod;
     return res;
 }
 
-inline ll sub64(const ll &a, const ll &b)
+inline ll sub64(const ll &a, const ll &b, const ll &mod)
 {
-    ll res = a - b;
+    __int128_t res = __int128_t(a) - b;
     if (res < 0)
         res += mod;
     if (res >= mod)
@@ -27,7 +26,7 @@ inline ll sub64(const ll &a, const ll &b)
     return res;
 }
 
-ll modPow(ll N, ll power, ll mod)
+ll modPow(ll N, ll power, const ll &mod)
 {
     if (N % mod == 0 || N == 0)
         return 0;
@@ -37,8 +36,8 @@ ll modPow(ll N, ll power, ll mod)
     while (power)
     {
         if (power & 1)
-            res = mult64(res, N);
-        N = mult64(N, N);
+            res = mult64(res, N, mod);
+        N = mult64(N, N, mod);
         power >>= 1;
     }
     return res;

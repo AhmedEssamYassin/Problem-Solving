@@ -29,7 +29,7 @@ inline ll mult64(const ll &a, const ll &b)
     return double_size_t(a) * b % mod;
 }
 
-ll modPow(ll N, ll power, ll mod)
+ll modPow(ll N, ll power)
 {
     if (N % mod == 0 || N == 0)
         return 0;

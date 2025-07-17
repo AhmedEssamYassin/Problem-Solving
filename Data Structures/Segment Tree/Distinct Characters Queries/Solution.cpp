@@ -11,13 +11,12 @@ struct SegmentTree
 private:
 	struct Node
 	{
-		int countDistinct{};
 		bitset<26> distinct; // All is cleared by default
 		// Constructors
 		Node() {}
-		Node(char val, int cnt)
+		Node(int cPos)
 		{
-			countDistinct = cnt;
+			distinct.set(cPos);
 		}
 	};
 	int size;
@@ -26,7 +25,6 @@ private:
 	{
 		Node res;
 		res.distinct = (leftNode.distinct | rightNode.distinct);
-		res.countDistinct = res.distinct.count();
 		return res;
 	}
 	void build(int left, int right, int node, string &arr)
@@ -34,7 +32,7 @@ private:
 		if (left == right) // Leaf Node (single element)
 		{
 			if (left < arr.size()) // Making sure we are inside the boundaries of the array
-				seg[node].countDistinct = 1, seg[node].distinct[arr[left] - 'a'] = 1;
+				seg[node] = arr[left] - 'a';
 			return;
 		}
 		// Building left node
@@ -50,7 +48,6 @@ private:
 	{
 		if (left == right)
 		{
-			seg[node].countDistinct = 1;
 			seg[node].distinct.reset();
 			seg[node].distinct[val - 'a'] = 1;
 			return;
@@ -66,7 +63,7 @@ private:
 	{
 		// Out of range
 		if (right < leftQuery || left > rightQuery)
-			return Node(0, 0); // A value that doesn't affect the solution
+			return Node(); // A value that doesn't affect the solution
 
 		// The whole range is the answer
 		if (left >= leftQuery && right <= rightQuery)
@@ -85,7 +82,7 @@ public:
 		int n = arr.size();
 		while (size < n)
 			size <<= 1;
-		seg = vector<Node>(2 * size, Node(0, 0));
+		seg = vector<Node>(2 * size, Node());
 		build(0, size - 1, 0, arr);
 	}
 	void update(int idx, const ll &val)
@@ -95,7 +92,7 @@ public:
 	ll query(int left, int right)
 	{
 		Node ans = query(0, size - 1, 0, left, right);
-		return ans.countDistinct;
+		return ans.distinct.count();
 	}
 
 #undef L

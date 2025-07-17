@@ -6,7 +6,6 @@ using namespace std;
 const ll mod = (119 << 23) + 1; // = 998244353
 
 #define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
-
 inline ll add64(const ll &a, const ll &b)
 {
     double_size_t res = double_size_t(a) + b;
@@ -30,7 +29,7 @@ inline ll mult64(const ll &a, const ll &b)
     return double_size_t(a) * b % mod;
 }
 
-ll modPow(ll N, ll power, ll mod)
+ll modPow(ll N, ll power)
 {
     if (N % mod == 0 || N == 0)
         return 0;
@@ -58,7 +57,7 @@ void preCompute(int N)
     for (int i = 1; i <= N; i++)
         factorial[i] = mult64(i, factorial[i - 1]);
 
-    invFactorial[N] = modPow(factorial[N], mod - 2, mod);
+    invFactorial[N] = modPow(factorial[N], mod - 2);
     for (int i = N - 1; i >= 0; i--)
         invFactorial[i] = mult64(invFactorial[i + 1], (i + 1));
 }

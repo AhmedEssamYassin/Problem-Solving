@@ -6,7 +6,7 @@ using namespace std;
 template <typename T>
 inline T add64(const T &a, const T &b, const T &mod)
 {
-    ll res = (ll)a + b;
+    __int128_t res = (__int128_t)a + b;
     if (res >= mod)
         res -= mod;
     return res;
@@ -15,7 +15,7 @@ inline T add64(const T &a, const T &b, const T &mod)
 template <typename T>
 inline T sub64(const T &a, const T &b, const T &mod)
 {
-    ll res = (ll)a - b;
+    __int128_t res = (__int128_t)a - b;
     if (res < 0)
         res += mod;
     if (res >= mod)

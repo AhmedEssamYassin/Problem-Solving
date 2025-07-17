@@ -53,7 +53,7 @@ Node *merge(Node *leftNode, Node *rightNode, bool in_place = 0, Node *Current = 
 	}
 }
 
-Node *insert(Node *node, int left, int right, int i, int val) // Update for a single version
+Node *insert(Node *node, ll left, ll right, ll i, ll val) // Update for a single version
 {
 	if (left <= i && right >= i)
 	{
@@ -71,7 +71,7 @@ Node *insert(Node *node, int left, int right, int i, int val) // Update for a si
 	return node;
 }
 
-ll query(Node *Current, int left, int right, int leftQuery, int rightQuery)
+ll query(Node *Current, ll left, ll right, ll leftQuery, ll rightQuery)
 {
 	// [left, right] doesn't intersect with [leftQuery, rightQuery]
 	if (Current == nullptr || left > rightQuery || right < leftQuery)
@@ -88,12 +88,12 @@ ll query(Node *Current, int left, int right, int leftQuery, int rightQuery)
 
 // Interface
 
-Node *insert(Node *Current, int i, int val)
+Node *insert(Node *Current, ll i, ll val)
 {
 	return insert(Current, 0, N, i, val);
 }
 
-ll query(Node *Current, int left, int right)
+ll query(Node *Current, ll left, ll right)
 {
 	ll ans = query(Current, 0, N, left, right);
 	return ans;

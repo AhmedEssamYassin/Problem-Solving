@@ -4,22 +4,40 @@ using namespace std;
 #define endl "\n"
 
 const ll mod = 1e9 + 7;
-ll mult(const initializer_list<ll> &init)
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
+
+inline ll add64(const ll &a, const ll &b)
 {
-	ll res{1};
-	for (const ll &x : init)
-		res = (res % mod * x % mod) % mod;
+	double_size_t res = double_size_t(a) + b;
+	if (res >= mod)
+		res -= mod;
 	return res;
 }
 
-ll modBinExp(ll N, ll power, ll mod)
+inline ll sub64(const ll &a, const ll &b)
+{
+	double_size_t res = double_size_t(a) - b;
+	if (res < 0)
+		res += mod;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
+
+inline ll mult64(const ll &a, const ll &b)
+{
+	return double_size_t(a) * b % mod;
+}
+
+ll modPow(ll N, ll power)
 {
 	ll res{1};
+	N %= mod;
 	while (power)
 	{
 		if (power & 1)
-			res = mult({res, N});
-		N = mult({N, N});
+			res = mult64(res, N);
+		N = mult64(N, N);
 		power >>= 1;
 	}
 	return res;
@@ -39,8 +57,8 @@ private:
 		Node(const ll &val)
 		{
 			sum1 = val;
-			sum2 = mult({val, val});
-			sum3 = mult({val, val, val});
+			sum2 = mult64(val, val);
+			sum3 = mult64(val, mult64(val, val));
 		}
 	};
 	struct LazyNode
@@ -51,8 +69,7 @@ private:
 		LazyNode(const ll &val) : value(val) {}
 		LazyNode operator+(const LazyNode &RHS)
 		{
-			value = (value + RHS.value);
-			value %= mod;
+			value = add64(value, RHS.value);
 			return *this;
 		}
 	};
@@ -62,12 +79,9 @@ private:
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
-		res.sum1 = (leftNode.sum1 + rightNode.sum1);
-		res.sum2 = (leftNode.sum2 + rightNode.sum2);
-		res.sum3 = (leftNode.sum3 + rightNode.sum3);
-		res.sum1 %= mod;
-		res.sum2 %= mod;
-		res.sum3 %= mod;
+		res.sum1 = add64(leftNode.sum1, rightNode.sum1);
+		res.sum2 = add64(leftNode.sum2, rightNode.sum2);
+		res.sum3 = add64(leftNode.sum3, rightNode.sum3);
 		return res;
 	}
 	void build(int left, int right, int node, const vector<ll> &arr)
@@ -91,19 +105,17 @@ private:
 		// Propagate the value
 		const ll &upd = lazy[node].value;
 		ll &X = seg[node].sum3;
-		X = (X + mult({(right - left + 1), modBinExp(upd, 3, mod)})) % mod;
-		X = (X + 3 * mult({seg[node].sum1, modBinExp(upd, 2, mod)})) % mod;
-		X = (X + 3 * mult({seg[node].sum2, upd})) % mod;
-		X %= mod;
+		X = (X + mult64((right - left + 1), modPow(upd, 3))) % mod;
+		X = (X + 3 * mult64(seg[node].sum1, modPow(upd, 2))) % mod;
+		X = (X + 3 * mult64(seg[node].sum2, upd)) % mod;
 		////////////////////////
 		ll &Y = seg[node].sum2;
-		Y = (Y + mult({(right - left + 1), modBinExp(upd, 2, mod)}));
-		Y = (Y + 2 * mult({seg[node].sum1, upd}));
+		Y = (Y + mult64((right - left + 1), modPow(upd, 2)));
+		Y = (Y + 2 * mult64(seg[node].sum1, upd));
 		Y %= mod;
 		///////////////////////
 		ll &Z = seg[node].sum1;
-		Z += mult({upd, right - left + 1});
-		Z %= mod;
+		Z = add64(Z, mult64(upd, right - left + 1));
 		// If the node is not a leaf
 		if (left != right)
 		{
@@ -171,7 +183,7 @@ public:
 	ll query(int left, int right)
 	{
 		Node ans = query(0, size - 1, 0, left, right);
-		return ans.sum3 % mod;
+		return ans.sum3;
 	}
 
 #undef L

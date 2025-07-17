@@ -3,12 +3,22 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-vector<ll> countDivisors(1000001, 1);
+vector<int> cntDivisors;
+void precomputeSigma0(int N)
+{
+	cntDivisors.assign(N + 1, 0);
+	for (int i = 1; i <= N; i++)
+	{
+		for (int j = i; j <= N; j += i)
+			cntDivisors[j]++;
+	}
+}
+static int autoCall = (precomputeSigma0(1000000), 0);
 
 template <typename T>
 T D(T N)
 {
-	return countDivisors[N];
+	return cntDivisors[N];
 }
 
 struct SegmentTree
@@ -125,12 +135,6 @@ int main()
 	// cin >> t;
 	while (t--)
 	{
-		for (int i{2}; i <= 1000000; i++)
-		{
-			for (int j = i; j <= 1000000; j += i)
-				countDivisors[j] += 1;
-		}
-
 		cin >> N >> M;
 		vector<ll> vc(N);
 		for (int i{}; i < N; i++)
