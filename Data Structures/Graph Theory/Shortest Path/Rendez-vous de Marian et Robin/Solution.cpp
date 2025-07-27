@@ -14,7 +14,7 @@ struct Edge
 };
 
 vector<bool> horse;
-void Dijkstra(const vector<Edge> adj[], vector<array<ll, 2>> &dist, int N, int src)
+void Dijkstra(const vector<vector<Edge>> &adj, vector<array<ll, 2>> &dist, int N, int src)
 {
 	dist.assign(N + 1, array<ll, 2>{INF, INF});
 	priority_queue<Edge> prQue;
@@ -56,7 +56,7 @@ int main()
 		for (int i{}, node; i < h; i++)
 			cin >> node, horse[node] = true;
 
-		vector<Edge> adj[N + 1];
+		vector<vector<Edge>> adj(N + 1);
 		while (M--)
 		{
 			ll u, v, w;

@@ -18,7 +18,7 @@ struct Edge
 	}
 };
 ll ans;
-void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src)
+void Dijkstra(const vector<vector<Edge>> &adj, vector<ll> &dist, int N, int src)
 {
 	dist.assign(N + 1, INF);
 	priority_queue<Edge> prQue;
@@ -53,7 +53,7 @@ int main()
 	while (t--)
 	{
 		cin >> N >> M >> K;
-		vector<Edge> adj[N + 1];
+		vector<vector<Edge>> adj(N + 1);
 		while (M--)
 		{
 			ll u, v, w;

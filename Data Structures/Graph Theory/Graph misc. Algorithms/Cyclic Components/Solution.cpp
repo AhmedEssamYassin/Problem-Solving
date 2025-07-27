@@ -6,7 +6,7 @@ using namespace std;
 bitset<200005> vis;
 vector<ll> degree(200005, 0), vertices;
 
-void dfs(const vector<ll> adj[], ll u)
+void dfs(const vector<vector<ll>> &adj, ll u)
 {
 	vis[u] = 1;
 	vertices.push_back(u);
@@ -31,7 +31,7 @@ int main()
 	while (t--)
 	{
 		cin >> N >> m;
-		vector<ll> adj[N + 1];
+		vector<vector<ll>> adj(N + 1);
 		for (int i{}; i < m; i++)
 		{
 			ll u, v;

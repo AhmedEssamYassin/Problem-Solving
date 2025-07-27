@@ -18,10 +18,7 @@ struct Trie
 	};
 
 	Node *root;
-	Trie()
-	{
-		root = new Node();
-	}
+	Trie() { root = new Node(); }
 
 	void insert(const string &str, int j)
 	{
@@ -72,12 +69,6 @@ struct Trie
 		// return cur->prefix;
 	}
 
-	// Checks if a node is a leaf node (doesn't have any children)
-	bool isLeaf(Node *root)
-	{
-		return root->character.empty();
-	}
-
 	// Recursive function to delete a word from given Trie (Assuming it's been inserted before)
 	void erase(const string &str, int pos)
 	{
@@ -91,11 +82,23 @@ struct Trie
 		cur->isEnd--;
 		cur->idxEnd.erase(pos);
 	}
-	~Trie()
+	~Trie() = default;
+	// Don't clean unless you need this memory because this makes it much slower
+	void clean()
 	{
-		for (auto &[character, node] : root->character)
-			delete (node);
-		delete (root);
+		stack<Node *> stk;
+		stk.push(root);
+		while (!stk.empty())
+		{
+			Node *node = stk.top();
+			stk.pop();
+			for (auto &[_, child] : node->character)
+			{
+				if (child)
+					stk.push(child);
+			}
+			delete node;
+		}
 	}
 };
 
@@ -108,10 +111,10 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
-	ll N, Q;
 	// cin >> t;
 	while (t--)
 	{
+		ll N, Q;
 		cin >> N;
 		vector<string> vc(N);
 		Trie trie;

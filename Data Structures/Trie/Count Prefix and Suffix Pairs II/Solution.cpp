@@ -17,10 +17,7 @@ struct Trie
 	};
 
 	Node *root;
-	Trie()
-	{
-		root = new Node();
-	}
+	Trie() { root = new Node(); }
 
 	void insert(const string &str)
 	{
@@ -54,11 +51,23 @@ struct Trie
 		return cnt;
 	}
 
-	~Trie()
+	~Trie() = default;
+	// Don't clean unless you need this memory because this makes it much slower
+	void clean()
 	{
-		for (auto &[character, node] : root->character)
-			delete (node);
-		delete (root);
+		stack<Node *> stk;
+		stk.push(root);
+		while (!stk.empty())
+		{
+			Node *node = stk.top();
+			stk.pop();
+			for (auto &[_, child] : node->character)
+			{
+				if (child)
+					stk.push(child);
+			}
+			delete node;
+		}
 	}
 };
 class Solution

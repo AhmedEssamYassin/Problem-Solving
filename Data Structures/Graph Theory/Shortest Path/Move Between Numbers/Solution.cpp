@@ -12,7 +12,7 @@ struct Edge
 	bool operator<(const Edge &E) const { return cost > E.cost; }
 };
 
-void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src, int dest)
+void Dijkstra(const vector<vector<Edge>> &adj, vector<ll> &dist, int N, int src, int dest)
 {
 	dist.assign(N + 1, INF);
 	priority_queue<Edge> prQue;
@@ -68,7 +68,7 @@ int main()
 
 			return (cnt == 17);
 		};
-		vector<Edge> adj[N + 1];
+		vector<vector<Edge>> adj(N + 1);
 		for (int i{}; i < N; i++)
 		{
 			for (int j{}; j < N; j++)

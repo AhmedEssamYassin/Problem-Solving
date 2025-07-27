@@ -20,7 +20,7 @@ struct Edge
 };
 ll a, b;
 set<ll> st;
-void dfs1(vector<Edge> adj[], ll u, ll prev, ll XOR)
+void dfs1(const vector<vector<Edge>> &adj, ll u, ll prev, ll XOR)
 {
 	if (u == b)
 		return;
@@ -33,7 +33,7 @@ void dfs1(vector<Edge> adj[], ll u, ll prev, ll XOR)
 	}
 }
 
-bool dfs2(vector<Edge> adj[], ll u, ll prev, ll XOR)
+bool dfs2(const vector<vector<Edge>> &adj, ll u, ll prev, ll XOR)
 {
 	// NOT the node `b`, but this cost is recorded as a path from node `a`
 	// that means we can go directly from that node to `b`, or teleport from that node to `b`
@@ -63,7 +63,7 @@ int main()
 	while (t--)
 	{
 		cin >> N >> a >> b;
-		vector<Edge> adj[N + 1];
+		vector<vector<Edge>> adj(N + 1);
 		while (--N)
 		{
 			ll u, v, w;

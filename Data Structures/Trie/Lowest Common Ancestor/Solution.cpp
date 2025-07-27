@@ -16,10 +16,7 @@ struct Trie
 		}
 	};
 	Node *root;
-	Trie()
-	{
-		root = new Node();
-	}
+	Trie() { root = new Node(); }
 	void insert(const string &str)
 	{
 		Node *cur = root;
@@ -42,6 +39,24 @@ struct Trie
 			cur = cur->mp[C];
 		}
 		return cur->prefix;
+	}
+	~Trie() = default;
+	// Don't clean unless you need this memory because this makes it much slower
+	void clean()
+	{
+		stack<Node *> stk;
+		stk.push(root);
+		while (!stk.empty())
+		{
+			Node *node = stk.top();
+			stk.pop();
+			for (auto &[_, child] : node->mp)
+			{
+				if (child)
+					stk.push(child);
+			}
+			delete node;
+		}
 	}
 };
 int main()

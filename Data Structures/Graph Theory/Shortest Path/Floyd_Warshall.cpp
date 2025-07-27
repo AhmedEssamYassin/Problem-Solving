@@ -34,7 +34,7 @@ void DetectNegativeCycles(int N)
         }
     }
 }
-void Floyd_Warshall(vector<Edge> graph[], int N)
+void Floyd_Warshall(const vector<vector<Edge>> &graph, int N)
 {
     dist.assign(N + 1, vector<ll>(N + 1, INF));
     for (int u = 1; u <= N; u++)
@@ -75,7 +75,7 @@ int main()
     while (t--)
     {
         cin >> N >> M >> Q;
-        vector<Edge> graph[N + 1];
+        vector<vector<Edge>> graph(N + 1);
         while (M--)
         {
             ll u, v, w;

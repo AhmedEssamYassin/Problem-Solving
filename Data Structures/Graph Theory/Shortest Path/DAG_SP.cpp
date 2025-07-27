@@ -16,7 +16,7 @@ struct Edge
 };
 
 // Kahn’s Algorithm
-vector<int> KahnTopologicalSort(vector<Edge> adj[], int N)
+vector<int> KahnTopologicalSort(const vector<vector<Edge>> &adj, int N)
 {
     vector<int> inDegree(N + 1);
     for (int u = 1; u <= N; u++)
@@ -57,7 +57,7 @@ vector<int> KahnTopologicalSort(vector<Edge> adj[], int N)
     return result;
 }
 
-vector<ll> shortestPath(vector<Edge> adj[], int N, int src, int dest)
+vector<ll> shortestPath(const vector<vector<Edge>> &adj, int N, int src, int dest)
 {
     // Find the topological sort of graph
     vector<int> topologicalOrder = KahnTopologicalSort(adj, N);
@@ -97,7 +97,7 @@ int main()
     while (t--)
     {
         cin >> N >> M;
-        vector<Edge> adj[N + 1];
+        vector<vector<Edge>> adj(N + 1);
         while (M--)
         {
             ll u, v, w;

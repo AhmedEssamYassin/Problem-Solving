@@ -17,7 +17,7 @@ vector<int> entryTime, low;
 map<pair<int, int>, bool> isBridge;
 int timer;
 
-void dfs(vector<Edge> adj[], int u, int par = -1)
+void dfs(const vector<vector<Edge>> &adj, int u, int par = -1)
 {
     visited[u] = true;
     entryTime[u] = low[u] = timer++;
@@ -41,7 +41,7 @@ void dfs(vector<Edge> adj[], int u, int par = -1)
     }
 }
 // Multiple edges CANNOT be bridge edges
-void findBridges(vector<Edge> adj[], int N)
+void findBridges(const vector<vector<Edge>> &adj, int N)
 {
     timer = 0;
     visited.assign(N + 1, false);

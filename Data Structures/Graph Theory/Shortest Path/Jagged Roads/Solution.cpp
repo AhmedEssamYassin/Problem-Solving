@@ -12,7 +12,7 @@ struct Edge
 	bool operator<(const Edge &E) const { return cost > E.cost; }
 };
 
-void Dijkstra(const vector<Edge> edges[], vector<long double> &dist, int N, int src)
+void Dijkstra(const vector<vector<Edge>> &edges, vector<long double> &dist, int N, int src)
 {
 	dist.assign(N + 1, INF);
 	priority_queue<Edge> prQue;
@@ -46,7 +46,7 @@ int main()
 	while (t--)
 	{
 		cin >> N >> M;
-		vector<Edge> edges[N + 1];
+		vector<vector<Edge>> edges(N + 1);
 		cout << fixed << setprecision(12);
 		for (int i{}; i < M; i++)
 		{

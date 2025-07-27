@@ -3,7 +3,8 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-struct binaryTrie
+const int BITS = 30; // change 30 based on number of bits in maximum number
+struct BinaryTrie
 {
     struct Node
     {
@@ -11,34 +12,35 @@ struct binaryTrie
         int freq[2];
         Node()
         {
-            child[0] = child[1] = 0;
+            child[0] = child[1] = nullptr;
             freq[0] = freq[1] = 0;
         }
     };
     Node *root = new Node();
 
-    binaryTrie()
-    {
-        insert(0);
-    }
-    void insert(ll n)
+    BinaryTrie() {}
+    void insert(ll x)
     {
         Node *cur = root;
-        for (int i = 30; i >= 0; i--) // change 30 based on number of bits in maximum number
+        for (int i = BITS; i >= 0; i--)
         {
-            int idx = ((n >> i) & 1); // same as (n & (1 << i)), but this avoids any overflow
+            int idx = ((x >> i) & 1); // same as (x & (1 << i)), but this avoids any overflow
             if (cur->child[idx] == 0)
                 cur->child[idx] = new Node();
             cur->freq[idx]++;
             cur = cur->child[idx];
         }
     }
-    void erase(ll n, int i, Node *cur)
+
+    // Recursively erases the number `x` from the binary trie starting at bit index `i`, using the current node `cur`.
+    // Decrements the frequency count of the path corresponding to the bits of `x`.
+    // If any child node's frequency becomes zero after deletion, it deallocates that node to save memory.
+    void erase(ll x, int i, Node *cur)
     {
         if (i == -1)
             return;
-        int idx = ((n >> i) & 1);
-        erase(n, i - 1, cur->child[idx]);
+        int idx = ((x >> i) & 1);
+        erase(x, i - 1, cur->child[idx]);
         cur->freq[idx]--;
         if (cur->freq[idx] == 0)
         {
@@ -46,19 +48,29 @@ struct binaryTrie
             cur->child[idx] = NULL;
         }
     }
-    ll maxXor(ll n)
+
+    // Returns the maximum XOR value obtainable by XORing input `x` with a number already inserted in the binary trie.
+    // Along with the maximum XOR value, it also returns the number from the trie that gives this XOR.
+    pair<ll, ll> maxXor(ll x)
     {
         Node *cur = root;
-        ll ret = 0;
-        for (int i = 30; i >= 0; i--) // change 30 based on number of bits in maximum number
+        ll retXor = 0, number = 0;
+        for (int i = BITS; i >= 0; i--)
         {
-            ll idx = ((n >> i) & 1); // same as (n & (1 << i)), but this avoids any overflow
-            if (cur->child[idx ^ 1] != 0)
-                cur = cur->child[idx ^ 1], ret |= (1 << i);
+            ll idx = ((x >> i) & 1);
+            if (cur->child[idx ^ 1])
+            {
+                retXor |= (1LL << i);
+                number |= ((idx ^ 1LL) << i);
+                cur = cur->child[idx ^ 1];
+            }
             else
+            {
+                number |= (idx << i);
                 cur = cur->child[idx];
+            }
         }
-        return ret;
+        return {retXor, number};
     }
 };
 

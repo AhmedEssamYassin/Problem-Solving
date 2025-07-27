@@ -10,8 +10,8 @@ Fenwick Tree: Binary Indexed Tree (BIT)
 1-based (because (0 & -0) would make an infinite loop)
 Works for invertible operations (such as Summation (+) and XOR (^))
 */
-int N;
-int BIT[200010];
+const int N = 200010;
+int BIT[N + 1];
 
 void Update(int pos, const int &delta)
 {
@@ -30,7 +30,9 @@ ll query(int pos)
 
 ll rangeQuery(int L, int R)
 {
-    return (query(R) - query(L));
+    if (L > R || L <= 0)
+        return 0; // Neutral value
+    return (query(R) - query(L - 1));
 }
 
 int main()
@@ -45,6 +47,7 @@ int main()
     cin >> t;
     while (t--)
     {
+        int N;
         cin >> N;
         int *arr = new int[N + 1];
         // Inputting and initializing

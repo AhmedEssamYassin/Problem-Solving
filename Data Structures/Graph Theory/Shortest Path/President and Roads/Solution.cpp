@@ -23,7 +23,7 @@ vector<int> entryTime, low;
 map<int, bool> isBridge;
 int timer;
 
-void dfs(vector<Edge> adj[], int u, int par = -1)
+void dfs(const vector<vector<Edge>> &adj, int u, int par = -1)
 {
 	visited[u] = true;
 	entryTime[u] = low[u] = timer++;
@@ -47,7 +47,7 @@ void dfs(vector<Edge> adj[], int u, int par = -1)
 	}
 }
 // Multiple edges CANNOT be bridge edges
-void findBridges(vector<Edge> adj[], int N)
+void findBridges(const vector<vector<Edge>> &adj, int N)
 {
 	timer = 0;
 	visited.assign(N + 1, false);
@@ -60,7 +60,7 @@ void findBridges(vector<Edge> adj[], int N)
 	}
 }
 
-void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src)
+void Dijkstra(const vector<vector<Edge>> &adj, vector<ll> &dist, int N, int src)
 {
 	dist.assign(N + 1, INF);
 	priority_queue<Edge> prQue;
@@ -92,7 +92,7 @@ int main()
 	while (t--)
 	{
 		cin >> N >> M >> S >> T;
-		vector<Edge> adj[N + 1], revAdj[N + 1], unDirectedAdj[N + 1];
+		vector<vector<Edge>> adj(N + 1), revAdj(N + 1), unDirectedAdj(N + 1);
 		vector<array<ll, 3>> edges;
 		while (M--)
 		{

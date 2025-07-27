@@ -20,7 +20,7 @@ struct Edge
 };
 
 bitset<100010> isBad;
-void Dijkstra(const vector<Edge> adj[], int N, int src, int dest)
+void Dijkstra(const vector<vector<Edge>> &adj, int N, int src, int dest)
 {
 	vector<ll> dist(N + 1, INF);
 	priority_queue<Edge> prQue;
@@ -70,7 +70,7 @@ int main()
 			cin >> city;
 			isBad[city] = 1;
 		}
-		vector<Edge> adj[N + 1];
+		vector<vector<Edge>> adj(N + 1);
 		for (int i{}; i < M; i++)
 		{
 			ll u, v;

@@ -16,7 +16,7 @@ struct Edge
     }
 };
 
-void Dijkstra(const vector<Edge> adj[], vector<ll> &dist, int N, int src, int dest)
+void Dijkstra(const vector<vector<Edge>> &adj, vector<ll> &dist, int N, int src, int dest)
 {
     dist.assign(N + 1, INF);
     vector<ll> parent(N + 1, -1);
@@ -66,7 +66,7 @@ int main()
     while (t--)
     {
         cin >> N >> M;
-        vector<Edge> adj[N + 1];
+        vector<vector<Edge>> adj(N + 1);
         while (M--)
         {
             ll u, v, w;
