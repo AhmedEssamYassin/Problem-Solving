@@ -14,37 +14,15 @@ private:
 		vector<ll> range;
 		// Constructors
 		Node() {}
-		Node(ll val)
-		{
-			range.push_back(val);
-		}
+		Node(const ll &value) { range.push_back(value); }
 	};
 	int size;
 	vector<Node> seg;
-	vector<ll> allValues;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
-		int i = 0; // Index for leftNode
-		int j = 0; // Index for rightNode
-
-		// Merge the two sorted ranges
-		while (i < leftNode.range.size() && j < rightNode.range.size())
-		{
-			if (leftNode.range[i] <= rightNode.range[j])
-				res.range.push_back(leftNode.range[i++]);
-			else
-				res.range.push_back(rightNode.range[j++]);
-		}
-
-		// Add any remaining elements from leftNode
-		while (i < leftNode.range.size())
-			res.range.push_back(leftNode.range[i++]);
-
-		// Add any remaining elements from rightNode
-		while (j < rightNode.range.size())
-			res.range.push_back(rightNode.range[j++]);
-
+		res.range.resize(leftNode.range.size() + rightNode.range.size());
+		std::merge(leftNode.range.begin(), leftNode.range.end(), rightNode.range.begin(), rightNode.range.end(), res.range.begin());
 		return res;
 	}
 	void build(int left, int right, int node, const vector<ll> &arr)
@@ -78,14 +56,16 @@ private:
 		// Updating while returning to parent nodes
 		seg[node] = merge(seg[L], seg[R]);
 	}
-	int countLessEqual(int left, int right, int node, int leftQuery, int rightQuery, ll x)
+
+	template <typename Pred>
+	int countPred(int left, int right, int node, int leftQuery, int rightQuery, ll x, Pred pred)
 	{
 		if (right < leftQuery || left > rightQuery)
 			return 0;
 		if (left >= leftQuery && right <= rightQuery)
-			return upper_bound(seg[node].range.begin(), seg[node].range.end(), x) - seg[node].range.begin();
-		return countLessEqual(left, mid, L, leftQuery, rightQuery, x) +
-			   countLessEqual(mid + 1, right, R, leftQuery, rightQuery, x);
+			return pred(seg[node].range.begin(), seg[node].range.end(), x);
+		return countPred(left, mid, L, leftQuery, rightQuery, x, pred) +
+			   countPred(mid + 1, right, R, leftQuery, rightQuery, x, pred);
 	}
 
 public:
@@ -95,9 +75,6 @@ public:
 		int n = arr.size();
 		while (size < n)
 			size <<= 1;
-		allValues = arr;
-		sort(allValues.begin(), allValues.end());
-		allValues.erase(unique(allValues.begin(), allValues.end()), allValues.end());
 		seg = vector<Node>(2 * size, Node());
 		build(0, size - 1, 0, arr);
 	}
@@ -105,10 +82,25 @@ public:
 	{
 		update(0, size - 1, 0, idx, val);
 	}
-	int countGreaterThan(int leftQuery, int rightQuery, ll x)
+	int countLess(int leftQuery, int rightQuery, ll x)
 	{
-		int countLessEq = countLessEqual(0, size - 1, 0, leftQuery, rightQuery, x);
-		return (rightQuery - leftQuery + 1) - countLessEq;
+		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
+						 { return std::lower_bound(begin, end, x) - begin; });
+	}
+	int countLessEq(int leftQuery, int rightQuery, ll x)
+	{
+		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
+						 { return std::upper_bound(begin, end, x) - begin; });
+	}
+	int countGreater(int leftQuery, int rightQuery, ll x)
+	{
+		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
+						 { return end - std::upper_bound(begin, end, x); });
+	}
+	int countGreaterEq(int leftQuery, int rightQuery, ll x)
+	{
+		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
+						 { return end - std::lower_bound(begin, end, x); });
 	}
 #undef L
 #undef R
@@ -139,7 +131,7 @@ int main()
 			ll L, R, k;
 			cin >> L >> R >> k;
 			L--, R--;
-			cout << segTree.countGreaterThan(L, R, k) << endl;
+			cout << segTree.countGreater(L, R, k) << endl;
 		}
 	}
 	return 0;
