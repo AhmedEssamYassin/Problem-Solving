@@ -9,7 +9,7 @@ inline T mult64(const T &a, const T &b, T mod)
     return (__int128_t)a * b % mod;
 }
 
-vector<ll> Prime, LPF;
+vector<int> Prime, LPF;
 bitset<1000001> isPrime;
 
 void linearSieveOfEratosthenes(int N)
@@ -17,14 +17,14 @@ void linearSieveOfEratosthenes(int N)
     isPrime.set(); // Initially Assuming all numbers to be primes
     LPF.resize(N + 1);
     isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
-    for (int i{2}; i <= N; i++)
+    for (long long i{2}; i <= N; i++)
     {
         if (isPrime[i])
         {
             Prime.push_back(i);
             LPF[i] = i; // The least prime factor of a prime number is itself
         }
-        for (int j{}; j < (int)Prime.size() and i * Prime[j] <= N and Prime[j] <= LPF[i]; j++)
+        for (long long j{}; j < (int)Prime.size() && i * Prime[j] <= N && Prime[j] <= LPF[i]; j++)
         {
             isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
             LPF[i * Prime[j]] = Prime[j];
@@ -56,7 +56,7 @@ ll expFactor(ll N, int p)
 void factorialFactorize(ll N, map<ll, ll> &primeFactors)
 {
     ll ans{1};
-    for (const int &p : Prime)
+    for (const ll &p : Prime)
     {
         if (p > N)
             break;
@@ -83,12 +83,12 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
     int t = 1;
-    ll N, M;
+    ll N;
     cin >> t;
     while (t--)
     {
-        cin >> N >> M;
-        cout << countDivisors(N, M) << endl;
+        cin >> N;
+        cout << countDivisors(N, 1e9 + 7) << endl;
     }
     return 0;
 }

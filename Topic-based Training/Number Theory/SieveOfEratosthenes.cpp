@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-vector<ll> Prime;
+vector<int> Prime;
 void SieveOfEratosthenes(int N)
 {
     vector<bool> isPrime(N + 1, true); // Initially Assuming all numbers to be primes

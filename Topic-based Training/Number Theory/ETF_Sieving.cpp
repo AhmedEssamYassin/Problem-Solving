@@ -10,7 +10,7 @@ void precomputePhi(int N)
     LPF.assign(N + 1, 0);
     phi.resize(N + 1);
     phi[1] = 1;
-    for (int i = 2; i <= N; i++)
+    for (long long i = 2; i <= N; i++)
     {
         if (LPF[i] == 0)
         {
@@ -26,7 +26,7 @@ void precomputePhi(int N)
             else
                 phi[i] = phi[i / LPF[i]] * (LPF[i] - 1);
         }
-        for (int j = 0; j < (int)Prime.size() && Prime[j] <= LPF[i] && i * Prime[j] <= N; j++)
+        for (long long j = 0; j < (int)Prime.size() && Prime[j] <= LPF[i] && i * Prime[j] <= N; j++)
             LPF[i * Prime[j]] = Prime[j];
     }
 }

@@ -166,58 +166,27 @@ T modPow(T N, T power, T mod)
 }
 
 template <typename T>
-bool checkComposite(T N, T a, T d, int s)
+bool isPrime(T N)
 {
-    T X = modPow(a, d, N);
-    if (X == 1 || X == N - 1)
-        return false; // Not composite
-
-    for (int r = 1; r < s; r++)
-    {
-        X = mult128(X, X, N);
-        if (X == 1 || X == N - 1)
-            return false; // Not composite
-    }
-    return true; // Composite
-}
-
-template <typename T>
-bool Miller_Rabin(T N, int K = 5) // k is the number of trials (bases). If k increases the accuracy increases
-{
+    if (N < 2 || N % 6 % 4 != 1)
+        return (N | 1) == 3;
     T d = N - 1;
     int s{};
     while (~s & 1)
         d >>= 1, ++s;
-
-    for (const T &a : {11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47})
+    for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
     {
-        if (N == a)
-            return true;
-        if (checkComposite(N, a, d, s))
+        T p = modPow(a % N, d, N), i = s;
+        while (p != 1 && p != N - 1 && a % N && i--)
+            p = mult128(p, p, N);
+        if (p != N - 1 && i != s)
             return false;
     }
     return true;
 }
 
 template <typename T>
-bool isPrime(T N)
-{
-    if (N < 2)
-        return false;
-
-    if (N <= 3)
-        return true;
-    if (N == 5 || N == 7)
-        return true;
-
-    if (!(N & 1) || N % 3 == 0 || N % 5 == 0 || N % 7 == 0)
-        return false;
-
-    return Miller_Rabin(N);
-}
-
-template <typename T>
-void Factor(T N, map<T, T> &primeFactors)
+void primeFactorize(T N, map<T, T> &primeFactors)
 {
     if (N == 1)
         return;
@@ -225,8 +194,8 @@ void Factor(T N, map<T, T> &primeFactors)
     if (!isPrime(N))
     {
         T Y = Pollard_Brent(N);
-        Factor(Y, primeFactors);
-        Factor(N / Y, primeFactors);
+        primeFactorize(Y, primeFactors);
+        primeFactorize(N / Y, primeFactors);
     }
     else
     {
@@ -235,32 +204,26 @@ void Factor(T N, map<T, T> &primeFactors)
     }
 }
 
-template <typename T>
-void primeFactorize(T N, map<T, T> &primeFactors) // Use a vector if generating ALL factors
-{
-    Factor(N, primeFactors);
-    // Sort if you use a vector and order matters!
-    // sort(primeFactors.begin(), primeFactors.end());
-}
-
 // As a rule of thumb, if you inevitably generate all factors, use sqrt(N) factorization.
 template <typename T>
 void getAllFactors(T N, vector<T> &factors)
 {
-    vector<T> primeFactors;
-    primeFactorize(N, primeFactors);
-    factors.push_back(1);
-    for (const T &p : primeFactors)
-    {
-        ll len = factors.size();
-        for (ll i{}; i < len; i++)
-            factors.push_back(p * factors[i]);
+    factors = {1};
+    map<T, T> freq;
+    primeFactorize(N, freq);
 
-        set<ll> distinctDivisors(factors.begin(), factors.end());
-        factors.clear();
-        for (const ll &it : distinctDivisors)
-            factors.push_back(it);
+    for (auto &[p, cnt] : freq)
+    {
+        vector<T> temp;
+        T pw = 1;
+        for (int i = 0; i <= cnt; i++, pw *= p)
+        {
+            for (const T &f : factors)
+                temp.push_back(f * pw);
+        }
+        factors.swap(temp);
     }
+    sort(factors.begin(), factors.end());
 }
 
 template <typename T>

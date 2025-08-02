@@ -27,22 +27,22 @@ T modPow(T N, T power, T mod)
     return res;
 }
 
-vector<ll> Prime, LPF;
-bitset<10000001> isPrime;
-vector<ll> cntPrimes;
+vector<int> Prime, LPF;
+bitset<100000001> isPrime;
+vector<int> cntPrimes;
 void linearSieveOfEratosthenes(int N)
 {
     isPrime.set(); // Initially Assuming all numbers to be primes
     LPF.resize(N + 1);
     isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
-    for (int i{2}; i <= N; i++)
+    for (long long i{2}; i <= N; i++)
     {
         if (isPrime[i])
         {
             Prime.push_back(i);
             LPF[i] = i; // The least prime factor of a prime number is itself
         }
-        for (int j{}; j < (int)Prime.size() and i * Prime[j] <= N and Prime[j] <= LPF[i]; j++)
+        for (long long j{}; j < (int)Prime.size() && i * Prime[j] <= N && Prime[j] <= LPF[i]; j++)
         {
             isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
             LPF[i * Prime[j]] = Prime[j];
@@ -52,7 +52,7 @@ void linearSieveOfEratosthenes(int N)
     for (int i = 1; i <= N; i++)
         cntPrimes[i] = cntPrimes[i - 1] + isPrime[i];
 }
-static int autoCall = (linearSieveOfEratosthenes(1e7), 0);
+static int autoCall = (linearSieveOfEratosthenes(1e8), 0);
 
 // Calculating the exponent of a prime `p` in N! (Legendre's Formula)
 int sumOfBin(ll N, int base)

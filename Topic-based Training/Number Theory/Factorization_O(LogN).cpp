@@ -5,21 +5,21 @@ using namespace std;
 
 // This Factorizes any number in log(N) time, but N <= 1000'000'0
 
-vector<ll> Prime, LPF;
+vector<int> Prime, LPF;
 bitset<1000001> isPrime;
 void linearSieveOfEratosthenes(int N)
 {
     isPrime.set(); // Initially Assuming all numbers to be primes
     LPF.resize(N + 1);
     isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
-    for (int i{2}; i <= N; i++)
+    for (long long i{2}; i <= N; i++)
     {
         if (isPrime[i])
         {
             Prime.push_back(i);
             LPF[i] = i; // The least prime factor of a prime number is itself
         }
-        for (int j{}; j < (int)Prime.size() and i * Prime[j] <= N and Prime[j] <= LPF[i]; j++)
+        for (long long j{}; j < (int)Prime.size() && i * Prime[j] <= N && Prime[j] <= LPF[i]; j++)
         {
             isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
             LPF[i * Prime[j]] = Prime[j];

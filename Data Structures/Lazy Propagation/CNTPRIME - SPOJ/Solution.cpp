@@ -10,11 +10,11 @@ void Sieve_Of_Eratosthenes(int N)
 	isPrime.set();
 	isPrime[0] = 0;
 	isPrime[1] = 0;
-	for (int i{2}; i * i <= N; i++)
+	for (long long i{2}; i * i <= N; i++)
 	{
 		if (isPrime[i])
 		{
-			for (int j = 2 * i; j <= N; j += i)
+			for (long long j = i * i; j <= N; j += i)
 				isPrime[j] = 0; // Crossing out all the multiples of prime numbers
 		}
 	}
