@@ -15,9 +15,7 @@ namespace bigNumber
         {
             a >= mod ? a -= mod : 0;
             if (b & 1)
-            {
                 result += a, result >= mod ? result -= mod : 0;
-            }
         }
         return result;
     }
