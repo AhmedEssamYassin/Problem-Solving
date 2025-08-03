@@ -39,54 +39,23 @@ T modPow(T N, T power, T mod)
 }
 
 template <typename T>
-bool checkComposite(T N, T a, T d, int s)
+bool isPrime(T N)
 {
-    T X = modPow(a, d, N);
-    if (X == 1 || X == N - 1)
-        return false; // Not composite
-
-    for (int r = 1; r < s; r++)
-    {
-        X = mult64(X, X, N);
-        if (X == 1 || X == N - 1)
-            return false; // Not composite
-    }
-    return true; // Composite
-}
-
-template <typename T>
-bool Miller_Rabin(T N, int K = 5) // k is the number of trials (bases). If k increases the accuracy increases
-{
+    if (N < 2 || N % 6 % 4 != 1)
+        return (N | 1) == 3;
     T d = N - 1;
     int s{};
     while (~s & 1)
         d >>= 1, ++s;
-
-    for (const T &a : {11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47})
+    for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
     {
-        if (N == a)
-            return true;
-        if (checkComposite(N, a, d, s))
+        T p = modPow(a % N, d, N), i = s;
+        while (p != 1 && p != N - 1 && a % N && i--)
+            p = mult64(p, p, N);
+        if (p != N - 1 && i != s)
             return false;
     }
     return true;
-}
-
-template <typename T>
-bool isPrime(T N)
-{
-    if (N < 2)
-        return false;
-
-    if (N <= 3)
-        return true;
-    if (N == 5 || N == 7)
-        return true;
-
-    if (!(N & 1) || N % 3 == 0 || N % 5 == 0 || N % 7 == 0)
-        return false;
-
-    return Miller_Rabin(N);
 }
 
 template <typename T>
