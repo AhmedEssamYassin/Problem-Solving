@@ -49,6 +49,7 @@ T modPow(T N, T power, T mod)
     }
     return res;
 }
+
 template <typename T>
 bool isPrime(T N)
 {
@@ -56,9 +57,9 @@ bool isPrime(T N)
         return (N | 1) == 3;
     T d = N - 1;
     int s{};
-    while (~s & 1)
+    while (!(d & 1))
         d >>= 1, ++s;
-    for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
+    for (const T &a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022})
     {
         T p = modPow(a % N, d, N), i = s;
         while (p != 1 && p != N - 1 && a % N && i--)

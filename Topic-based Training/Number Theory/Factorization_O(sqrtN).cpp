@@ -3,7 +3,6 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-// As a rule of thumb, if you inevitably generate all factors, use sqrt(N) factorization.
 void getAllFactors(ll N, vector<ll> &factors)
 {
     for (ll d = 1; d * d <= N; d++)

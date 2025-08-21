@@ -44,11 +44,11 @@ bool checkComposite(T N, T a, T d, int s)
 }
 
 template <typename T>
-bool Miller_Rabin(T N, int K = 5) // k is the number of trials (bases). If k increases the accuracy increases
+bool Miller_Rabin(T N)
 {
     T d = N - 1;
     int s{};
-    while (~s & 1)
+    while (!(d & 1))
         d >>= 1, ++s;
 
     for (const T &a : {11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47})

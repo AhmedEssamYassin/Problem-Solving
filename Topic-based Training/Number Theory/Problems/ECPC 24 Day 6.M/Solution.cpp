@@ -8,6 +8,20 @@ namespace bigNumber
 {
 	using u128 = __uint128_t;
 
+	// ---------- 64-bit limb helpers (fast) ----------
+	static inline void mult64(uint64_t a, uint64_t b, uint64_t &lo, uint64_t &hi)
+	{
+		__uint128_t p = (__uint128_t)a * b;
+		lo = (uint64_t)p;
+		hi = (uint64_t)(p >> 64);
+	}
+	static inline uint64_t add64(uint64_t a, uint64_t b, uint64_t &carry)
+	{
+		__uint128_t s = (__uint128_t)a + b + carry;
+		carry = (uint64_t)(s >> 64);
+		return (uint64_t)s;
+	}
+	// Fallback generic (slow): kept for setup (e.g., computing R^2 mod N once)
 	u128 mult128(u128 a, u128 b, u128 mod)
 	{
 		u128 result = 0;
@@ -19,59 +33,68 @@ namespace bigNumber
 		}
 		return result;
 	}
-
-	static u128 mult(u128 x, u128 y, u128 &high)
+	// ---------- Montgomery (CIOS, 2x64-bit limbs) ----------
+	// Compute n0' = -N^{-1} mod 2^64 (low limb only)
+	static inline uint64_t inv64_2k(uint64_t n0)
 	{
-		const size_t shift = sizeof(x) * 4;
-		u128 a = x >> shift, b = (x << shift) >> shift;
-		u128 c = y >> shift, d = (y << shift) >> shift;
-		u128 ac = a * c;
-		u128 ad = a * d;
-		u128 bc = b * c;
-		u128 bd = b * d;
-		u128 carry = ((ad << shift) >> shift) + ((bc << shift) >> shift) + (bd >> shift);
-		high = ac + (ad >> shift) + (bc >> shift) + (carry >> shift);
-		return (ad << shift) + (bc << shift) + bd;
-	}
-	u128 montMult(u128 a, u128 b, u128 N, u128 N_neg_inv)
-	{
-		u128 Th, Tl, m, mNh, mNl;
-		Tl = mult(a, b, Th);
-		m = Tl * N_neg_inv;
-		mNl = mult(m, N, mNh);
-		bool lc = Tl + mNl < Tl;
-		u128 th = Th + mNh + lc;
-		bool hc = (th < Th) || (th == Th && lc);
-
-		if (hc > 0 || th >= N)
-			th = th - N;
-
-		return th;
+		uint64_t x = 1; // initial approx
+		for (int i = 6; i > 0; i--)
+			x = (__uint128_t)x * (2 - (__uint128_t)n0 * x);
+		return x; // x ≡ n0^{-1}
 	}
 
-	inline pair<u128, u128> montModInv(u128 m)
+	inline pair<u128, u128> montModInv(u128 N)
 	{
-		const size_t shift = sizeof(m) * 8 - 1;
-		u128 a = u128(1) << shift;
-		u128 u = 1;
-		u128 v = 0;
+		return {0, (u128)(0 - inv64_2k(N))};
+	}
 
-		while (a)
+	// Fast Montgomery multiplication: returns a*b*R^{-1} mod N, where R=2^128
+	inline u128 montMult(u128 a, u128 b, u128 N, u128 N_n0prime)
+	{
+		uint64_t n0 = (uint64_t)N, n1 = (uint64_t)(N >> 64);
+		uint64_t a0 = (uint64_t)a, a1 = (uint64_t)(a >> 64);
+		uint64_t b0 = (uint64_t)b, b1 = (uint64_t)(b >> 64);
+		uint64_t n0p = (uint64_t)N_n0prime;
+		uint64_t t0 = 0, t1 = 0, t2 = 0;
+
+		auto round_step = [&](uint64_t ai)
 		{
-			a >>= 1;
-			if (u & 1)
-			{
-				u = ((u ^ m) >> 1) + (u & m);
-				v = (v >> 1) + (u128(1) << shift);
-			}
-			else
-			{
-				u >>= 1;
-				v >>= 1;
-			}
-		}
+			uint64_t lo, hi, carry;
+			// t += ai * b
+			mult64(ai, b0, lo, hi);
+			carry = 0;
+			t0 = add64(t0, lo, carry);
+			t1 = add64(t1, hi, carry);
+			t2 = add64(t2, 0, carry);
+			mult64(ai, b1, lo, hi);
+			carry = 0;
+			t1 = add64(t1, lo, carry);
+			t2 = add64(t2, hi, carry);
+			// m = t0 * n0' (mod 2^64)
+			uint64_t m = (uint64_t)((__uint128_t)t0 * n0p);
+			// t += m * N
+			mult64(m, n0, lo, hi);
+			carry = 0;
+			t0 = add64(t0, lo, carry);
+			t1 = add64(t1, hi, carry);
+			t2 = add64(t2, 0, carry);
+			mult64(m, n1, lo, hi);
+			carry = 0;
+			t1 = add64(t1, lo, carry);
+			t2 = add64(t2, hi, carry);
+			// shift by one limb
+			t0 = t1;
+			t1 = t2;
+			t2 = 0;
+		};
 
-		return {u, v};
+		round_step(a0);
+		round_step(a1);
+
+		__uint128_t res = (((__uint128_t)t1 << 64) | t0);
+		if (res >= N)
+			res -= N;
+		return (u128)res;
 	}
 }
 using namespace bigNumber;
@@ -170,9 +193,9 @@ bool isPrime(T N)
 		return (N | 1) == 3;
 	T d = N - 1;
 	int s{};
-	while (~s & 1)
+	while (!(d & 1))
 		d >>= 1, ++s;
-	for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
+	for (const T &a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022})
 	{
 		T p = modPow(a % N, d, N), i = s;
 		while (p != 1 && p != N - 1 && a % N && i--)
@@ -202,7 +225,6 @@ void primeFactorize(T N, map<T, T> &primeFactors)
 	}
 }
 
-// As a rule of thumb, if you inevitably generate all factors, use sqrt(N) factorization.
 template <typename T>
 void getAllFactors(T N, vector<T> &factors)
 {
