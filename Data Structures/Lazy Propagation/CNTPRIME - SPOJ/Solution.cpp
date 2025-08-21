@@ -5,7 +5,7 @@ using namespace std;
 
 bitset<1000001> isPrime;
 
-void Sieve_Of_Eratosthenes(int N)
+void SieveOfEratosthenes(int N)
 {
 	isPrime.set();
 	isPrime[0] = 0;
@@ -160,7 +160,7 @@ int main()
 	int t = 1;
 	ll N, Q;
 	cin >> t;
-	Sieve_Of_Eratosthenes(1000000);
+	SieveOfEratosthenes(1000000);
 	for (int T = 1; T <= t; T++)
 	{
 		cout << "Case " << T << ":" << endl;
