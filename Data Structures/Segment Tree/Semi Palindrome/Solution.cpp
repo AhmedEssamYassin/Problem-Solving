@@ -220,7 +220,7 @@ private:
 	};
 	int size;
 	vector<Node> seg;
-	Node merge(Node &leftNode, Node &rightNode)
+	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
 		res.forwardHash = (leftNode.forwardHash + rightNode.forwardHash);
@@ -281,7 +281,7 @@ public:
 		int n = arr.size();
 		while (size < n)
 			size <<= 1;
-		seg = vector<Node>(2 * size, 0);
+		seg = vector<Node>(2 * size);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int idx, const ll &val)
@@ -322,6 +322,7 @@ bool canBePalindrome(SegmentTree &segTree, int st, int end)
 	// (impossible case because we only check if it's not a palindrome, so there must be a mis-match)
 	if (idx == -1) // If there is NO any mis-match
 		return true;
+
 	return (segTree.query(i + idx + 1, j).forwardHash == segTree.query(l, k - idx - 1).backwardHash);
 }
 

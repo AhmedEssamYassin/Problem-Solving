@@ -220,7 +220,7 @@ private:
 	};
 	int size;
 	vector<Node> seg;
-	Node merge(Node &leftNode, Node &rightNode)
+	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
 		res.forwardHash = (leftNode.forwardHash + rightNode.forwardHash);
@@ -281,7 +281,7 @@ public:
 		int n = arr.size();
 		while (size < n)
 			size <<= 1;
-		seg = vector<Node>(2 * size, 0);
+		seg = vector<Node>(2 * size);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int idx, const ll &val)

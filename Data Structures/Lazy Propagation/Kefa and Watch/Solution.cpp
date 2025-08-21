@@ -236,16 +236,15 @@ private:
 		{
 			if (left < str.size())
 				seg[node] = str[left];
+
+			return;
 		}
-		else
-		{
-			// Recursively build the left child
-			build(left, mid, L, str);
-			// Recursively build the right child
-			build(mid + 1, right, R, str);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively build the left child
+		build(left, mid, L, str);
+		// Recursively build the right child
+		build(mid + 1, right, R, str);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	void push(int left, int right, int node)
 	{
@@ -279,16 +278,14 @@ private:
 
 			// Apply the update immediately
 			push(left, right, node);
+			return;
 		}
-		else
-		{
-			// Recursively update the left child
-			update(left, mid, L, leftQuery, rightQuery, val);
-			// Recursively update the right child
-			update(mid + 1, right, R, leftQuery, rightQuery, val);
-			// Merge the children values
-			seg[node] = merge(seg[L], seg[R]);
-		}
+		// Recursively update the left child
+		update(left, mid, L, leftQuery, rightQuery, val);
+		// Recursively update the right child
+		update(mid + 1, right, R, leftQuery, rightQuery, val);
+		// Merge the children values
+		seg[node] = merge(seg[L], seg[R]);
 	}
 	Node query(int left, int right, int node, int leftQuery, int rightQuery)
 	{
