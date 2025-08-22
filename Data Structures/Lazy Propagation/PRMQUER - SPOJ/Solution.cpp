@@ -5,7 +5,7 @@ using namespace std;
 
 bitset<10000001> isPrime;
 
-void SieveOfEratosthenes(ll N)
+void sieveOfEratosthenes(ll N)
 {
 	isPrime.set(); // Initially Assuming all numbers to be primes
 
@@ -194,7 +194,7 @@ int main()
 #endif //! ONLINE_JUDGE
 	int t = 1;
 	ll N, Q;
-	SieveOfEratosthenes(10000000);
+	sieveOfEratosthenes(10000000);
 	// cin >> t;
 	while (t--)
 	{
