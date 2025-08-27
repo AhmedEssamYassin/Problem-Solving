@@ -4,6 +4,12 @@ using namespace std;
 #define u128 __uint128_t
 #define endl "\n"
 
+// Use mult64() if the number fits in 64 bits, otherwise change all to mult128() (slower)
+template <typename T>
+inline T mult64(const T &a, const T &b, T mod)
+{
+    return (__int128_t)a * b % mod;
+}
 namespace bigNumber
 {
     using u128 = __uint128_t;

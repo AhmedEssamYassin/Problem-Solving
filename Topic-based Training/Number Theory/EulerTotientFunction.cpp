@@ -103,7 +103,7 @@ T Phi(T N)
     map<T, T> pf;
     primeFactorize(N, pf);
     T ans = 1;
-    for (auto &[p, exp] : pf)
+    for (auto &[p, exp] : pf) // O(log² N)
         ans *= (binPow(p, exp) - binPow(p, exp - 1));
     return ans;
 }

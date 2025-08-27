@@ -4,6 +4,12 @@ using namespace std;
 #define u128 __uint128_t
 #define endl "\n"
 
+// Use mult64() if the number fits in 64 bits, otherwise change all to mult128() (slower)
+template <typename T>
+inline T mult64(const T &a, const T &b, T mod)
+{
+    return (__int128_t)a * b % mod;
+}
 namespace bigNumber
 {
     using u128 = __uint128_t;
@@ -180,8 +186,8 @@ T modPow(T N, T power, T mod)
     while (power)
     {
         if (power & 1)
-            res = mult128(res, N, mod);
-        N = mult128(N, N, mod);
+            res = mult64(res, N, mod);
+        N = mult64(N, N, mod);
         power >>= 1;
     }
     return res;
@@ -200,7 +206,7 @@ bool isPrime(T N)
     {
         T p = modPow(a % N, d, N), i = s;
         while (p != 1 && p != N - 1 && a % N && i--)
-            p = mult128(p, p, N);
+            p = mult64(p, p, N);
         if (p != N - 1 && i != s)
             return false;
     }
@@ -249,7 +255,7 @@ T Phi(T N)
     map<T, T> pf;
     primeFactorize(N, pf);
     T ans = 1;
-    for (auto &[p, exp] : pf)
+    for (auto &[p, exp] : pf) // O(log² N)
         ans *= (binPow(p, exp) - binPow(p, exp - 1));
     return ans;
 }

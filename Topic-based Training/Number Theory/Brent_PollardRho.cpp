@@ -4,6 +4,7 @@ using namespace std;
 #define i128 __int128_t
 #define endl "\n"
 
+// Use mult64() if the number fits in 64 bits, otherwise change all to mult128() (slower)
 template <typename T>
 inline T mult64(const T &a, const T &b, T mod)
 {
@@ -32,7 +33,7 @@ inline T mult128(T a, T b, T mod)
 template <typename T>
 inline T F(T x, T c, T mod) // Pollard-rho function
 {
-    return (mult128(x, x, mod) + c) % mod;
+    return (mult64(x, x, mod) + c) % mod;
 }
 
 template <typename T>
@@ -77,7 +78,7 @@ T Pollard_Brent(T N)
             for (size_t i = 0; i < m && i < L - k; i++)
             {
                 X = F(X, C, N);
-                q = mult128(q, __abs(Xt - X), N);
+                q = mult64(q, __abs(Xt - X), N);
             }
             gcdVal = __gcd(q, N);
             k += m;
@@ -107,8 +108,8 @@ T modPow(T N, T power, T mod)
     while (power)
     {
         if (power & 1)
-            res = mult128(res, N, mod);
-        N = mult128(N, N, mod);
+            res = mult64(res, N, mod);
+        N = mult64(N, N, mod);
         power >>= 1;
     }
     return res;
@@ -127,7 +128,7 @@ bool isPrime(T N)
     {
         T p = modPow(a % N, d, N), i = s;
         while (p != 1 && p != N - 1 && a % N && i--)
-            p = mult128(p, p, N);
+            p = mult64(p, p, N);
         if (p != N - 1 && i != s)
             return false;
     }
