@@ -1,103 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ll long long int
-#define u128 __uint128_t
+#define i128 __int128_t
 #define endl "\n"
-
-namespace bigNumber
-{
-    using u128 = __uint128_t;
-
-    // ---------- 64-bit limb helpers (fast) ----------
-    static inline void mult64(uint64_t a, uint64_t b, uint64_t &lo, uint64_t &hi)
-    {
-        __uint128_t p = (__uint128_t)a * b;
-        lo = (uint64_t)p;
-        hi = (uint64_t)(p >> 64);
-    }
-    static inline uint64_t add64(uint64_t a, uint64_t b, uint64_t &carry)
-    {
-        __uint128_t s = (__uint128_t)a + b + carry;
-        carry = (uint64_t)(s >> 64);
-        return (uint64_t)s;
-    }
-    // Fallback generic (slow): kept for setup (e.g., computing R^2 mod N once)
-    u128 mult128(u128 a, u128 b, u128 mod)
-    {
-        u128 result = 0;
-        for (a %= mod; b > 0; a <<= 1, b >>= 1)
-        {
-            a >= mod ? a -= mod : 0;
-            if (b & 1)
-                result += a, result >= mod ? result -= mod : 0;
-        }
-        return result;
-    }
-    // ---------- Montgomery (CIOS, 2x64-bit limbs) ----------
-    // Compute n0' = -N^{-1} mod 2^64 (low limb only)
-    static inline uint64_t inv64_2k(uint64_t n0)
-    {
-        uint64_t x = 1; // initial approx
-        for (int i = 6; i > 0; i--)
-            x = (__uint128_t)x * (2 - (__uint128_t)n0 * x);
-        return x; // x ≡ n0^{-1}
-    }
-
-    inline pair<u128, u128> montModInv(u128 N)
-    {
-        return {0, (u128)(0 - inv64_2k(N))};
-    }
-
-    // Fast Montgomery multiplication: returns a*b*R^{-1} mod N, where R=2^128
-    inline u128 montMult(u128 a, u128 b, u128 N, u128 N_n0prime)
-    {
-        uint64_t n0 = (uint64_t)N, n1 = (uint64_t)(N >> 64);
-        uint64_t a0 = (uint64_t)a, a1 = (uint64_t)(a >> 64);
-        uint64_t b0 = (uint64_t)b, b1 = (uint64_t)(b >> 64);
-        uint64_t n0p = (uint64_t)N_n0prime;
-        uint64_t t0 = 0, t1 = 0, t2 = 0;
-
-        auto round_step = [&](uint64_t ai)
-        {
-            uint64_t lo, hi, carry;
-            // t += ai * b
-            mult64(ai, b0, lo, hi);
-            carry = 0;
-            t0 = add64(t0, lo, carry);
-            t1 = add64(t1, hi, carry);
-            t2 = add64(t2, 0, carry);
-            mult64(ai, b1, lo, hi);
-            carry = 0;
-            t1 = add64(t1, lo, carry);
-            t2 = add64(t2, hi, carry);
-            // m = t0 * n0' (mod 2^64)
-            uint64_t m = (uint64_t)((__uint128_t)t0 * n0p);
-            // t += m * N
-            mult64(m, n0, lo, hi);
-            carry = 0;
-            t0 = add64(t0, lo, carry);
-            t1 = add64(t1, hi, carry);
-            t2 = add64(t2, 0, carry);
-            mult64(m, n1, lo, hi);
-            carry = 0;
-            t1 = add64(t1, lo, carry);
-            t2 = add64(t2, hi, carry);
-            // shift by one limb
-            t0 = t1;
-            t1 = t2;
-            t2 = 0;
-        };
-
-        round_step(a0);
-        round_step(a1);
-
-        __uint128_t res = (((__uint128_t)t1 << 64) | t0);
-        if (res >= N)
-            res -= N;
-        return (u128)res;
-    }
-}
-using namespace bigNumber;
 
 template <typename T>
 inline T add64(const T &a, const T &b, const T &mod)
@@ -109,11 +14,15 @@ inline T add64(const T &a, const T &b, const T &mod)
 }
 
 template <typename T>
-inline T F(T x, T c, T mod, T inv) // Pollard-rho function
+inline T mult64(const T &a, const T &b, T mod)
 {
-    x = montMult(x, x, mod, inv);
-    x = x >= mod - c ? x - mod + c : x + c;
-    return x;
+    return (__int128_t)a * b % mod;
+}
+
+template <typename T>
+inline T F(T x, T c, T mod) // Pollard-rho function
+{
+    return (mult64(x, x, mod) + c) % mod;
 }
 
 template <typename T>
@@ -132,7 +41,7 @@ T Pollard_Brent(T N)
         return 2;
 
     // Random Number Linear Congruential Generator MMIX from D.E. Knuth
-    static u128 rng = 0xdeafbeefff;
+    static i128 rng = 0xdeafbeefff;
     uint64_t a = rng * 6364136223846793005ull + 1442695040888963407ull;
     uint64_t b = a * 6364136223846793005ull + 1442695040888963407ull;
     rng = (a + b) ^ (a * b);
@@ -144,13 +53,12 @@ T Pollard_Brent(T N)
     T q = 1;
     T Xs, Xt;
     T m = 128;
-    u128 inv = montModInv(N).second;
     T L = 1;
     while (gcdVal == 1)
     {
         Xt = X;
         for (size_t i = 1; i < L; i++)
-            X = F(X, C, N, inv);
+            X = F(X, C, N);
 
         int k = 0;
         while (k < L && gcdVal == 1)
@@ -158,8 +66,8 @@ T Pollard_Brent(T N)
             Xs = X;
             for (size_t i = 0; i < m && i < L - k; i++)
             {
-                X = F(X, C, N, inv);
-                q = montMult(q, Xt > X ? Xt - X : X - Xt, N, inv);
+                X = F(X, C, N);
+                q = mult64(q, __abs(Xt - X), N);
             }
             gcdVal = __gcd(q, N);
             k += m;
@@ -170,8 +78,8 @@ T Pollard_Brent(T N)
     {
         do
         {
-            Xs = F(Xs, C, N, inv);
-            gcdVal = __gcd(Xs > Xt ? Xs - Xt : Xt - Xs, N);
+            Xs = F(Xs, C, N);
+            gcdVal = __gcd(__abs(Xs - Xt), N);
         } while (gcdVal == 1);
     }
     return gcdVal;
@@ -180,18 +88,17 @@ T Pollard_Brent(T N)
 template <typename T>
 T modPow(T N, T power, T mod)
 {
-    if (mod == 1)
-        return 0; // N^k mod 1 = 0 for any N, k
-    if (power == 0)
-        return 1 % mod; // N^0 = 1 (if N ≠ 0), so handle this first
-    if (N == 0 || N % mod == 0)
-        return 0; // 0^k = 0 (k > 0), and (m·x)^k ≡ 0 mod m (k > 0)
+    if (N % mod == 0 || N == 0)
+        return 0;
+    if (N == 1 || power == 0)
+        return 1;
+
     T res{1};
     while (power)
     {
         if (power & 1)
-            res = mult128(res, N, mod);
-        N = mult128(N, N, mod);
+            res = mult64(res, N, mod);
+        N = mult64(N, N, mod);
         power >>= 1;
     }
     return res;
@@ -210,7 +117,7 @@ bool isPrime(T N)
     {
         T p = modPow(a % N, d, N), i = s;
         while (p != 1 && p != N - 1 && a % N && i--)
-            p = mult128(p, p, N);
+            p = mult64(p, p, N);
         if (p != N - 1 && i != s)
             return false;
     }
@@ -252,14 +159,14 @@ T binPow(T N, T power)
 
 // Euler Totient Function
 template <typename T>
-T Phi(T N)
+T phi(T N)
 {
     if (isPrime(N))
         return (N - 1);
     map<T, T> pf;
     primeFactorize(N, pf);
     T ans = 1;
-    for (auto &[p, exp] : pf)
+    for (auto &[p, exp] : pf) // O(log² N)
         ans *= (binPow(p, exp) - binPow(p, exp - 1));
     return ans;
 }
@@ -336,10 +243,26 @@ inline auto &operator<<(ostream &stream, int128 num) { return int128_io::write(s
 inline auto &operator>>(istream &stream, uint128 &num) { return int128_io::read(stream, num); }
 inline auto &operator<<(ostream &stream, uint128 num) { return int128_io::write(stream, num); }
 
-template <typename T>
-T modInverse(T N, T mod) // N and mod must be co-primes, i.e., gcd (N, mod) = 1
+ll normalize(__int128_t x, ll m)
 {
-    return 1 < N ? mod - modInverse(mod % N, N) * mod / N : 1;
+    if (x < m)
+        return x;
+    return (m + x % m);
+}
+
+template <typename T>
+T Exp(T N, T power, T mod)
+{
+    T res{1};
+    while (power)
+    {
+        if (power & 1)
+            res = normalize((__int128_t)res * N, mod);
+
+        N = normalize((__int128_t)N * N, mod);
+        power >>= 1;
+    }
+    return res;
 }
 
 int main()
@@ -353,66 +276,24 @@ int main()
     // freopen("calc.in", "r", stdin);
     // freopen("calc.out", "w", stdout);
     int t = 1;
-    u128 N, k;
+    ll N, k;
     // cin >> t;
     while (t--)
     {
         cin >> N >> k;
         if (N == 0)
-            return cout << add64(2 % k, u128(1), k), 0;
-        u128 base = 2;
-        u128 g = __gcd(base, k);
-        if (g == 1) // Euler Generalization
+            return cout << add64(2 % k, 1LL, k), 0;
+        ll w[] = {0, 2, 2, N}; // 0 is padding
+        function<ll(ll, ll, ll)> solve = [&](ll l, ll r, ll m) -> ll
         {
-            u128 power = modPow(u128(2), N, Phi(k));
-            cout << add64(modPow(base, power, k), u128(1), k);
-        }
-        else
-        {
-            /*
-            Computes x ≡ (a^b) mod k using Chinese Remainder Theorem (CRT) decomposition
-            when k = g^m * k' (where g = gcd(a, k))
+            if (l == r + 1 || m == 1)
+                return 1;
 
-            The solution combines two congruences using CRT:
-            1. x ≡ 0 mod g^m           (since a^b is divisible by g^m when b >= m)
-            2. x ≡ a^(b mod ϕ(k')) mod k' (using Euler's theorem)
-
-            The CRT solution is:
-            x = [ (0 × k' × inv(k', g^m))
-                + (a^(b mod ϕ(k')) × g^m × inv(g^m, k')) ] mod k
-
-            Where:
-            - inv(a,b) = modular inverse of a modulo b
-            - ϕ(k')    = Euler's Totient function for k'
-            - g^m      = maximal power of g dividing k
-
-            Note: The first term vanishes (0 × ...), so we simplify to:
-            x = [a^(b mod ϕ(k')) × g^m × inv(g^m, k')] mod k
-            */
-            u128 k_dash = k, m = 0, g_power_m = 1;
-            while (k_dash % g == 0)
-                k_dash /= g, g_power_m *= g, m++;
-
-            if (N >= m) // The first term vanishes
-            {
-                u128 phi_k_dash = Phi(k_dash);
-                u128 res = modPow(base, modPow(u128(2), N, phi_k_dash), k);
-                res = mult128(res, g_power_m, k);
-                res = mult128(res, modInverse(g_power_m, k_dash), k);
-                cout << add64(res, u128(1), k);
-            }
-            else
-            {
-                u128 phi_k_dash = Phi(k_dash);
-                u128 Term1 = modPow(base, (u128(1) << N), g_power_m);
-                Term1 = mult128(Term1, k_dash, g_power_m);
-                Term1 = mult128(Term1, modInverse(k_dash, g_power_m), g_power_m);
-                u128 Term2 = modPow(base, modPow(u128(2), N, phi_k_dash), k);
-                Term2 = mult128(Term2, g_power_m, k);
-                Term2 = mult128(Term2, modInverse(g_power_m, k_dash), k);
-                cout << add64(Term1, add64(Term2, u128(1), k), k);
-            }
-        }
+            ll power = solve(l + 1, r, phi(m));
+            ll res = Exp(w[l], power, m);
+            return res; // Don't take mod here
+        };
+        cout << add64(solve(1, 3, k) % k, 1LL, k);
     }
     return 0;
 }
