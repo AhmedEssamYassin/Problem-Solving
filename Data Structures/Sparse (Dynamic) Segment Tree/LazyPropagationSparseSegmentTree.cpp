@@ -9,69 +9,69 @@ struct LazyDynamicSegmentTree
 private:
     struct Node
     {
-        ll Value;
-        Node *LeftChild, *RightChild; // Pointers to left child and right child
+        ll value;
+        Node *L, *R; // Pointers to left child and right child
 
         Node() // Constructor
         {
-            Value = 0;
-            LeftChild = nullptr;
-            RightChild = nullptr;
+            value = 0;
+            L = nullptr;
+            R = nullptr;
         }
         Node(const ll &val)
         {
-            Value = val;
-            LeftChild = nullptr;
-            RightChild = nullptr;
+            value = val;
+            L = nullptr;
+            R = nullptr;
         }
 
-        void createChildren(const int val = 0) // Construct Childs
-        {
-            if (LeftChild == nullptr)
-                LeftChild = new Node(val);
-            if (RightChild == nullptr)
-                RightChild = new Node(val);
-        }
         ~Node() // Destructor. Notice the "~" character before the struct name.
         {
-            delete LeftChild;
-            delete RightChild;
-            LeftChild = nullptr;
-            RightChild = nullptr;
+            delete L;
+            delete R;
+            L = nullptr;
+            R = nullptr;
         }
     };
     ll N;
     Node *segRoot;
     Node *lazyRoot;
-    ll merge(const ll &leftNode, const ll &rightNode) { return leftNode + rightNode; }
+    void merge(Node *&segNode)
+    {
+        segNode->value = (segNode->L ? segNode->L->value : 0) + (segNode->R ? segNode->R->value : 0);
+    }
 
     void push(ll left, ll right, Node *segNode, Node *lazyNode)
     {
         // Propagate the value
-        if (segNode == nullptr || lazyNode == nullptr || lazyNode->Value == -1)
+        if (segNode == nullptr || lazyNode == nullptr || lazyNode->value == -1)
             return;
         // (a + b + c + d + e) --> (x + x + x + x + x) --> (right - left + 1) * x
-        segNode->Value = (right - left + 1) * lazyNode->Value;
+        segNode->value = (right - left + 1) * lazyNode->value;
         // If the node is not a leaf
         if (left != right)
         {
             // Update the lazy values for the left child
-            if (lazyNode->LeftChild == nullptr)
-                lazyNode->LeftChild = new Node(lazyNode->Value);
+            if (lazyNode->L == nullptr)
+                lazyNode->L = new Node(lazyNode->value);
             else
-                lazyNode->LeftChild->Value = lazyNode->Value;
+                lazyNode->L->value = lazyNode->value;
 
             // Update the lazy values for the right child
-            if (lazyNode->RightChild == nullptr)
-                lazyNode->RightChild = new Node(lazyNode->Value);
+            if (lazyNode->R == nullptr)
+                lazyNode->R = new Node(lazyNode->value);
             else
-                lazyNode->RightChild->Value = lazyNode->Value;
+                lazyNode->R->value = lazyNode->value;
         }
         // Reset the lazy value
-        lazyNode->Value = -1;
+        lazyNode->value = -1;
     }
-    void update(ll left, ll right, Node *segNode, Node *lazyNode, ll leftQuery, ll rightQuery, const ll &val)
+    void update(ll left, ll right, Node *&segNode, Node *&lazyNode, ll leftQuery, ll rightQuery, const ll &val)
     {
+        if (!segNode)
+            segNode = new Node(0);
+        if (!lazyNode)
+            lazyNode = new Node(-1);
         push(left, right, segNode, lazyNode);
         // If the range is invalid, return
         if (left > rightQuery || right < leftQuery)
@@ -80,24 +80,22 @@ private:
         if (left >= leftQuery && right <= rightQuery)
         {
             // Update the lazy value
-            lazyNode->Value = val;
+            lazyNode->value = val;
             // Apply the update immediately
             push(left, right, segNode, lazyNode);
             return;
         }
-        segNode->createChildren();
-        lazyNode->createChildren(-1);
         // Recursively update the left child
-        update(left, mid, segNode->LeftChild, lazyNode->LeftChild, leftQuery, rightQuery, val);
+        update(left, mid, segNode->L, lazyNode->L, leftQuery, rightQuery, val);
         // Recursively update the right child
-        update(mid + 1, right, segNode->RightChild, lazyNode->RightChild, leftQuery, rightQuery, val);
+        update(mid + 1, right, segNode->R, lazyNode->R, leftQuery, rightQuery, val);
         // Merge the children values
-        segNode->Value = merge(segNode->LeftChild->Value, segNode->RightChild->Value);
+        merge(segNode);
     }
     ll query(ll left, ll right, Node *segNode, Node *lazyNode, ll leftQuery, ll rightQuery)
     {
         // If the range is invalid, return a value that does NOT to affect other queries
-        if (left > rightQuery || right < leftQuery)
+        if (!segNode || left > rightQuery || right < leftQuery)
             return 0;
 
         // Apply the pending updates if any
@@ -105,12 +103,10 @@ private:
 
         // If the range matches the segment
         if (leftQuery <= left && right <= rightQuery)
-            return segNode->Value;
-        segNode->createChildren();
-        lazyNode->createChildren(-1);
-        ll leftSegment = query(left, mid, segNode->LeftChild, lazyNode->LeftChild, leftQuery, rightQuery);
-        ll rightSegment = query(mid + 1, right, segNode->RightChild, lazyNode->RightChild, leftQuery, rightQuery);
-        return merge(leftSegment, rightSegment);
+            return segNode->value;
+        ll leftSegment = query(left, mid, segNode->L, lazyNode->L, leftQuery, rightQuery);
+        ll rightSegment = query(mid + 1, right, segNode->R, lazyNode->R, leftQuery, rightQuery);
+        return leftSegment + rightSegment;
     }
 
 public:

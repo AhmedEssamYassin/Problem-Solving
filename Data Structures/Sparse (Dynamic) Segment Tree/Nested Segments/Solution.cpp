@@ -9,74 +9,66 @@ struct DynamicSegmentTree
 private:
 	struct Node
 	{
-		ll Value;
-		Node *LeftChild, *RightChild; // Pointers to left child and right child
+		ll value;
+		Node *L, *R; // Pointers to left child and right child
 
 		Node() // Constructor
 		{
-			Value = 0;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = 0;
+			L = nullptr;
+			R = nullptr;
 		}
 		Node(const ll &val)
 		{
-			Value = val;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = val;
+			L = nullptr;
+			R = nullptr;
 		}
 
-		void createChildren() // Construct Childs
-		{
-			if (LeftChild == nullptr)
-				LeftChild = new Node();
-			if (RightChild == nullptr)
-				RightChild = new Node();
-		}
 		~Node() // Destructor. Notice the "~" character before the struct name.
 		{
-			delete LeftChild;
-			delete RightChild;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			delete L;
+			delete R;
+			L = nullptr;
+			R = nullptr;
 		}
 	};
 	ll N;
 	Node *root;
 	void merge(Node *&segNode)
 	{
-		segNode->Value = segNode->LeftChild->Value + segNode->RightChild->Value;
+		segNode->value = (segNode->L ? segNode->L->value : 0) + (segNode->R ? segNode->R->value : 0);
 	}
-	void update(ll left, ll right, Node *Current, ll idx, const ll &newValue)
+	void update(ll left, ll right, Node *&curr, ll idx, const ll &newValue)
 	{
 		// idx is not in range [left, right]
 		if (left > idx || right < idx)
 			return;
-
-		// Current is the Node that manage only ith element
+		if (curr == nullptr)
+			curr = new Node();
+		// curr is the Node that manage only ith element
 		if (left == right)
 		{
-			Current->Value += newValue;
+			curr->value += newValue;
 			return;
 		}
 
-		Current->createChildren();
-		update(left, mid, Current->LeftChild, idx, newValue);
-		update(mid + 1, right, Current->RightChild, idx, newValue);
-		merge(Current);
+		update(left, mid, curr->L, idx, newValue);
+		update(mid + 1, right, curr->R, idx, newValue);
+		merge(curr);
 	}
-	ll query(ll left, ll right, Node *Current, ll leftQuery, ll rightQuery)
+	ll query(ll left, ll right, Node *curr, ll leftQuery, ll rightQuery)
 	{
 		// [left, right] doesn't intersect with [leftQuery, rightQuery]
-		if (left > rightQuery || right < leftQuery)
+		if (curr == nullptr || left > rightQuery || right < leftQuery)
 			return 0;
 
 		// [left, curR] is inside [leftQuery, rightQuery]
 		if (leftQuery <= left && right <= rightQuery)
-			return Current->Value;
+			return curr->value;
 
-		Current->createChildren();
-		ll leftSegment = query(left, mid, Current->LeftChild, leftQuery, rightQuery);
-		ll rightSegment = query(mid + 1, right, Current->RightChild, leftQuery, rightQuery);
+		ll leftSegment = query(left, mid, curr->L, leftQuery, rightQuery);
+		ll rightSegment = query(mid + 1, right, curr->R, leftQuery, rightQuery);
 		return (leftSegment + rightSegment);
 	}
 
@@ -88,11 +80,11 @@ public:
 	}
 	void update(ll idx, const ll &val)
 	{
-		update(0, N, root, idx, val);
+		update(-N, N, root, idx, val);
 	}
 	ll query(ll left, ll right)
 	{
-		ll ans = query(0, N, root, left, right);
+		ll ans = query(-N, N, root, left, right);
 		return ans;
 	}
 #undef mid
@@ -116,32 +108,19 @@ int main()
 		vector<ll> Rs;
 		DynamicSegmentTree segTree;
 
-		// Instead of Coordinate compression
-		ll minValue = LLONG_MAX;
-		auto giveOffset = [&](ll x)
-		{
-			return x + abs(minValue);
-		};
 		int pos = 0;
 		for (auto &[L, R, idx] : intervals)
 		{
 			cin >> L >> R;
 			idx = pos++;
-			minValue = min(minValue, L);
-			minValue = min(minValue, R);
 		}
 
-		for (auto &[L, R, idx] : intervals)
-		{
-			L = giveOffset(L);
-			R = giveOffset(R);
-		}
 		map<ll, ll> ans;
 		sort(intervals.begin(), intervals.end()); // Sorting on basis of `L`
 		for (int i = N - 1; i >= 0; i--)
 		{
 			auto &[L, R, idx] = intervals[i];
-			ans[idx] = segTree.query(0, R);
+			ans[idx] = segTree.query(-2e9, R);
 			segTree.update(R, 1);
 		}
 		for (const auto &[idx, cnt] : ans)

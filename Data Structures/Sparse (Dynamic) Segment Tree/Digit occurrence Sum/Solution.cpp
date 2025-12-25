@@ -9,86 +9,80 @@ struct DynamicSegmentTree
 private:
 	struct Node
 	{
-		ll Value;
-		Node *LeftChild, *RightChild; // Pointers to left child and right child
+		ll value;
+		Node *L, *R; // Pointers to left child and right child
 
 		Node() // Constructor
 		{
-			Value = 0;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = 0;
+			L = nullptr;
+			R = nullptr;
 		}
 		Node(const ll &val)
 		{
-			Value = val;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = val;
+			L = nullptr;
+			R = nullptr;
 		}
 
-		void createChildren() // Construct Childs
-		{
-			if (LeftChild == nullptr)
-				LeftChild = new Node();
-			if (RightChild == nullptr)
-				RightChild = new Node();
-		}
 		~Node() // Destructor. Notice the "~" character before the struct name.
 		{
-			delete LeftChild;
-			delete RightChild;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			delete L;
+			delete R;
+			L = nullptr;
+			R = nullptr;
 		}
 	};
 	ll N;
 	Node *root;
 	void merge(Node *&segNode)
 	{
-		segNode->Value = segNode->LeftChild->Value + segNode->RightChild->Value;
+		segNode->value = (segNode->L ? segNode->L->value : 0) + (segNode->R ? segNode->R->value : 0);
 	}
-	void update(ll left, ll right, Node *Current, ll idx, const ll &newValue)
+	void update(ll left, ll right, Node *&curr, ll idx, const ll &newValue)
 	{
 		// idx is not in range [left, right]
 		if (left > idx || right < idx)
 			return;
-
-		// Current is the Node that manage only ith element
+		if (curr == nullptr)
+			curr = new Node();
+		// curr is the Node that manage only ith element
 		if (left == right)
 		{
-			Current->Value += newValue;
+			curr->value += newValue;
 			return;
 		}
 
-		Current->createChildren();
-		update(left, mid, Current->LeftChild, idx, newValue);
-		update(mid + 1, right, Current->RightChild, idx, newValue);
-		merge(Current);
+		update(left, mid, curr->L, idx, newValue);
+		update(mid + 1, right, curr->R, idx, newValue);
+		merge(curr);
 	}
-	ll query(ll left, ll right, Node *Current, ll leftQuery, ll rightQuery)
+	ll query(ll left, ll right, Node *curr, ll leftQuery, ll rightQuery)
 	{
 		// [left, right] doesn't intersect with [leftQuery, rightQuery]
-		if (left > rightQuery || right < leftQuery)
+		if (curr == nullptr || left > rightQuery || right < leftQuery)
 			return 0;
 
 		// [left, curR] is inside [leftQuery, rightQuery]
 		if (leftQuery <= left && right <= rightQuery)
-			return Current->Value;
+			return curr->value;
 
-		Current->createChildren();
-		ll leftSegment = query(left, mid, Current->LeftChild, leftQuery, rightQuery);
-		ll rightSegment = query(mid + 1, right, Current->RightChild, leftQuery, rightQuery);
+		ll leftSegment = query(left, mid, curr->L, leftQuery, rightQuery);
+		ll rightSegment = query(mid + 1, right, curr->R, leftQuery, rightQuery);
 		return (leftSegment + rightSegment);
 	}
-	ll kthOne(ll left, ll right, Node *Current, ll k)
+	ll kthOne(ll left, ll right, Node *curr, ll k)
 	{
+		if (curr == nullptr || curr->value < k)
+			return -1;
 		if (left == right)
-			return (Current != nullptr && Current->Value == 1 ? left : -1);
-		Current->createChildren();
-		ll sumR = Current->RightChild->Value;
+			return left;
+
+		ll sumR = (curr->R ? curr->R->value : 0);
 		if (sumR >= k)
-			return kthOne(mid + 1, right, Current->RightChild, k);
+			return kthOne(mid + 1, right, curr->R, k);
 		else
-			return kthOne(left, mid, Current->LeftChild, k - sumR);
+			return kthOne(left, mid, curr->L, k - sumR);
 	}
 
 public:

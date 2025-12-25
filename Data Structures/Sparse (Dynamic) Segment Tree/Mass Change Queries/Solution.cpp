@@ -9,51 +9,51 @@ struct DynamicSegmentTree
 private:
 	struct Node
 	{
-		ll Value;
-		Node *LeftChild, *RightChild; // Pointers to left child and right child
+		ll value;
+		Node *L, *R; // Pointers to left child and right child
 
 		Node() // Constructor
 		{
-			Value = 0;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = 0;
+			L = nullptr;
+			R = nullptr;
 		}
 		Node(const ll &val)
 		{
-			Value = val;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = val;
+			L = nullptr;
+			R = nullptr;
 		}
 
 		void createChildren() // Construct Childs
 		{
-			if (LeftChild == nullptr)
-				LeftChild = new Node();
-			if (RightChild == nullptr)
-				RightChild = new Node();
+			if (L == nullptr)
+				L = new Node();
+			if (R == nullptr)
+				R = new Node();
 		}
 		// Will cause RTE, when we delete a node, it will unintentionally delete its children
 		// ~Node() // Destructor. Notice the "~" character before the struct name.
 		// {
-		// 	if (LeftChild != nullptr)
-		// 		delete LeftChild;
-		// 	if (RightChild != nullptr)
-		// 		delete RightChild;
-		// 	LeftChild = nullptr;
-		// 	RightChild = nullptr;
+		// 	if (L != nullptr)
+		// 		delete L;
+		// 	if (R != nullptr)
+		// 		delete R;
+		// 	L = nullptr;
+		// 	R = nullptr;
 		// }
 	};
 	ll N;
-	void insert(Node *&Current, int left, int right, ll idx)
+	void insert(Node *&curr, int left, int right, ll idx)
 	{
-		if (Current == nullptr)
-			Current = new Node();
+		if (curr == nullptr)
+			curr = new Node();
 		if (left == right)
 			return;
 		if (idx <= mid)
-			insert(Current->LeftChild, left, mid, idx);
+			insert(curr->L, left, mid, idx);
 		else
-			insert(Current->RightChild, mid + 1, right, idx);
+			insert(curr->R, mid + 1, right, idx);
 	}
 
 public:
@@ -85,18 +85,18 @@ public:
 				return;
 			}
 
-			transfer(xRoot->LeftChild, yRoot->LeftChild, left, mid, leftQuery, rightQuery);
-			transfer(xRoot->RightChild, yRoot->RightChild, mid + 1, right, leftQuery, rightQuery);
+			transfer(xRoot->L, yRoot->L, left, mid, leftQuery, rightQuery);
+			transfer(xRoot->R, yRoot->R, mid + 1, right, leftQuery, rightQuery);
 			delete xRoot;
 			xRoot = nullptr;
 		}
 		else // Partial overlapping
 		{
 			// Create local variables that can be passed by reference
-			Node *xLeft = xRoot ? xRoot->LeftChild : nullptr;
-			Node *xRight = xRoot ? xRoot->RightChild : nullptr;
-			Node *yLeft = yRoot ? yRoot->LeftChild : nullptr;
-			Node *yRight = yRoot ? yRoot->RightChild : nullptr;
+			Node *xLeft = xRoot ? xRoot->L : nullptr;
+			Node *xRight = xRoot ? xRoot->R : nullptr;
+			Node *yLeft = yRoot ? yRoot->L : nullptr;
+			Node *yRight = yRoot ? yRoot->R : nullptr;
 
 			// Now safely recurse
 			transfer(xLeft, yLeft, left, mid, leftQuery, rightQuery);
@@ -112,16 +112,16 @@ public:
 				}
 				else
 				{
-					xRoot->LeftChild = xLeft;
-					xRoot->RightChild = xRight;
+					xRoot->L = xLeft;
+					xRoot->R = xRight;
 				}
 			}
 			if ((yLeft || yRight) && (yRoot == nullptr))
 				yRoot = new Node();
 			if (yRoot)
 			{
-				yRoot->LeftChild = yLeft;
-				yRoot->RightChild = yRight;
+				yRoot->L = yLeft;
+				yRoot->R = yRight;
 			}
 		}
 	}
@@ -134,8 +134,8 @@ public:
 			arr[left] = val;
 			return;
 		}
-		recover(node->LeftChild, arr, left, mid, val);
-		recover(node->RightChild, arr, mid + 1, right, val);
+		recover(node->L, arr, left, mid, val);
+		recover(node->R, arr, mid + 1, right, val);
 	}
 #undef mid
 };
