@@ -12,107 +12,101 @@ private:
 	{
 		ll sum;
 		ll maxPrefSum;
-		Node *LeftChild, *RightChild; // Pointers to left child and right child
+		Node *L, *R; // Pointers to left child and right child
 
 		Node() // Constructor
 		{
 			sum = 0;
 			maxPrefSum = 0;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			L = nullptr;
+			R = nullptr;
 		}
 		Node(const ll &val, const ll &maxVal)
 		{
 			sum = val;
 			maxPrefSum = maxVal;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			L = nullptr;
+			R = nullptr;
 		}
-
 		void createChildren(const ll &val = 0, const ll &maxVal = 0) // Construct Childs
 		{
-			if (LeftChild == nullptr)
-				LeftChild = new Node(val, maxVal);
-			if (RightChild == nullptr)
-				RightChild = new Node(val, maxVal);
+			if (L == nullptr)
+				L = new Node(val, maxVal);
+			if (R == nullptr)
+				R = new Node(val, maxVal);
 		}
 		~Node() // Destructor. Notice the "~" character before the struct name.
 		{
-			delete LeftChild;
-			delete RightChild;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			delete L;
+			delete R;
+			L = nullptr;
+			R = nullptr;
 		}
 	};
 	struct LazyNode
 	{
-		ll Value;
-		LazyNode *LeftChild, *RightChild; // Pointers to left child and right child
+		ll value;
+		LazyNode *L, *R; // Pointers to left child and right child
 
 		LazyNode() // Constructor
 		{
-			Value = INF;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = INF;
+			L = nullptr;
+			R = nullptr;
 		}
 		LazyNode(const ll &val)
 		{
-			Value = val;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			value = val;
+			L = nullptr;
+			R = nullptr;
 		}
-
 		void createChildren(const ll &val = INF) // Construct Childs
 		{
-			if (LeftChild == nullptr)
-				LeftChild = new LazyNode(val);
-			if (RightChild == nullptr)
-				RightChild = new LazyNode(val);
+			if (L == nullptr)
+				L = new LazyNode(val);
+			if (R == nullptr)
+				R = new LazyNode(val);
 		}
 		~LazyNode() // Destructor. Notice the "~" character before the struct name.
 		{
-			delete LeftChild;
-			delete RightChild;
-			LeftChild = nullptr;
-			RightChild = nullptr;
+			delete L;
+			delete R;
+			L = nullptr;
+			R = nullptr;
 		}
 	};
 	ll N;
 	Node *segRoot;
 	LazyNode *lazyRoot;
+
 	void merge(Node *&segNode)
 	{
-		segNode->sum = (segNode->LeftChild->sum + segNode->RightChild->sum);
-		segNode->maxPrefSum = max(segNode->LeftChild->maxPrefSum, segNode->LeftChild->sum + segNode->RightChild->maxPrefSum);
+		segNode->sum = (segNode->L->sum + segNode->R->sum);
+		segNode->maxPrefSum = max(segNode->L->maxPrefSum, segNode->L->sum + segNode->R->maxPrefSum);
 	}
 
-	void push(ll left, ll right, Node *segNode, LazyNode *lazyNode)
+	void push(ll left, ll right, Node *&segNode, LazyNode *lazyNode)
 	{
 		// Propagate the value
-		if (segNode == nullptr || lazyNode == nullptr || lazyNode->Value == INF)
+		if (segNode == nullptr || lazyNode == nullptr || lazyNode->value == INF)
 			return;
 		// (a + b + c + d + e) --> (x + x + x + x + x) --> (right - left + 1) * x
-		segNode->sum = (right - left + 1) * lazyNode->Value;
+		segNode->sum = (right - left + 1) * lazyNode->value;
 		segNode->maxPrefSum = max(0LL, segNode->sum);
 		// If the node is not a leaf
 		if (left != right)
 		{
+			lazyNode->createChildren();
 			// Update the lazy values for the left child
-			if (lazyNode->LeftChild == nullptr)
-				lazyNode->LeftChild = new LazyNode(lazyNode->Value);
-			else
-				lazyNode->LeftChild->Value = lazyNode->Value;
+			lazyNode->L->value = lazyNode->value;
 
 			// Update the lazy values for the right child
-			if (lazyNode->RightChild == nullptr)
-				lazyNode->RightChild = new LazyNode(lazyNode->Value);
-			else
-				lazyNode->RightChild->Value = lazyNode->Value;
+			lazyNode->R->value = lazyNode->value;
 		}
 		// Reset the lazy value
-		lazyNode->Value = INF;
+		lazyNode->value = INF;
 	}
-	void update(ll left, ll right, Node *segNode, LazyNode *lazyNode, ll leftQuery, ll rightQuery, const ll &val)
+	void update(ll left, ll right, Node *&segNode, LazyNode *&lazyNode, ll leftQuery, ll rightQuery, const ll &val)
 	{
 		push(left, right, segNode, lazyNode);
 		// If the range is invalid, return
@@ -122,7 +116,7 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 		{
 			// Update the lazy value
-			lazyNode->Value = val;
+			lazyNode->value = val;
 			// Apply the update immediately
 			push(left, right, segNode, lazyNode);
 			return;
@@ -130,30 +124,25 @@ private:
 		segNode->createChildren();
 		lazyNode->createChildren(INF);
 		// Recursively update the left child
-		update(left, mid, segNode->LeftChild, lazyNode->LeftChild, leftQuery, rightQuery, val);
+		update(left, mid, segNode->L, lazyNode->L, leftQuery, rightQuery, val);
 		// Recursively update the right child
-		update(mid + 1, right, segNode->RightChild, lazyNode->RightChild, leftQuery, rightQuery, val);
+		update(mid + 1, right, segNode->R, lazyNode->R, leftQuery, rightQuery, val);
 		// Merge the children values
 		merge(segNode);
 	}
-	ll query(ll left, ll right, Node *segNode, LazyNode *lazyNode, ll h)
+	ll query(ll left, ll right, Node *&segNode, LazyNode *lazyNode, ll h)
 	{
 		// Apply the pending updates if any
 		push(left, right, segNode, lazyNode);
-
-		// If leaf node
 		if (left == right)
 			return left - (segNode->maxPrefSum > h);
-
 		segNode->createChildren();
 		lazyNode->createChildren(INF);
-
-		// Apply the pending updates (if any) on the leftChild before using
-		push(left, mid, segNode->LeftChild, lazyNode->LeftChild);
-		if (segNode->LeftChild->maxPrefSum > h)
-			return query(left, mid, segNode->LeftChild, lazyNode->LeftChild, h);
+		push(left, mid, segNode->L, lazyNode->L);
+		if (segNode->L->maxPrefSum > h)
+			return query(left, mid, segNode->L, lazyNode->L, h);
 		else
-			return query(mid + 1, right, segNode->RightChild, lazyNode->RightChild, h - segNode->LeftChild->sum);
+			return query(mid + 1, right, segNode->R, lazyNode->R, h - segNode->L->sum);
 	}
 
 public:

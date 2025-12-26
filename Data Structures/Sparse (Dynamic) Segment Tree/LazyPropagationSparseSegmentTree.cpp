@@ -24,7 +24,13 @@ private:
             L = nullptr;
             R = nullptr;
         }
-
+        void createChildren(const ll &val = 0) // Construct Childs
+        {
+            if (L == nullptr)
+                L = new Node(val);
+            if (R == nullptr)
+                R = new Node(val);
+        }
         ~Node() // Destructor. Notice the "~" character before the struct name.
         {
             delete L;
@@ -38,7 +44,7 @@ private:
     Node *lazyRoot;
     void merge(Node *&segNode)
     {
-        segNode->value = (segNode->L ? segNode->L->value : 0) + (segNode->R ? segNode->R->value : 0);
+        segNode->value = (segNode->L->value + segNode->R->value);
     }
 
     void push(ll left, ll right, Node *segNode, Node *lazyNode)
@@ -51,27 +57,18 @@ private:
         // If the node is not a leaf
         if (left != right)
         {
+            lazyNode->createChildren();
             // Update the lazy values for the left child
-            if (lazyNode->L == nullptr)
-                lazyNode->L = new Node(lazyNode->value);
-            else
-                lazyNode->L->value = lazyNode->value;
+            lazyNode->L->value = lazyNode->value;
 
             // Update the lazy values for the right child
-            if (lazyNode->R == nullptr)
-                lazyNode->R = new Node(lazyNode->value);
-            else
-                lazyNode->R->value = lazyNode->value;
+            lazyNode->R->value = lazyNode->value;
         }
         // Reset the lazy value
         lazyNode->value = -1;
     }
     void update(ll left, ll right, Node *&segNode, Node *&lazyNode, ll leftQuery, ll rightQuery, const ll &val)
     {
-        if (!segNode)
-            segNode = new Node(0);
-        if (!lazyNode)
-            lazyNode = new Node(-1);
         push(left, right, segNode, lazyNode);
         // If the range is invalid, return
         if (left > rightQuery || right < leftQuery)
@@ -85,6 +82,8 @@ private:
             push(left, right, segNode, lazyNode);
             return;
         }
+        segNode->createChildren(0);
+        lazyNode->createChildren(-1);
         // Recursively update the left child
         update(left, mid, segNode->L, lazyNode->L, leftQuery, rightQuery, val);
         // Recursively update the right child
@@ -95,12 +94,13 @@ private:
     ll query(ll left, ll right, Node *segNode, Node *lazyNode, ll leftQuery, ll rightQuery)
     {
         // If the range is invalid, return a value that does NOT to affect other queries
-        if (!segNode || left > rightQuery || right < leftQuery)
+        if (left > rightQuery || right < leftQuery)
             return 0;
 
         // Apply the pending updates if any
         push(left, right, segNode, lazyNode);
-
+        segNode->createChildren();
+        lazyNode->createChildren(-1);
         // If the range matches the segment
         if (leftQuery <= left && right <= rightQuery)
             return segNode->value;
