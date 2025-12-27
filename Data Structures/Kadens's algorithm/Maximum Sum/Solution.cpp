@@ -49,17 +49,17 @@ ll modPow(ll N, ll power)
 
 // Kadane's Algorithm to Maximum Sum Sub_array
 // At each element: Either start a new contiguous sub_array or continue the previous sum
-ll maxSubarraySum(const vector<ll> &arr, int size)
+ll maxSubarraySum(const vector<ll> &arr)
 {
-	ll maxSubSum = 0, curr_sum = 0;
-	for (int i{}; i < size; i++)
+	ll maxSubSum = 0, currSum = 0;
+	for (int i{}; i < arr.size(); i++)
 	{
-		curr_sum += arr[i];
-		if (curr_sum > maxSubSum)
-			maxSubSum = curr_sum;
+		currSum += arr[i];
+		if (currSum > maxSubSum)
+			maxSubSum = currSum;
 
-		if (curr_sum < 0)
-			curr_sum = 0;
+		if (currSum < 0)
+			currSum = 0;
 	}
 	return maxSubSum;
 }
@@ -83,7 +83,7 @@ int main()
 			cin >> arr[i];
 
 		ll maxSum{};
-		maxSum = maxSubarraySum(arr, N);
+		maxSum = maxSubarraySum(arr);
 
 		ll S{};
 		for (int i{}; i < N; i++)
