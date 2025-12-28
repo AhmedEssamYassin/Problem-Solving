@@ -5,7 +5,7 @@ using namespace std;
 
 struct DSU
 {
-	vector<ll> parent, size; // Representative
+	vector<int> parent, size; // Representative
 	int N;
 	// The leader should be the parent of itself
 	DSU(int _N)
@@ -15,17 +15,17 @@ struct DSU
 		size.resize(N + 1, 1); // Each component if of size 1 initially
 		iota(parent.begin(), parent.end(), 0);
 	}
-	ll Find(ll node)
+	int Find(int node)
 	{
 		if (parent[node] == node)
 			return node;
 
 		return parent[node] = Find(parent[node]); // Path compression
 	}
-	ll Union(ll u, ll v)
+	int Union(int u, int v)
 	{
-		ll rep1 = Find(u);
-		ll rep2 = Find(v);
+		int rep1 = Find(u);
+		int rep2 = Find(v);
 		if (rep1 == rep2)
 			return 0;
 		// Small-to-large technique
@@ -35,13 +35,13 @@ struct DSU
 		size[rep2] += size[rep1];
 		return 1;
 	}
-	bool isSameComponent(ll u, ll v)
+	bool isSameComponent(int u, int v)
 	{
 		return (Find(u) == Find(v));
 	}
-	set<ll> findConnectedComponents()
+	set<int> findConnectedComponents()
 	{
-		set<ll> st;
+		set<int> st;
 		// Traverse all vertices
 		for (int i = 1; i <= N; i++)
 			st.insert(Find(parent[i]));
@@ -55,8 +55,8 @@ int main()
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
 #ifndef ONLINE_JUDGE
-	// freopen("input.txt", "r", stdin);
-	// freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
 	int t = 1;
 	ll n, m;
