@@ -213,18 +213,18 @@ U &operator>>(U &stream, Modular<T> &number)
 	return stream;
 }
 
-using ModType = int; // Important for is_same<> to work
+// using ModType = int; // Important for is_same<> to work
 
-struct VarMod
-{
-	static ModType value;
-};
-ModType VarMod::value;
-ModType &mod = VarMod::value;
-using Mint = Modular<VarMod>;
+// struct VarMod
+// {
+//     static ModType value;
+// };
+// ModType VarMod::value;
+// ModType &mod = VarMod::value;
+// using Mint = Modular<VarMod>;
 
-// constexpr int mod = 1e9 + 7;
-// using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
+constexpr int mod = 1e9 + 7;
+using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
 Mint operator""_m(unsigned long long literal)
 {
 	return Mint(literal);
@@ -332,104 +332,6 @@ public:
 constexpr int sz = 2;
 using Matrix2by2 = Matrix<sz, sz>;
 
-struct SegmentTree
-{
-#define L (2 * node + 1)
-#define R (2 * node + 2)
-#define mid ((left + right) >> 1)
-private:
-	struct Node
-	{
-		Matrix2by2 matrix;
-		// Constructors
-		Node()
-		{
-			matrix[0][0] = 1;
-			matrix[0][1] = 0;
-			matrix[1][0] = 0;
-			matrix[1][1] = 1;
-		}
-		Node(const Matrix2by2 &other) : matrix(other) {}
-	};
-	int size;
-	vector<Node> seg;
-	Node merge(const Node &leftNode, const Node &rightNode)
-	{
-		Node res;
-		res.matrix = (leftNode.matrix * rightNode.matrix);
-		return res;
-	}
-	void build(int left, int right, int node, const vector<Matrix2by2> &arr)
-	{
-		if (left == right)
-		{
-			if (left < arr.size())
-				seg[node] = arr[left];
-			return;
-		}
-
-		// Building left node
-		build(left, mid, L, arr);
-
-		// Building right node
-		build(mid + 1, right, R, arr);
-
-		// Returning to parent nodes
-		seg[node] = merge(seg[L], seg[R]);
-	}
-	void update(int left, int right, int node, int idx, const Matrix2by2 &other)
-	{
-		if (left == right)
-		{
-			seg[node].matrix = other;
-			return;
-		}
-		if (idx <= mid)
-			update(left, mid, L, idx, other);
-		else
-			update(mid + 1, right, R, idx, other);
-
-		// Updating while returning to parent nodes
-		seg[node] = merge(seg[L], seg[R]);
-	}
-	Node query(int left, int right, int node, int leftQuery, int rightQuery)
-	{
-		// Out of range
-		if (right < leftQuery || left > rightQuery)
-			return Node(); // Identity Matrix
-		// The whole range is the answer
-		if (left >= leftQuery && right <= rightQuery)
-			return seg[node];
-		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-		return merge(leftSegment, rightSegment);
-	}
-
-public:
-	SegmentTree(const vector<Matrix2by2> &arr)
-	{
-		size = 1;
-		int n = arr.size();
-		while (size < n)
-			size <<= 1;
-		seg = vector<Node>(2 * size, Node());
-		build(0, size - 1, 0, arr);
-	}
-	void update(int idx, const Matrix2by2 &val)
-	{
-		update(0, size - 1, 0, idx, val);
-	}
-	Matrix2by2 query(int left, int right)
-	{
-		Node ans = query(0, size - 1, 0, left, right);
-		return ans.matrix;
-	}
-
-#undef L
-#undef R
-#undef mid
-};
-
 int main()
 {
 	ios_base::sync_with_stdio(false);
@@ -438,20 +340,29 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
-	int N, M, L, R;
-	cin >> mod >> N >> M;
-	vector<Matrix2by2> vc(N);
-	for (int i{}; i < N; i++)
-		cin >> vc[i];
-	SegmentTree segTree(vc);
-	while (M--)
+	int t = 1;
+	// cin >> t;
+	while (t--)
 	{
-		cin >> L >> R;
-		L--, R--; // To be 0-based
-		Matrix2by2 ans = segTree.query(L, R);
-		cout << ans[0][0] << " " << ans[0][1] << endl;
-		cout << ans[1][0] << " " << ans[1][1] << endl;
-		cout << endl;
+		/*
+		H makes him happy
+		S, D make him sad
+		Vowels [A, E, I, O, U]
+		Others have no effect
+		He starts Happy
+		'H' stays 'H' if we read 19 characters (any character other than 'S', 'D' and vowels)
+		'H' flip to 'S' if we read 7 characters (any character of 'S', 'D' and vowels)
+		'S' stays 'S' if we read 20 characters (any character other than 'H' and vowels)
+		'S' flip to 'H' if we read 6 characters (any character of 'H' and vowels)
+		*/
+		ll n;
+		cin >> n;
+		Matrix2by2 mat;
+		mat[0][0] = 19; // Happy -> Happy
+		mat[0][1] = 7;	// Happy -> Sad
+		mat[1][0] = 6;	// Sad -> Happy
+		mat[1][1] = 20; // Sad -> Sad
+		cout << mat.matrixPower(n)[0][0];
 	}
 	return 0;
 }

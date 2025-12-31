@@ -213,18 +213,18 @@ U &operator>>(U &stream, Modular<T> &number)
 	return stream;
 }
 
-using ModType = int; // Important for is_same<> to work
+// using ModType = int; // Important for is_same<> to work
 
-struct VarMod
-{
-	static ModType value;
-};
-ModType VarMod::value;
-ModType &mod = VarMod::value;
-using Mint = Modular<VarMod>;
+// struct VarMod
+// {
+//     static ModType value;
+// };
+// ModType VarMod::value;
+// ModType &mod = VarMod::value;
+// using Mint = Modular<VarMod>;
 
-// constexpr int mod = 1e9 + 7;
-// using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
+constexpr int mod = 1e9 + 7;
+using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
 Mint operator""_m(unsigned long long literal)
 {
 	return Mint(literal);
@@ -237,6 +237,7 @@ private:
 	Mint data[Rows][Cols];
 
 public:
+	static Matrix<Rows, Cols> pow2[32];
 	// Constructor: zero matrix
 	Matrix() { memset(data, 0, sizeof(data)); }
 
@@ -300,7 +301,12 @@ public:
 			identity[i][i] = 1;
 		return identity;
 	}
-
+	static void precompute(const Matrix<Rows, Cols> &mat)
+	{
+		pow2[0] = mat;
+		for (int i{1}; i < 32; i++)
+			pow2[i] = pow2[i - 1] * pow2[i - 1];
+	}
 	// Matrix exponentiation (only for square matrices)
 	Matrix<Rows, Rows> matrixPower(ll exp) const
 	{
@@ -329,106 +335,21 @@ public:
 		return is;
 	}
 };
-constexpr int sz = 2;
-using Matrix2by2 = Matrix<sz, sz>;
+constexpr int sz = 201;
+using TransMatrix = Matrix<sz, sz>;
+template <int Rows, int Cols>
+Matrix<Rows, Cols> Matrix<Rows, Cols>::pow2[32];
 
-struct SegmentTree
+vector<Mint> multiplyVector(const vector<Mint> &vec, const TransMatrix &mat)
 {
-#define L (2 * node + 1)
-#define R (2 * node + 2)
-#define mid ((left + right) >> 1)
-private:
-	struct Node
+	vector<Mint> res(sz);
+	for (int j = 0; j < sz; j++)
 	{
-		Matrix2by2 matrix;
-		// Constructors
-		Node()
-		{
-			matrix[0][0] = 1;
-			matrix[0][1] = 0;
-			matrix[1][0] = 0;
-			matrix[1][1] = 1;
-		}
-		Node(const Matrix2by2 &other) : matrix(other) {}
-	};
-	int size;
-	vector<Node> seg;
-	Node merge(const Node &leftNode, const Node &rightNode)
-	{
-		Node res;
-		res.matrix = (leftNode.matrix * rightNode.matrix);
-		return res;
+		for (int k = 0; k < sz; k++)
+			res[j] += vec[k] * mat[k][j];
 	}
-	void build(int left, int right, int node, const vector<Matrix2by2> &arr)
-	{
-		if (left == right)
-		{
-			if (left < arr.size())
-				seg[node] = arr[left];
-			return;
-		}
-
-		// Building left node
-		build(left, mid, L, arr);
-
-		// Building right node
-		build(mid + 1, right, R, arr);
-
-		// Returning to parent nodes
-		seg[node] = merge(seg[L], seg[R]);
-	}
-	void update(int left, int right, int node, int idx, const Matrix2by2 &other)
-	{
-		if (left == right)
-		{
-			seg[node].matrix = other;
-			return;
-		}
-		if (idx <= mid)
-			update(left, mid, L, idx, other);
-		else
-			update(mid + 1, right, R, idx, other);
-
-		// Updating while returning to parent nodes
-		seg[node] = merge(seg[L], seg[R]);
-	}
-	Node query(int left, int right, int node, int leftQuery, int rightQuery)
-	{
-		// Out of range
-		if (right < leftQuery || left > rightQuery)
-			return Node(); // Identity Matrix
-		// The whole range is the answer
-		if (left >= leftQuery && right <= rightQuery)
-			return seg[node];
-		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-		return merge(leftSegment, rightSegment);
-	}
-
-public:
-	SegmentTree(const vector<Matrix2by2> &arr)
-	{
-		size = 1;
-		int n = arr.size();
-		while (size < n)
-			size <<= 1;
-		seg = vector<Node>(2 * size, Node());
-		build(0, size - 1, 0, arr);
-	}
-	void update(int idx, const Matrix2by2 &val)
-	{
-		update(0, size - 1, 0, idx, val);
-	}
-	Matrix2by2 query(int left, int right)
-	{
-		Node ans = query(0, size - 1, 0, left, right);
-		return ans.matrix;
-	}
-
-#undef L
-#undef R
-#undef mid
-};
+	return res;
+}
 
 int main()
 {
@@ -438,20 +359,36 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
-	int N, M, L, R;
-	cin >> mod >> N >> M;
-	vector<Matrix2by2> vc(N);
-	for (int i{}; i < N; i++)
-		cin >> vc[i];
-	SegmentTree segTree(vc);
-	while (M--)
+	int t = 1;
+	// cin >> t;
+	while (t--)
 	{
-		cin >> L >> R;
-		L--, R--; // To be 0-based
-		Matrix2by2 ans = segTree.query(L, R);
-		cout << ans[0][0] << " " << ans[0][1] << endl;
-		cout << ans[1][0] << " " << ans[1][1] << endl;
-		cout << endl;
+		ll n, m, q;
+		cin >> n >> m >> q;
+		TransMatrix mat;
+		for (int i{}; i < m; i++)
+		{
+			int u, v;
+			cin >> u >> v;
+			mat[u][v] = 1;
+		}
+		Matrix<sz, sz>::precompute(mat);
+
+		while (q--)
+		{
+			int u, v, k;
+			cin >> u >> v >> k;
+			vector<Mint> dp(sz);
+			dp[u] = 1; // start node
+
+			for (int bit = 0; bit < 32; bit++)
+			{
+				if ((k >> bit) & 1)
+					dp = multiplyVector(dp, Matrix<sz, sz>::pow2[bit]);
+			}
+
+			cout << dp[v] << endl;
+		}
 	}
 	return 0;
 }

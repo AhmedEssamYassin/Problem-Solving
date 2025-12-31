@@ -213,18 +213,18 @@ U &operator>>(U &stream, Modular<T> &number)
 	return stream;
 }
 
-using ModType = int; // Important for is_same<> to work
+// using ModType = int; // Important for is_same<> to work
 
-struct VarMod
-{
-	static ModType value;
-};
-ModType VarMod::value;
-ModType &mod = VarMod::value;
-using Mint = Modular<VarMod>;
+// struct VarMod
+// {
+//     static ModType value;
+// };
+// ModType VarMod::value;
+// ModType &mod = VarMod::value;
+// using Mint = Modular<VarMod>;
 
-// constexpr int mod = 1e9 + 7;
-// using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
+constexpr int modPhi = (1e9 + 7) - 1;
+using Mint = Modular<std::integral_constant<decay<decltype(modPhi)>::type, modPhi>>;
 Mint operator""_m(unsigned long long literal)
 {
 	return Mint(literal);
@@ -300,7 +300,6 @@ public:
 			identity[i][i] = 1;
 		return identity;
 	}
-
 	// Matrix exponentiation (only for square matrices)
 	Matrix<Rows, Rows> matrixPower(ll exp) const
 	{
@@ -329,106 +328,52 @@ public:
 		return is;
 	}
 };
-constexpr int sz = 2;
-using Matrix2by2 = Matrix<sz, sz>;
+constexpr int sz = 8;
+using TransMatrix = Matrix<sz, sz>;
 
-struct SegmentTree
+const ll mod = 1e9 + 7;
+
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
+inline ll add64(const ll &a, const ll &b)
 {
-#define L (2 * node + 1)
-#define R (2 * node + 2)
-#define mid ((left + right) >> 1)
-private:
-	struct Node
-	{
-		Matrix2by2 matrix;
-		// Constructors
-		Node()
-		{
-			matrix[0][0] = 1;
-			matrix[0][1] = 0;
-			matrix[1][0] = 0;
-			matrix[1][1] = 1;
-		}
-		Node(const Matrix2by2 &other) : matrix(other) {}
-	};
-	int size;
-	vector<Node> seg;
-	Node merge(const Node &leftNode, const Node &rightNode)
-	{
-		Node res;
-		res.matrix = (leftNode.matrix * rightNode.matrix);
-		return res;
-	}
-	void build(int left, int right, int node, const vector<Matrix2by2> &arr)
-	{
-		if (left == right)
-		{
-			if (left < arr.size())
-				seg[node] = arr[left];
-			return;
-		}
+	double_size_t res = double_size_t(a) + b;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
 
-		// Building left node
-		build(left, mid, L, arr);
+inline ll sub64(const ll &a, const ll &b)
+{
+	double_size_t res = double_size_t(a) - b;
+	if (res < 0)
+		res += mod;
+	if (res >= mod)
+		res -= mod;
+	return res;
+}
 
-		// Building right node
-		build(mid + 1, right, R, arr);
+inline ll mult64(const ll &a, const ll &b)
+{
+	return double_size_t(a) * b % mod;
+}
 
-		// Returning to parent nodes
-		seg[node] = merge(seg[L], seg[R]);
-	}
-	void update(int left, int right, int node, int idx, const Matrix2by2 &other)
-	{
-		if (left == right)
-		{
-			seg[node].matrix = other;
-			return;
-		}
-		if (idx <= mid)
-			update(left, mid, L, idx, other);
-		else
-			update(mid + 1, right, R, idx, other);
+ll modPow(ll N, ll power)
+{
+	if (N % mod == 0 || N == 0)
+		return 0;
+	if (N == 1 || power == 0)
+		return 1;
 
-		// Updating while returning to parent nodes
-		seg[node] = merge(seg[L], seg[R]);
-	}
-	Node query(int left, int right, int node, int leftQuery, int rightQuery)
+	ll res{1};
+	while (power)
 	{
-		// Out of range
-		if (right < leftQuery || left > rightQuery)
-			return Node(); // Identity Matrix
-		// The whole range is the answer
-		if (left >= leftQuery && right <= rightQuery)
-			return seg[node];
-		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
-		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
-		return merge(leftSegment, rightSegment);
+		if (power & 1)
+			res = mult64(res, N);
+		N = mult64(N, N);
+		power >>= 1;
 	}
-
-public:
-	SegmentTree(const vector<Matrix2by2> &arr)
-	{
-		size = 1;
-		int n = arr.size();
-		while (size < n)
-			size <<= 1;
-		seg = vector<Node>(2 * size, Node());
-		build(0, size - 1, 0, arr);
-	}
-	void update(int idx, const Matrix2by2 &val)
-	{
-		update(0, size - 1, 0, idx, val);
-	}
-	Matrix2by2 query(int left, int right)
-	{
-		Node ans = query(0, size - 1, 0, left, right);
-		return ans.matrix;
-	}
-
-#undef L
-#undef R
-#undef mid
-};
+	return res;
+}
 
 int main()
 {
@@ -438,20 +383,38 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
-	int N, M, L, R;
-	cin >> mod >> N >> M;
-	vector<Matrix2by2> vc(N);
-	for (int i{}; i < N; i++)
-		cin >> vc[i];
-	SegmentTree segTree(vc);
-	while (M--)
+	int t = 1;
+	// cin >> t;
+	while (t--)
 	{
-		cin >> L >> R;
-		L--, R--; // To be 0-based
-		Matrix2by2 ans = segTree.query(L, R);
-		cout << ans[0][0] << " " << ans[0][1] << endl;
-		cout << ans[1][0] << " " << ans[1][1] << endl;
-		cout << endl;
+		ll f[3];
+		ll c;
+		ll n;
+		cin >> n >> f[0] >> f[1] >> f[2] >> c;
+		TransMatrix mat = TransMatrix({
+			{1, 1, 1, 0, 0, 0, 0, 0},		   // row 0
+			{1, 0, 0, 0, 0, 0, 0, 0},		   // row 1
+			{0, 1, 0, 0, 0, 0, 0, 0},		   // row 2
+			{0, 0, 0, 1, 1, 1, 2, modPhi - 4}, // row 3
+			{0, 0, 0, 1, 0, 0, 0, 0},		   // row 4
+			{0, 0, 0, 0, 1, 0, 0, 0},		   // row 5
+			{0, 0, 0, 0, 0, 0, 1, 1},		   // row 6
+			{0, 0, 0, 0, 0, 0, 0, 1}		   // row 7
+		});
+
+		// Exponentiate
+		auto M = mat.matrixPower(n - 3);
+
+		Mint e1 = M[0][2];
+		Mint e2 = M[0][1];
+		Mint e3 = M[0][0];
+		Mint ec = M[3][6] * 3 + M[3][7];
+		ll ans = 1;
+		ans = mult64(ans, modPow(f[0], e1()));
+		ans = mult64(ans, modPow(f[1], e2()));
+		ans = mult64(ans, modPow(f[2], e3()));
+		ans = mult64(ans, modPow(c, ec()));
+		cout << ans << endl;
 	}
 	return 0;
 }

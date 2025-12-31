@@ -29,40 +29,34 @@ inline ll mult64(const ll &a, const ll &b)
 }
 
 // Fast Doubling method
-void fastDoubling(ll N, ll &x, ll &y)
+pair<ll, ll> getNthFib(ll N)
 {
+	ll a = 0, b = 1; // (F(0), F(1))
 	if (N == 0)
-	{
-		x = 0;
-		y = 1;
-		return;
-	}
+		return {a, b};
 
-	if (N & 1)
+	int msb = __lg(N);
+	for (int i = msb; i >= 0; i--)
 	{
-		fastDoubling(N - 1, y, x);
-		y = add64(y, x);
+		ll c = mult64(a, sub64(mult64(b, 2), a)); // F(2k)
+		ll d = add64(mult64(a, a), mult64(b, b)); // F(2k + 1)
+		if ((N >> i) & 1)
+		{
+			a = d;
+			b = add64(c, d);
+		}
+		else
+		{
+			a = c;
+			b = d;
+		}
 	}
-	else
-	{
-		ll a, b;
-		fastDoubling(N >> 1, a, b);
-
-		ll a_sq = mult64(a, a);
-		ll b_sq = mult64(b, b);
-		ll ab = mult64(a, b);
-		ll b_minus_a = sub64(b, a);
-
-		y = add64(a_sq, b_sq);
-		x = add64(ab, mult64(a, b_minus_a));
-	}
+	return {a, b};
 }
 
 ll F(ll N)
 {
-	ll x, y;
-	fastDoubling(N, x, y); // x = F(N), y = F(N + 1)
-	return x;
+	return getNthFib(N).first;
 }
 
 ll sumFib(ll N)

@@ -213,18 +213,18 @@ U &operator>>(U &stream, Modular<T> &number)
 	return stream;
 }
 
-using ModType = int; // Important for is_same<> to work
+// using ModType = int; // Important for is_same<> to work
 
-struct VarMod
-{
-	static ModType value;
-};
-ModType VarMod::value;
-ModType &mod = VarMod::value;
-using Mint = Modular<VarMod>;
+// struct VarMod
+// {
+//     static ModType value;
+// };
+// ModType VarMod::value;
+// ModType &mod = VarMod::value;
+// using Mint = Modular<VarMod>;
 
-// constexpr int mod = 1e9 + 7;
-// using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
+constexpr int mod = 1e9 + 7;
+using Mint = Modular<std::integral_constant<decay<decltype(mod)>::type, mod>>;
 Mint operator""_m(unsigned long long literal)
 {
 	return Mint(literal);
@@ -340,34 +340,27 @@ struct SegmentTree
 private:
 	struct Node
 	{
-		Matrix2by2 matrix;
+		Matrix2by2 mat;
 		// Constructors
-		Node()
-		{
-			matrix[0][0] = 1;
-			matrix[0][1] = 0;
-			matrix[1][0] = 0;
-			matrix[1][1] = 1;
-		}
-		Node(const Matrix2by2 &other) : matrix(other) {}
+		Node() { mat = mat.createIdentity<sz>(); }
+		Node(const Matrix2by2 &o) : mat(o) {}
 	};
 	int size;
 	vector<Node> seg;
 	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
-		res.matrix = (leftNode.matrix * rightNode.matrix);
+		res.mat = (leftNode.mat * rightNode.mat);
 		return res;
 	}
 	void build(int left, int right, int node, const vector<Matrix2by2> &arr)
 	{
-		if (left == right)
+		if (left == right) // Leaf Node (single element)
 		{
-			if (left < arr.size())
+			if (left < arr.size()) // Making sure we are inside the boundaries of the array
 				seg[node] = arr[left];
 			return;
 		}
-
 		// Building left node
 		build(left, mid, L, arr);
 
@@ -377,18 +370,17 @@ private:
 		// Returning to parent nodes
 		seg[node] = merge(seg[L], seg[R]);
 	}
-	void update(int left, int right, int node, int idx, const Matrix2by2 &other)
+	void update(int left, int right, int node, int idx, const Matrix2by2 &x)
 	{
 		if (left == right)
 		{
-			seg[node].matrix = other;
+			seg[node] = x;
 			return;
 		}
 		if (idx <= mid)
-			update(left, mid, L, idx, other);
+			update(left, mid, L, idx, x);
 		else
-			update(mid + 1, right, R, idx, other);
-
+			update(mid + 1, right, R, idx, x);
 		// Updating while returning to parent nodes
 		seg[node] = merge(seg[L], seg[R]);
 	}
@@ -396,10 +388,13 @@ private:
 	{
 		// Out of range
 		if (right < leftQuery || left > rightQuery)
-			return Node(); // Identity Matrix
+			return Node(); // A value that doesn't affect the query
+
 		// The whole range is the answer
 		if (left >= leftQuery && right <= rightQuery)
 			return seg[node];
+
+		// ONLY a part of this segment belongs to the query
 		Node leftSegment = query(left, mid, L, leftQuery, rightQuery);
 		Node rightSegment = query(mid + 1, right, R, leftQuery, rightQuery);
 		return merge(leftSegment, rightSegment);
@@ -412,23 +407,66 @@ public:
 		int n = arr.size();
 		while (size < n)
 			size <<= 1;
-		seg = vector<Node>(2 * size, Node());
+		seg = vector<Node>(2 * size);
 		build(0, size - 1, 0, arr);
 	}
 	void update(int idx, const Matrix2by2 &val)
 	{
 		update(0, size - 1, 0, idx, val);
 	}
-	Matrix2by2 query(int left, int right)
+	Mint query(int left, int right)
 	{
 		Node ans = query(0, size - 1, 0, left, right);
-		return ans.matrix;
+		return ans.mat[0][0];
 	}
 
 #undef L
 #undef R
 #undef mid
 };
+
+Matrix2by2 getTransition(char c)
+{
+	Matrix2by2 trans;
+
+	if (c == '?')
+	{
+		trans[0][0] = 19; // happy -> happy
+		trans[0][1] = 7;  // happy -> sad
+		trans[1][0] = 6;  // sad -> happy
+		trans[1][1] = 20; // sad -> sad
+	}
+	else
+	{
+		// Specific character
+		if (c == 'S' || c == 'D')
+		{
+			// Makes sad
+			trans[0][1] = 1; // happy -> sad
+			trans[1][1] = 1; // sad -> sad
+		}
+		else if (c == 'H')
+		{
+			// Makes happy
+			trans[0][0] = 1; // happy -> happy
+			trans[1][0] = 1; // sad -> happy
+		}
+		else if (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U')
+		{
+			// Flips mood
+			trans[0][1] = 1; // happy -> sad
+			trans[1][0] = 1; // sad -> happy
+		}
+		else
+		{
+			// No change
+			trans[0][0] = 1; // happy -> happy
+			trans[1][1] = 1; // sad -> sad
+		}
+	}
+
+	return trans;
+}
 
 int main()
 {
@@ -438,20 +476,28 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
 #endif //! ONLINE_JUDGE
-	int N, M, L, R;
-	cin >> mod >> N >> M;
-	vector<Matrix2by2> vc(N);
-	for (int i{}; i < N; i++)
-		cin >> vc[i];
-	SegmentTree segTree(vc);
-	while (M--)
+	int t = 1;
+	// cin >> t;
+	while (t--)
 	{
-		cin >> L >> R;
-		L--, R--; // To be 0-based
-		Matrix2by2 ans = segTree.query(L, R);
-		cout << ans[0][0] << " " << ans[0][1] << endl;
-		cout << ans[1][0] << " " << ans[1][1] << endl;
-		cout << endl;
+		int n, q;
+		cin >> n >> q;
+		string str;
+		cin >> str;
+		vector<Matrix2by2> vc;
+		for (int i{}; i < n; i++)
+			vc.push_back(getTransition(str[i]));
+		SegmentTree segTree(vc);
+		cout << segTree.query(0, n - 1) << endl;
+		while (q--)
+		{
+			int i;
+			char c;
+			cin >> i >> c;
+			i--;
+			segTree.update(i, getTransition(c));
+			cout << segTree.query(0, n - 1) << endl;
+		}
 	}
 	return 0;
 }
