@@ -7,10 +7,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	∑ ∑ ∑ (a[i] & a[j]) . (a[j] | a[k])
 	We can rearrange the sigmas so that the sigma with the variable j comes first

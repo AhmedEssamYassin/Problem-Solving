@@ -20,10 +20,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	construct an array a[] is of length N
 	where 0 <= a[i] <= (1 << k) - 1, i.e., each number is at most k bits

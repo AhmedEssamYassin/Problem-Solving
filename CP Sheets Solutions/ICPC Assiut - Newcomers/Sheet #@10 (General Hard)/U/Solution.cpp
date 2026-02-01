@@ -22,10 +22,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	If the answer exists, then each element of string S matches with some element of string T. Thereby string S MUST be a subsequence of string T.
 	i.e. ALL the characters in string S MUST appear in the same order they appears in string T

@@ -36,10 +36,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	You should pick the largest subset that for every two elements, A and B, there should be at least one zero in A%10 and B%10,
 	at least one zero in A/10%10 and B/10%10, and at least one zero in A/100%10 and B/100%10.

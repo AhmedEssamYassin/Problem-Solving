@@ -40,10 +40,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 
 	Generate_Lucky_Numbers(0); // It's extremely fast, It's O(2^18)
 	// It generates Lucky numbers UNSORTED, so we need to sort them first

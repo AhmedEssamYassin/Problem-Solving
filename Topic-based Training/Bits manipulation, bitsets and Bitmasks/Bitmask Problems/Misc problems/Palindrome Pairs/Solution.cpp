@@ -14,10 +14,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	For a string to have the capability of being reordered to become a palindrome:
 	1. If length is EVEN: ALL characters MUST have EVEN occurrence

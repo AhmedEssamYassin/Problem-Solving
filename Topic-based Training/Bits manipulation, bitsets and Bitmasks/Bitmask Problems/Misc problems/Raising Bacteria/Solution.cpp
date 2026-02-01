@@ -7,10 +7,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	Initially, the box is empty.
 	Each morning, you can put any number of bacteria into the box. And each night, every bacterium in the box will split into TWO bacteria.

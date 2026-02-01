@@ -7,10 +7,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	0 1 2 3	4 5 6 7		8 9 10 11		12 13 14 15 ...
 	0 01 10 11	 0100 0101 0110 0111 	1000 1001 1010 1011 	1100 1101 1110 1111

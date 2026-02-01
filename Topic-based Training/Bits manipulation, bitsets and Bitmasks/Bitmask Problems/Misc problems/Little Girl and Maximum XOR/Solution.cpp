@@ -7,10 +7,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	(N + 1) flips ALL bits after the rightmost cleared bit of N, including the rightmost cleared bit
 	So, going from L to R meaning adding 1 each time getting (L + 1), (L + 2),..., R

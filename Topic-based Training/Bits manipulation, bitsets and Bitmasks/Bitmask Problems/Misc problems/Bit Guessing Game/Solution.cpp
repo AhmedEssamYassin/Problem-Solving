@@ -7,10 +7,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	Let's try to subtract 1, 2, 4, ... . i.e., (1, 2¹, 2², 2³ ...)
 	In other words, we will iterate over k = 0, 1, 2, ..., and subtract (1LL << k)

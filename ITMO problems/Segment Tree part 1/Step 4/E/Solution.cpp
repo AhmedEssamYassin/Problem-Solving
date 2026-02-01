@@ -109,10 +109,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	ll N, M, q, i, h, L, R, P;
 	cin >> N >> M;
 	SegmentTree segTree(vector<ll>(N, INT_MAX));

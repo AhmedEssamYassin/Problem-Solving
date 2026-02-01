@@ -15,10 +15,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	In Your faculty, there is N student's some of them can work with each other, but NOT all of them can work with each other.
 	Your job is to create a team from them such that ALL of its members can work with each other

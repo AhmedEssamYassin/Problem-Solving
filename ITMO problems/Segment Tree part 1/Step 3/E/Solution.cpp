@@ -100,10 +100,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	int N, M, q, L, R, v, idx;
 	cin >> N >> M;
 	vector<ll> vc(N + 1, 0);

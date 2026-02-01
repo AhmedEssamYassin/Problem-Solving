@@ -7,10 +7,10 @@ int main()
 {
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	If the Kth bit is set in XOR means there is an ODD number of 1's in that Kth bit
 	It can be cleared iff: The Kth bit in any B[j] is set && A's length is EVEN

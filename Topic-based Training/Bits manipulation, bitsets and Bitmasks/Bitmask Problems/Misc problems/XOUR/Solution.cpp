@@ -8,10 +8,10 @@ int main()
 	ios_base::sync_with_stdio(false);
 	cin.tie(nullptr);
 	cout.tie(nullptr);
-#ifndef ONLINE_JUDGE
+#ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif //! ONLINE_JUDGE
+#endif
 	/*
 	For any i and j, (a[i] ^ a[j]) < 4 iff the two numbers are the same in all bits except the first two bits
 	This is because if they have a mismatch in any other bit, their XOR will include this bit, making its value >= 4
