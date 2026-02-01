@@ -139,7 +139,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 
 	/*
 	Sum of ALL numbers from 1 to N:

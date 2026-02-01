@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 
 	/*
 	First, note that parts of the picture separated by 'W' are independent.

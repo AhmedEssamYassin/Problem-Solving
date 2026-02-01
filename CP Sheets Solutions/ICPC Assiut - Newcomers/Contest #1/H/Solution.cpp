@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 
 	long double n, k, a, Expr;
 	cin >> n >> k >> a;

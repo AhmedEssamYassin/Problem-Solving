@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 
 	ll Apples_on_tree, Apples_pm;
 	cin >> Apples_on_tree >> Apples_pm;

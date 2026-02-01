@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 	int t = 1, N, A, B;
 	string Code;
 	regex Digits_reg("[0-9]+"); // Matches Any string of characters from '0' to '9'

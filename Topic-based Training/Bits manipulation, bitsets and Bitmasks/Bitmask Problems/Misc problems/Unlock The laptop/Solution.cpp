@@ -17,7 +17,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 
 	/*
 	You are given an integer number N and array A of N Characters (consisting of digits ,uppercase and lowercase English letters),

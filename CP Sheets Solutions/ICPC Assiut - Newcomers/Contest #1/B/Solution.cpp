@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 	long long int a, b, k;
 	cin >> a >> b >> k;
 	if (a % k == 0 && b % k == 0)

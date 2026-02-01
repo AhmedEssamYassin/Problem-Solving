@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 	/*
 	Original price = Price after discount + Discount percentage * Original price
 	Original price - Discount percentage * Original price = Price after discount

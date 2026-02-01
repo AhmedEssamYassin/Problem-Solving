@@ -10,7 +10,7 @@ int main()
 #ifdef LOCAL
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
-#endif // !ONLINE_JUDGE
+#endif
 
 	/*
 	(A^B)  and  (C^D) , Taking their constraints into consideration, will difinitely OVERFLOW any data type in C++ (in worst case scenarios)
