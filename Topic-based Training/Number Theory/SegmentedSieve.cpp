@@ -6,49 +6,44 @@ using namespace std;
 const ll L1D_CACHE_SIZE = 32768;
 
 // Optimized segmented sieve for range [L, R]
-pair<vector<ll>, ll> getPrimesInRange(ll L, ll R)
+template <typename T>
+void getPrimesInRange(T L, T R, vector<T> &res)
 {
-    if (L > R)
-        return {{}, 0};
-    if (R < 2)
-        return {{}, 0};
-
-    vector<ll> result;
+    if (L > R || R < 2)
+        return;
 
     // Handle special case for 2
     if (L <= 2 && R >= 2)
-    {
-        result.push_back(2);
-    }
+        res.push_back(2);
 
     // Make L odd if it's even (we only check odd numbers)
     if (L % 2 == 0)
         L++;
 
-    ll sqrt_R = sqrtl(R);
-    ll segment_size = max(sqrt_R, L1D_CACHE_SIZE);
+    ll sqrtR = sqrtl(R);
+    ll segSize = max(sqrtR, L1D_CACHE_SIZE);
 
     // Generate base primes up to sqrt(R) using simple sieve
-    vector<bool> isPrime(sqrt_R + 1, true);
+    vector<bool> isPrime(sqrtR + 1, true);
     isPrime[0] = isPrime[1] = false;
 
     // Only sieve odd numbers for base primes
-    for (ll i = 3; i * i <= sqrt_R; i += 2)
+    for (ll i = 3; i * i <= sqrtR; i += 2)
     {
         if (isPrime[i])
         {
-            for (ll j = i * i; j <= sqrt_R; j += 2 * i)
+            for (ll j = i * i; j <= sqrtR; j += 2 * i)
                 isPrime[j] = false;
         }
     }
 
     // Collect odd primes >= 3 for sieving
-    vector<ll> primes;
-    vector<ll> multiples;
+    vector<T> primes;
+    vector<T> multiples;
 
-    for (ll low = L; low <= R; low += segment_size)
+    for (ll low = L; low <= R; low += segSize)
     {
-        ll high = min(low + segment_size - 1, R);
+        ll high = min<ll>(low + segSize - 1, R);
 
         // Use char array for better cache performance
         vector<char> sieve((high - low) / 2 + 1, true);
@@ -61,11 +56,11 @@ pair<vector<ll>, ll> getPrimesInRange(ll L, ll R)
                 primes.push_back(p);
 
                 // Find first odd multiple of p in range [low, high]
-                ll first_multiple = max(p * p, ((low + p - 1) / p) * p);
-                if (first_multiple % 2 == 0)
-                    first_multiple += p;
+                ll mult = max(p * p, ((low + p - 1) / p) * p);
+                if (mult % 2 == 0)
+                    mult += p;
 
-                multiples.push_back((first_multiple - low) / 2);
+                multiples.push_back((mult - low) / 2);
             }
         }
 
@@ -74,17 +69,17 @@ pair<vector<ll>, ll> getPrimesInRange(ll L, ll R)
         {
             ll p = primes[i];
             ll j = multiples[i];
-            ll segment_limit = (high - low) / 2;
+            ll segLimit = (high - low) / 2;
 
             // Mark multiples of p in current segment
-            while (j <= segment_limit)
+            while (j <= segLimit)
             {
                 sieve[j] = false;
                 j += p; // Skip by p (since we're dealing with odd numbers only)
             }
 
             // Update multiple for next segment
-            multiples[i] = j - (segment_limit + 1);
+            multiples[i] = j - (segLimit + 1);
         }
 
         // Collect primes from current segment
@@ -92,14 +87,14 @@ pair<vector<ll>, ll> getPrimesInRange(ll L, ll R)
         {
             if (sieve[i])
             {
-                ll candidate = low + 2 * i;
-                if (candidate >= L && candidate <= R && candidate > 1)
-                    result.push_back(candidate);
+                ll cand = low + 2 * i;
+                if (cand >= L && cand <= R && cand > 1)
+                    res.push_back(cand);
             }
         }
     }
 
-    return {result, (ll)result.size()};
+    return;
 }
 
 int main()
@@ -111,14 +106,14 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif
     int t = 1;
-    ll N;
     cin >> t;
     while (t--)
     {
         int L, R;
         cin >> L >> R;
-        auto [primes, cnt] = getPrimesInRange(L, R);
-        for (ll &p : primes)
+        vector<int> primes;
+        getPrimesInRange(L, R, primes);
+        for (const auto &p : primes)
             cout << p << endl;
         cout << endl;
     }
