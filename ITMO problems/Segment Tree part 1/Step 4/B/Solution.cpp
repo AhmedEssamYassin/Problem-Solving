@@ -280,12 +280,24 @@ public:
 	Matrix<Rows, Q> operator*(const Matrix<Cols, Q> &other) const
 	{
 		Matrix<Rows, Q> result;
+		// constexpr int b = min<u64>(16, ~0ULL / (1ULL * (mod - 1) * (mod - 1))); // For constant mod only
+		constexpr int b = 16; // If mod is larger that 1.07e9, b must take smaller values
 		for (int i = 0; i < Rows; i++)
 		{
-			for (int j = 0; j < Q; j++)
+			for (int bk = 0; bk < Cols; bk += b)
 			{
-				for (int k = 0; k < Cols; k++)
-					result[i][j] += data[i][k] * other[k][j];
+				int kEnd = min(Cols, bk + b);
+				alignas(64) uint64_t localC[Q] = {0};
+				for (int k = bk; k < kEnd; k++)
+				{
+					uint32_t valA = data[i][k]();
+					if (!valA)
+						continue;
+					for (int j = 0; j < Q; j++)
+						localC[j] += 1ULL * valA * other[k][j]();
+				}
+				for (int j = 0; j < Q; j++)
+					result[i][j] += localC[j] % mod;
 			}
 		}
 		return result;
@@ -449,6 +461,7 @@ int main()
 		cin >> L >> R;
 		L--, R--; // To be 0-based
 		Matrix2by2 ans = segTree.query(L, R);
+
 		cout << ans[0][0] << " " << ans[0][1] << endl;
 		cout << ans[1][0] << " " << ans[1][1] << endl;
 		cout << endl;

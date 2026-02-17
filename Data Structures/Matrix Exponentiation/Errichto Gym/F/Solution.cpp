@@ -55,9 +55,9 @@ public:
 		Matrix<Rows, Q> result(2e18);
 		for (int i = 0; i < Rows; i++)
 		{
-			for (int j = 0; j < Q; j++)
+			for (int k = 0; k < Cols; k++)
 			{
-				for (int k = 0; k < Cols; k++)
+				for (int j = 0; j < Q; j++)
 					result[i][j] = min(result[i][j], data[i][k] + other[k][j]);
 			}
 		}
