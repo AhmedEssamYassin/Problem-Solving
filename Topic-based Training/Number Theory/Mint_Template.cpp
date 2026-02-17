@@ -193,7 +193,7 @@ bool IsZero(const Modular<T> &number)
 template <typename T>
 string to_string(const Modular<T> &number)
 {
-    return to_string(number());
+    return std::to_string(number());
 }
 
 // U == std::ostream? but done this way because of fastoutput
@@ -213,7 +213,7 @@ U &operator>>(U &stream, Modular<T> &number)
     return stream;
 }
 
-// using ModType = ll;
+// using ModType = int; // Important for is_same<> to work
 
 // struct VarMod
 // {
