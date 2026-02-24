@@ -3,103 +3,140 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-struct Node
+struct PersistentSegmentTree
 {
-	ll Value;
-	Node *LeftChild, *RightChild; // Pointers to left child and right child
-
-	Node(const ll &val = 0)
-	{
-		Value = val;
-		LeftChild = nullptr;
-		RightChild = nullptr;
-	}
-	Node(Node *l, Node *r, const ll &val = 0)
-	{
-		LeftChild = l;
-		RightChild = r;
-		Value = val;
-	}
-
-	void createChildren() // Construct Childs
-	{
-		if (LeftChild == nullptr)
-			LeftChild = new Node();
-		if (RightChild == nullptr)
-			RightChild = new Node();
-	}
-	~Node() // Destructor. Notice the "~" character before the struct name.
-	{
-		delete LeftChild;
-		delete RightChild;
-		LeftChild = nullptr;
-		RightChild = nullptr;
-	}
-};
-Node *Versions[100001]; // To maintain versions of the segment tree
-
 #define mid ((left + right) >> 1)
-ll N = 30001;
-Node *merge(Node *leftNode, Node *rightNode, bool in_place = 0, Node *Current = nullptr) // In_place for update and insert
-{
-	ll res = ((leftNode == nullptr ? 0 : leftNode->Value) + (rightNode == nullptr ? 0 : rightNode->Value));
-
-	if (not in_place)
-		return new Node(nullptr, nullptr, res);
-	else
+private:
+	struct Node
 	{
-		Current->Value = res;
-		return Current;
-	}
-}
+		ll value;
+		int L;
+		int R;
+		Node() { value = 0, L = 0, R = 0; }
+		Node(const ll &x)
+		{
+			value = x;
+			L = 0;
+			R = 0;
+		}
+		void merge(const Node &leftNode, const Node &rightNode)
+		{
+			value = (leftNode.value + rightNode.value);
+		}
+	};
 
-Node *insert(Node *node, ll left, ll right, ll i, ll val) // Update for a single version
-{
-	if (left <= i && right >= i)
+	vector<Node> tree;
+	int maxN;
+	vector<int> versions;
+
+	int build(const vector<ll> &arr, int left, int right)
 	{
-		if (node == nullptr)
-			node = new Node();
+		int newNode = tree.size();
+		tree.push_back(Node());
 
 		if (left == right)
-			return new Node(node->LeftChild, node->RightChild, node->Value + val);
+		{
+			tree[newNode] = arr[left];
+			return newNode;
+		}
 
-		Node *goLeft = insert(node->LeftChild, left, mid, i, val);
-		Node *goRight = insert(node->RightChild, mid + 1, right, i, val);
-		Node *res = new Node(goLeft, goRight);
-		return merge(goLeft, goRight, 1, res);
+		tree[newNode].L = build(arr, left, mid);
+		tree[newNode].R = build(arr, mid + 1, right);
+		tree[newNode].merge(tree[tree[newNode].L], tree[tree[newNode].R]);
+		return newNode;
 	}
-	return node;
-}
 
-ll query(Node *Current, ll left, ll right, ll leftQuery, ll rightQuery)
-{
-	// [left, right] doesn't intersect with [leftQuery, rightQuery]
-	if (Current == nullptr || left > rightQuery || right < leftQuery)
-		return 0;
+	int insert(int node, int left, int right, int i, ll val)
+	{
+		Node copy = tree[node];
+		int newNode = tree.size();
+		tree.push_back(copy);
 
-	// [left, curR] is inside [leftQuery, rightQuery]
-	if (leftQuery <= left && right <= rightQuery)
-		return Current->Value;
+		if (left == right)
+		{
+			tree[newNode].value += val;
+			return newNode;
+		}
 
-	ll leftSegment = query(Current->LeftChild, left, mid, leftQuery, rightQuery);
-	ll rightSegment = query(Current->RightChild, mid + 1, right, leftQuery, rightQuery);
-	return (leftSegment + rightSegment);
-}
+		if (i <= mid)
+			tree[newNode].L = insert(copy.L, left, mid, i, val);
+		else
+			tree[newNode].R = insert(copy.R, mid + 1, right, i, val);
 
-// Interface
+		tree[newNode].merge(tree[tree[newNode].L], tree[tree[newNode].R]);
+		return newNode;
+	}
 
-Node *insert(Node *Current, ll i, ll val)
-{
-	return insert(Current, 0, N, i, val);
-}
+	Node query(int node, int left, int right, int leftQuery, int rightQuery)
+	{
+		if (!node || leftQuery > right || rightQuery < left)
+			return Node();
+		if (leftQuery <= left && right <= rightQuery)
+			return tree[node];
 
-ll query(Node *Current, ll left, ll right)
-{
-	ll ans = query(Current, 0, N, left, right);
-	return ans;
-}
+		Node leftSegment = query(tree[node].L, left, mid, leftQuery, rightQuery);
+		Node rightSegment = query(tree[node].R, mid + 1, right, leftQuery, rightQuery);
+		Node res;
+		res.merge(leftSegment, rightSegment);
+		return res;
+	}
+
+public:
+	PersistentSegmentTree(int n, int maxInsertions) : maxN(n)
+	{
+		int capacity = (n + maxInsertions) * (__lg(max(1, n)) + 2) + 2;
+		tree.reserve(capacity);
+		tree.push_back(Node());
+		versions.push_back(0);
+	}
+
+	// Constructs tree from base array. Returns new version index.
+	int build(const vector<ll> &arr)
+	{
+		tree.reserve(tree.capacity() + 4 * arr.size());
+		int root = build(arr, 0, maxN - 1);
+		versions.push_back(root);
+		return versions.size() - 1;
+	}
+
+	// Inserts `value` at `idx` based on a previous version. Returns new version index.
+	// Call to create a new historical state
+	int insert(int version, int i, ll x)
+	{
+		assert(version >= 0 && version < versions.size());
+		int newRoot = insert(versions[version], 0, maxN - 1, i, x);
+		versions.push_back(newRoot);
+		return versions.size() - 1;
+	}
+
+	// Updates a version IN-PLACE. Does NOT create a new version.
+	// Call when modifying a state without needing to keep the old one.
+	void update(int version, int i, ll x)
+	{
+		assert(version >= 1 && version < versions.size());
+		// Overwrite the root of the existing version instead of appending a new one
+		versions[version] = insert(versions[version], 0, maxN - 1, i, x);
+	}
+
+	// Queries sum/result in [leftQuery, rightQuery] for a specific version.
+	// Call to answer standard range queries on historical data.
+	ll query(int version, int leftQuery, int rightQuery)
+	{
+		assert(version >= 0 && version < versions.size());
+		return query(versions[version], 0, maxN - 1, leftQuery, rightQuery).value;
+	}
+
+	// Duplicates a specific version exactly. Returns new version index.
+	// Call when a time-step occurs but no actual data changes.
+	int copyAndAppend(int k)
+	{
+		assert(k >= 0 && k < versions.size());
+		versions.push_back(versions[k]);
+		return versions.size() - 1;
+	}
 
 #undef mid
+};
 
 int main()
 {
@@ -116,22 +153,23 @@ int main()
 	{
 		cin >> N;
 		map<int, int> lastPos;
-		Versions[0] = new Node(0);
+		PersistentSegmentTree pst(N + 1, 2 * N);
 		for (int i{1}; i <= N; i++)
 		{
 			ll x;
 			cin >> x;
-			int last = lastPos[x];
-			Versions[i] = insert(Versions[i - 1], last, -1 * (last > 0));
+			int currVer = pst.copyAndAppend(i - 1);
+			if (lastPos.count(x))
+				pst.update(currVer, lastPos[x], -1);
+			pst.update(currVer, i, 1);
 			lastPos[x] = i;
-			Versions[i] = insert(Versions[i], lastPos[x], 1);
 		}
 		cin >> Q;
 		while (Q--)
 		{
 			int L, R;
 			cin >> L >> R;
-			cout << query(Versions[R], L, R) << endl;
+			cout << pst.query(R, L, R) << endl;
 		}
 	}
 	return 0;
