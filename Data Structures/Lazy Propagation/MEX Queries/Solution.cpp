@@ -19,14 +19,8 @@ public:
 		init = vec;
 		compress(init);
 	}
-	int index(ll val)
-	{
-		return lower_bound(init.begin(), init.end(), val) - init.begin();
-	}
-	ll initVal(int idx)
-	{
-		return init[idx];
-	}
+	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
+	ll initialValue(int idx) { return init[idx]; }
 };
 
 struct LazySegmentTree
@@ -222,7 +216,7 @@ int main()
 				segTree.update(L, R, 1, 0);
 			else // 3
 				segTree.update(L, R, 2, 1);
-			cout << comp.initVal(segTree.query()) << endl;
+			cout << comp.initialValue(segTree.query()) << endl;
 		}
 	}
 	return 0;

@@ -20,14 +20,8 @@ public:
 		init = vec;
 		compress(init);
 	}
-	int index(ll val)
-	{
-		return lower_bound(init.begin(), init.end(), val) - init.begin();
-	}
-	ll initVal(int idx)
-	{
-		return init[idx];
-	}
+	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
+	ll initialValue(int idx) { return init[idx]; }
 };
 
 struct SegmentTree

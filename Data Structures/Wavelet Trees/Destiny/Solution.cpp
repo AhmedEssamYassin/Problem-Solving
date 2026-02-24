@@ -49,14 +49,8 @@ public:
 		init = vec;
 		compress(init);
 	}
-	int index(ll val)
-	{
-		return lower_bound(init.begin(), init.end(), val) - init.begin();
-	}
-	ll initVal(int idx)
-	{
-		return init[idx];
-	}
+	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
+	ll initialValue(int idx) { return init[idx]; }
 };
 
 struct WaveletMatrix
@@ -135,7 +129,7 @@ struct WaveletMatrix
 				r = mid[bit] + bv[bit].rank1(r);
 			}
 		}
-		return cr.initVal(res);
+		return cr.initialValue(res);
 	}
 
 private:
@@ -175,7 +169,7 @@ private:
 			return -1;
 
 		if (bit < 0)
-			return cr.initVal(res);
+			return cr.initialValue(res);
 
 		int c0 = bv[bit].rank0(r) - bv[bit].rank0(l);
 		int c1 = (r - l) - c0;

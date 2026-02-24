@@ -19,14 +19,8 @@ public:
 		init = vec;
 		compress(init);
 	}
-	int index(ll val)
-	{
-		return lower_bound(init.begin(), init.end(), val) - init.begin();
-	}
-	ll initVal(int idx)
-	{
-		return init[idx];
-	}
+	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
+	ll initialValue(int idx) { return init[idx]; }
 };
 
 struct PersistentSegmentTree
@@ -214,7 +208,7 @@ int main()
 			int L, R, k;
 			cin >> L >> R >> k;
 			int pos = pst.getKth(L, R, k);
-			cout << comp.initVal(pos) << endl;
+			cout << comp.initialValue(pos) << endl;
 		}
 	}
 	return 0;
