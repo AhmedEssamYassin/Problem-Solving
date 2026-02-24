@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-class CompressedRange
+class CoordinateCompression
 {
 private:
 	vector<ll> init;
@@ -14,7 +14,7 @@ private:
 	}
 
 public:
-	CompressedRange(vector<ll> &vec)
+	CoordinateCompression(vector<ll> &vec)
 	{
 		init = vec;
 		compress(init);
@@ -146,7 +146,7 @@ int main()
 			idx = pos++;
 			Rs.push_back(R);
 		}
-		CompressedRange comp(Rs);
+		CoordinateCompression comp(Rs);
 		for (auto &[L, R, idx] : intervals)
 			R = comp.index(R);
 

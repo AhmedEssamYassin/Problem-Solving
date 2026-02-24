@@ -33,7 +33,7 @@ struct SuccinctBitVector
 	int rank0(int i) { return i - rank1(i); }
 };
 
-class CompressedRange
+class CoordinateCompression
 {
 private:
 	vector<ll> init;
@@ -44,8 +44,8 @@ private:
 	}
 
 public:
-	CompressedRange() {}
-	CompressedRange(vector<ll> &vec)
+	CoordinateCompression() {}
+	CoordinateCompression(vector<ll> &vec)
 	{
 		init = vec;
 		compress(init);
@@ -59,7 +59,7 @@ struct WaveletMatrix
 	int n, maxLog;
 	vector<SuccinctBitVector> bv;
 	vector<int> mid;
-	CompressedRange cr;
+	CoordinateCompression cr;
 
 	WaveletMatrix(vector<ll> arr) : cr(arr)
 	{

@@ -4,7 +4,7 @@ using namespace std;
 #define endl "\n"
 
 const int mod = 1000000007;
-class CompressedRange
+class CoordinateCompression
 {
 private:
 	vector<ll> init;
@@ -15,7 +15,7 @@ private:
 	}
 
 public:
-	CompressedRange(vector<ll> vec)
+	CoordinateCompression(vector<ll> vec)
 	{
 		init = vec;
 		compress(init);
@@ -145,7 +145,7 @@ int main()
 	for (int i{1}; i < N; i++)
 		pref[i] = pref[i - 1] + vc[i];
 	// The problem is that negative numbers cannot be treated as indices
-	CompressedRange comp(pref);
+	CoordinateCompression comp(pref);
 	SegmentTree freqTree(vector<ll>(N + 1, 0));
 	SegmentTree sumTree(vector<ll>(N + 1, 0));
 

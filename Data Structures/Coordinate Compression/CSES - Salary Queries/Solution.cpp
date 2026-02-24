@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-class CompressedRange
+class CoordinateCompression
 {
 private:
 	vector<ll> init;
@@ -14,7 +14,7 @@ private:
 	}
 
 public:
-	CompressedRange(vector<ll> &vec)
+	CoordinateCompression(vector<ll> &vec)
 	{
 		init = vec;
 		compress(init);
@@ -155,7 +155,7 @@ int main()
 				vc.push_back(R);
 			}
 		}
-		CompressedRange comp(vc);
+		CoordinateCompression comp(vc);
 		for (int i{}; i < n; i++)
 			arr[i] = comp.index(arr[i]), segTree.update(arr[i], 1);
 
