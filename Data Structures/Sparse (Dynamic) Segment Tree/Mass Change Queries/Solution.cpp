@@ -43,7 +43,7 @@ private:
 		// 	R = nullptr;
 		// }
 	};
-	ll N;
+	ll minValue, maxValue;
 	void insert(Node *&curr, int left, int right, ll idx)
 	{
 		if (curr == nullptr)
@@ -58,14 +58,11 @@ private:
 
 public:
 	Node *root;
-	DynamicSegmentTree(ll rangeSize = 1e9)
-	{
-		root = new Node();
-		N = rangeSize;
-	}
+	DynamicSegmentTree(ll minValue = 0, ll maxValue = 1e9) : minValue(minValue), maxValue(maxValue) { root = new Node(); }
+
 	void insert(ll idx)
 	{
-		insert(root, 0, N - 1, idx);
+		insert(root, minValue, maxValue, idx);
 	}
 	static void transfer(Node *&xRoot, Node *&yRoot, int left, int right, int leftQuery, int rightQuery)
 	{
@@ -160,7 +157,7 @@ int main()
 			ll x;
 			cin >> x;
 			if (mp.count(x) == 0)
-				mp[x] = DynamicSegmentTree(N);
+				mp[x] = DynamicSegmentTree(0, N - 1);
 			mp[x].insert(i);
 		}
 		cin >> Q;
@@ -173,7 +170,7 @@ int main()
 			{
 				// Create y entry if it doesn't exist
 				if (mp.count(y) == 0)
-					mp[y] = DynamicSegmentTree(N);
+					mp[y] = DynamicSegmentTree(0, N - 1);
 				DynamicSegmentTree::transfer(mp[x].root, mp[y].root, 0, N - 1, L, R);
 			}
 		}

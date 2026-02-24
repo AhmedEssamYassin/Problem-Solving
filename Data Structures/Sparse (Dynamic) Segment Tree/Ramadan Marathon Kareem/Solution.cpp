@@ -35,7 +35,7 @@ private:
 			R = nullptr;
 		}
 	};
-	ll N;
+	ll minValue, maxValue;
 	Node *root;
 	void merge(Node *&segNode)
 	{
@@ -75,18 +75,15 @@ private:
 	}
 
 public:
-	DynamicSegmentTree(ll rangeSize = 2e14)
-	{
-		root = new Node();
-		N = rangeSize + 1;
-	}
+	DynamicSegmentTree(ll minValue = 0, ll maxValue = 1e9) : minValue(minValue), maxValue(maxValue) { root = new Node(); }
+
 	void update(ll idx, const ll &val)
 	{
-		update(-N, N, root, idx, val);
+		update(minValue, maxValue, root, idx, val);
 	}
 	ll query(ll left, ll right)
 	{
-		ll ans = query(-N, N, root, left, right);
+		ll ans = query(minValue, maxValue, root, left, right);
 		return ans;
 	}
 #undef mid
@@ -109,8 +106,8 @@ int main()
 	pref[0] = vc[0];
 	for (int i{1}; i < N; i++)
 		pref[i] = pref[i - 1] + vc[i];
-	DynamicSegmentTree freqTree(2e14);
-	DynamicSegmentTree sumTree(2e14);
+	DynamicSegmentTree freqTree(-2e14, 2e14);
+	DynamicSegmentTree sumTree(-2e14, 2e14);
 
 	ll sum{};
 	for (int i{}; i < N; i++)

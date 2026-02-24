@@ -24,7 +24,7 @@ struct DynamicSegmentTree
 {
 #define mid ((left + right) >> 1)
 private:
-	ll N;
+	ll minValue, maxValue;
 	int root;
 	void merge(int curr)
 	{
@@ -65,18 +65,15 @@ private:
 	}
 
 public:
-	DynamicSegmentTree(ll rangeSize = 1e9)
-	{
-		root = newNode();
-		N = rangeSize + 2;
-	}
+	DynamicSegmentTree(ll minValue = 0, ll maxValue = 1e9) : minValue(minValue), maxValue(maxValue) { root = newNode(); }
+
 	void update(ll idx, const ll &val)
 	{
-		update(1, N, root, idx, val);
+		update(minValue, maxValue, root, idx, val);
 	}
 	ll query(ll left, ll right)
 	{
-		ll ans = query(1, N, root, left, right);
+		ll ans = query(minValue, maxValue, root, left, right);
 		return ans;
 	}
 #undef mid
@@ -101,7 +98,7 @@ int main()
 			cin >> vc[i];
 		vector<int> cntL(n);
 		ptr = 0; // Reset pool
-		DynamicSegmentTree segTree(1e9);
+		DynamicSegmentTree segTree(0, 1e9);
 		for (int i = 0; i < n; i++)
 		{
 			cntL[i] = segTree.query(vc[i] + 1, 1e9);
@@ -109,7 +106,7 @@ int main()
 		}
 
 		ptr = 0; // Reset pool
-		segTree = DynamicSegmentTree(1e9);
+		segTree = DynamicSegmentTree(0, 1e9);
 		ll cnt = 0;
 		for (int j = n - 2; j > 0; j--)
 		{

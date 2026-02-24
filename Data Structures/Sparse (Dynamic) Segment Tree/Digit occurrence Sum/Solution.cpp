@@ -33,7 +33,7 @@ private:
 			R = nullptr;
 		}
 	};
-	ll N;
+	ll minValue, maxValue;
 	Node *root;
 	void merge(Node *&segNode)
 	{
@@ -86,23 +86,20 @@ private:
 	}
 
 public:
-	DynamicSegmentTree(ll rangeSize = 2e9)
-	{
-		root = new Node();
-		N = rangeSize + 1;
-	}
+	DynamicSegmentTree(ll minValue = 0, ll maxValue = 1e9) : minValue(minValue), maxValue(maxValue) { root = new Node(); }
+
 	void update(ll idx, const ll &val)
 	{
-		update(0, N, root, idx, val);
+		update(minValue, maxValue, root, idx, val);
 	}
 	ll query(ll left, ll right)
 	{
-		ll ans = query(0, N, root, left, right);
+		ll ans = query(minValue, maxValue, root, left, right);
 		return ans;
 	}
 	ll kthOne(ll k)
 	{
-		ll ans = kthOne(0, N, root, k);
+		ll ans = kthOne(minValue, maxValue, root, k);
 		return ans;
 	}
 #undef mid
@@ -134,7 +131,7 @@ int main()
 			while (N)
 				cnt[N % 10]--, N /= 10;
 		};
-		DynamicSegmentTree segTree;
+		DynamicSegmentTree segTree(0, 2e9);
 		for (auto &x : vc)
 			cin >> x, addDigits(x), segTree.update(x, 1);
 		while (Q--)

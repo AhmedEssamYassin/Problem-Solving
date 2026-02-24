@@ -75,7 +75,7 @@ private:
 			R = nullptr;
 		}
 	};
-	ll N;
+	ll minValue, maxValue;
 	Node *segRoot;
 	LazyNode *lazyRoot;
 
@@ -146,19 +146,18 @@ private:
 	}
 
 public:
-	LazyDynamicSegmentTree(ll rangeSize = 2e9)
+	LazyDynamicSegmentTree(ll minValue = 0, ll maxValue = 1e9) : minValue(minValue), maxValue(maxValue)
 	{
 		segRoot = new Node();
 		lazyRoot = new LazyNode(INF);
-		N = rangeSize;
 	}
 	void update(ll left, ll right, const ll &val)
 	{
-		update(1, N, segRoot, lazyRoot, left, right, val);
+		update(minValue, maxValue, segRoot, lazyRoot, left, right, val);
 	}
 	ll query(ll h)
 	{
-		ll ans = query(1, N, segRoot, lazyRoot, h);
+		ll ans = query(minValue, maxValue, segRoot, lazyRoot, h);
 		return ans;
 	}
 #undef mid
@@ -180,7 +179,7 @@ int main()
 		cin >> N;
 		char C;
 		ll a, b, D, h;
-		LazyDynamicSegmentTree segTree(N);
+		LazyDynamicSegmentTree segTree(1, N);
 		segTree.update(1, N, 0); // Initially, make all elements 0
 		while (cin >> C)
 		{

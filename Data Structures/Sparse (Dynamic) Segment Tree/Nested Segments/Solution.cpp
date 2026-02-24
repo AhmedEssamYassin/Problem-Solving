@@ -33,7 +33,7 @@ private:
 			R = nullptr;
 		}
 	};
-	ll N;
+	ll minValue, maxValue;
 	Node *root;
 	void merge(Node *&segNode)
 	{
@@ -73,18 +73,15 @@ private:
 	}
 
 public:
-	DynamicSegmentTree(ll rangeSize = 2e9)
-	{
-		root = new Node();
-		N = rangeSize + 2;
-	}
+	DynamicSegmentTree(ll minValue = 0, ll maxValue = 1e9) : minValue(minValue), maxValue(maxValue) { root = new Node(); }
+
 	void update(ll idx, const ll &val)
 	{
-		update(-N, N, root, idx, val);
+		update(minValue, maxValue, root, idx, val);
 	}
 	ll query(ll left, ll right)
 	{
-		ll ans = query(-N, N, root, left, right);
+		ll ans = query(minValue, maxValue, root, left, right);
 		return ans;
 	}
 #undef mid
@@ -106,7 +103,7 @@ int main()
 		cin >> N;
 		vector<tuple<ll, ll, int>> intervals(N);
 		vector<ll> Rs;
-		DynamicSegmentTree segTree;
+		DynamicSegmentTree segTree(-1e9, 1e9);
 
 		int pos = 0;
 		for (auto &[L, R, idx] : intervals)
@@ -120,7 +117,7 @@ int main()
 		for (int i = N - 1; i >= 0; i--)
 		{
 			auto &[L, R, idx] = intervals[i];
-			ans[idx] = segTree.query(-2e9, R);
+			ans[idx] = segTree.query(-1e9, R);
 			segTree.update(R, 1);
 		}
 		for (const auto &[idx, cnt] : ans)
