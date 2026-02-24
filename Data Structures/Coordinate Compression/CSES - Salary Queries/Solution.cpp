@@ -19,94 +19,90 @@ public:
 		init = vec;
 		compress(init);
 	}
-	int index(ll val)
-	{
-		return lower_bound(init.begin(), init.end(), val) - init.begin();
-	}
-	ll initVal(int idx)
-	{
-		return init[idx];
-	}
-};
-
-struct Node
-{
-	ll Value;
-	Node *LeftChild, *RightChild; // Pointers to left child and right child
-
-	Node(const ll &val = 0)
-	{
-		Value = val;
-		LeftChild = nullptr;
-		RightChild = nullptr;
-	}
-
-	void createChildren() // Construct Childs
-	{
-		if (LeftChild == nullptr)
-			LeftChild = new Node();
-		if (RightChild == nullptr)
-			RightChild = new Node();
-	}
+	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
+	ll initialValue(int idx) { return init[idx]; }
 };
 
 struct DynamicSegmentTree
 {
 #define mid ((left + right) >> 1)
 private:
+	struct Node
+	{
+		ll value;
+		Node *L, *R; // Pointers to left child and right child
+
+		Node() // Constructor
+		{
+			value = 0;
+			L = nullptr;
+			R = nullptr;
+		}
+		Node(const ll &val)
+		{
+			value = val;
+			L = nullptr;
+			R = nullptr;
+		}
+
+		~Node() // Destructor. Notice the "~" character before the struct name.
+		{
+			delete L;
+			delete R;
+			L = nullptr;
+			R = nullptr;
+		}
+	};
 	ll N;
 	Node *root;
-	ll merge(const ll &leftNode, const ll &rightNode)
+	void merge(Node *&segNode)
 	{
-		ll res;
-		res = (leftNode + rightNode);
-		return res;
+		segNode->value = (segNode->L ? segNode->L->value : 0) + (segNode->R ? segNode->R->value : 0);
 	}
-	void update(int left, int right, Node *Current, int idx, const ll &newValue)
+	void update(ll left, ll right, Node *&curr, ll idx, const ll &newValue)
 	{
 		// idx is not in range [left, right]
 		if (left > idx || right < idx)
 			return;
-
-		// Current is the Node that manage only ith element
+		if (curr == nullptr)
+			curr = new Node();
+		// curr is the Node that manage only ith element
 		if (left == right)
 		{
-			Current->Value += newValue;
+			curr->value += newValue;
 			return;
 		}
 
-		Current->createChildren();
-		update(left, mid, Current->LeftChild, idx, newValue);
-		update(mid + 1, right, Current->RightChild, idx, newValue);
-		Current->Value = merge(Current->LeftChild->Value, Current->RightChild->Value);
+		update(left, mid, curr->L, idx, newValue);
+		update(mid + 1, right, curr->R, idx, newValue);
+		merge(curr);
 	}
-	ll query(int left, int right, Node *&Current, int leftQuery, int rightQuery)
+	ll query(ll left, ll right, Node *curr, ll leftQuery, ll rightQuery)
 	{
 		// [left, right] doesn't intersect with [leftQuery, rightQuery]
-		if (Current == nullptr || left > rightQuery || right < leftQuery)
+		if (curr == nullptr || left > rightQuery || right < leftQuery)
 			return 0;
 
 		// [left, curR] is inside [leftQuery, rightQuery]
 		if (leftQuery <= left && right <= rightQuery)
-			return Current->Value;
+			return curr->value;
 
-		ll leftSegment{}, rightSegment{};
-		leftSegment = query(left, mid, Current->LeftChild, leftQuery, rightQuery);
-		rightSegment = query(mid + 1, right, Current->RightChild, leftQuery, rightQuery);
-		return merge(leftSegment, rightSegment);
+		ll leftSegment = query(left, mid, curr->L, leftQuery, rightQuery);
+		ll rightSegment = query(mid + 1, right, curr->R, leftQuery, rightQuery);
+		return (leftSegment + rightSegment);
 	}
 
 public:
-	DynamicSegmentTree()
+	DynamicSegmentTree(ll rangeSize = 1e9)
 	{
 		root = new Node();
-		N = 2e6;
+		N = rangeSize + 1;
 	}
-	void update(int idx, const ll &val)
+	void update(ll idx, const ll &val)
 	{
 		update(0, N, root, idx, val);
 	}
-	ll query(int left, int right)
+	ll query(ll left, ll right)
 	{
 		ll ans = query(0, N, root, left, right);
 		return ans;
@@ -134,7 +130,7 @@ int main()
 		for (ll i{}; i < n; i++)
 			cin >> arr[i], vc.push_back(arr[i]);
 
-		DynamicSegmentTree segTree;
+		DynamicSegmentTree segTree(1e6);
 
 		vector<tuple<int, int, int>> query(q);
 		for (auto &[type, L, R] : query)
