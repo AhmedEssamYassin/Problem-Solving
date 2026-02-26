@@ -44,7 +44,7 @@ private:
 
 public:
 	CoordinateCompression() {}
-	CoordinateCompression(vector<ll> &vec)
+	CoordinateCompression(const vector<ll> &vec)
 	{
 		init = vec;
 		compress(init);
@@ -60,7 +60,7 @@ struct WaveletMatrix
 	vector<int> mid;
 	CoordinateCompression cr;
 
-	WaveletMatrix(vector<ll> arr) : cr(arr)
+	WaveletMatrix(const vector<ll> &arr) : cr(arr)
 	{
 		n = arr.size();
 		if (n == 0)

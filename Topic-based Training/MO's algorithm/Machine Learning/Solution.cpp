@@ -15,7 +15,7 @@ private:
 
 public:
 	CoordinateCompression() {}
-	CoordinateCompression(vector<ll> &vec)
+	CoordinateCompression(const vector<ll> &vec)
 	{
 		init = vec;
 		compress(init);
