@@ -25,36 +25,25 @@ struct SegmentTree
 private:
     struct Node
     {
-        ll value;
-        int countMinVal{};
+        ll sum;
         // Constructors
-        Node() {}
-        Node(ll val, int cnt)
-        {
-            value = val;
-            countMinVal = cnt;
-        }
+        Node() { sum = 0; }
+        Node(ll val) { sum = val; }
     };
     int size;
     vector<Node> seg;
     Node merge(const Node &leftNode, const Node &rightNode)
     {
-        if (leftNode.value == rightNode.value)
-            return Node(leftNode.value, leftNode.countMinVal + rightNode.countMinVal);
-        else
-        {
-            if (leftNode.value < rightNode.value)
-                return leftNode;
-            else
-                return rightNode;
-        }
+        Node res;
+        res.sum = (leftNode.sum + rightNode.sum);
+        return res;
     }
     void build(int left, int right, int node, const vector<ll> &arr)
     {
         if (left == right)
         {
             if (left < arr.size())
-                seg[node] = Node(arr[left], 1);
+                seg[node] = arr[left];
             return;
         }
         // Building left node
@@ -70,7 +59,7 @@ private:
     {
         if (left == right)
         {
-            seg[node] = Node(val, 1);
+            seg[node] = val;
             return;
         }
         if (idx <= mid)
@@ -84,7 +73,7 @@ private:
     {
         // Out of range
         if (right < leftQuery || left > rightQuery)
-            return Node(LLONG_MAX, 1); // A value that doesn't affect the minimization
+            return Node(); // A neutral value that doesn't affect other queries
 
         // The whole range is the answer
         if (left >= leftQuery && right <= rightQuery)
@@ -103,17 +92,17 @@ public:
         int n = arr.size();
         while (size < n)
             size <<= 1;
-        seg = vector<Node>(2 * size, Node(LLONG_MAX, 1));
+        seg = vector<Node>(2 * size);
         build(0, size - 1, 0, arr);
     }
     void update(int idx, const ll &val)
     {
         update(0, size - 1, 0, idx, val);
     }
-    pair<int, int> query(int left, int right)
+    ll query(int left, int right)
     {
         Node ans = query(0, size - 1, 0, left, right);
-        return {ans.value, ans.countMinVal};
+        return ans.sum;
     }
 
 #undef L
@@ -125,7 +114,6 @@ int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
-    cout.tie(nullptr);
 #ifdef LOCAL
     freopen("input.txt", "r", stdin);
     freopen("Output.txt", "w", stdout);
@@ -148,8 +136,7 @@ int main()
         else
         {
             cin >> L >> R;
-            auto [minVal, countMinVal] = segTree.query(L, R - 1);
-            cout << minVal << " " << countMinVal << endl;
+            cout << segTree.query(L, R - 1) << endl;
         }
     }
 
