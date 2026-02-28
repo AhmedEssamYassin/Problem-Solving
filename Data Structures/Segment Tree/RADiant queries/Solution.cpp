@@ -3,10 +3,10 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-vector<int> Prime, LPF;
-bitset<200001> isPrime;
+vector<int> primes, LPF;
+bitset<1000001> isPrime;
 
-void Linear_Sieve_Of_Eratosthenes(int N)
+void linearSieveOfEratosthenes(int N)
 {
 	isPrime.set(); // Initially Assuming all numbers to be primes
 	LPF.resize(N + 1);
@@ -15,16 +15,17 @@ void Linear_Sieve_Of_Eratosthenes(int N)
 	{
 		if (isPrime[i])
 		{
-			Prime.push_back(i);
+			primes.push_back(i);
 			LPF[i] = i; // The least prime factor of a prime number is itself
 		}
-		for (long long j{}; j < (int)Prime.size() && i * Prime[j] <= N && Prime[j] <= LPF[i]; j++)
+		for (long long j{}; j < (int)primes.size() && i * primes[j] <= N && primes[j] <= LPF[i]; j++)
 		{
-			isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
-			LPF[i * Prime[j]] = Prime[j];
+			isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
+			LPF[i * primes[j]] = primes[j];
 		}
 	}
 }
+
 vector<vector<int>> primeFactors;
 void primeFactorize()
 {
@@ -42,7 +43,7 @@ void primeFactorize()
 	}
 }
 
-static int autoCall = (Linear_Sieve_Of_Eratosthenes(200000), primeFactorize(), 0);
+static int autoCall = (linearSieveOfEratosthenes(200000), primeFactorize(), 0);
 const ll mod = 1e9 + 7;
 ll mult64(const ll &a, const ll &b)
 {
@@ -174,7 +175,7 @@ int main()
 				lastPos[p].push(i);
 		}
 		SegmentTree segTree(vector<ll>(N, 1));
-		for (const ll &p : Prime)
+		for (const ll &p : primes)
 		{
 			if (!lastPos[p].empty())
 				segTree.update(lastPos[p].top(), p, 1);

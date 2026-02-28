@@ -230,7 +230,7 @@ Mint operator""_m(unsigned long long literal)
     return Mint(literal);
 }
 
-vector<int> Prime;
+vector<int> primes;
 void linearSieveOfEratosthenes(ll N)
 {
     bitset<2000001> isPrime;
@@ -239,12 +239,12 @@ void linearSieveOfEratosthenes(ll N)
     for (ll i = 2; i <= N; i++)
     {
         if (isPrime[i])
-            Prime.push_back(i);
-        for (ll j = 0; j < (ll)Prime.size() && i * Prime[j] <= N; j++)
+            primes.push_back(i);
+        for (ll j = 0; j < (ll)primes.size() && i * primes[j] <= N; j++)
         {
-            ll multiple = i * Prime[j];
+            ll multiple = i * primes[j];
             isPrime[multiple] = 0;
-            if (i % Prime[j] == 0)
+            if (i % primes[j] == 0)
                 break;
         }
     }
@@ -263,7 +263,7 @@ void sosOverDivisors(vector<T> &f, bool inverse = false)
     if (!inverse)
     {
         // Forward SOS over divisors
-        for (const ll &p : Prime)
+        for (const ll &p : primes)
         {
             for (ll i = 1; i * p < n; i++)
                 f[i * p] = (f[i * p] + f[i]);
@@ -272,7 +272,7 @@ void sosOverDivisors(vector<T> &f, bool inverse = false)
     else
     {
         // Inverse SOS over divisors
-        for (const ll &p : Prime)
+        for (const ll &p : primes)
         {
             for (ll i = (n - 1) / p; i >= 1; i--)
                 f[i * p] = (f[i * p] - f[i]);

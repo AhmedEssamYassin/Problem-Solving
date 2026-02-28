@@ -75,7 +75,7 @@ void sieveOfEratosthenes()
 	}
 }
 
-inline void Set_ith_bit(ll &N, uint16_t i) // 0-based
+inline void setIthBit(ll &N, uint16_t i) // 0-based
 {
 	N |= (1LL << i);
 }
@@ -85,7 +85,7 @@ void primeFactorize(ll N, ll &primeSet)
 	if (N <= 1)
 		return;
 	if (!(N & 1))
-		Set_ith_bit(primeSet, pos[2]);
+		setIthBit(primeSet, pos[2]);
 
 	while (not(N & 1))
 		N >>= 1;
@@ -93,12 +93,12 @@ void primeFactorize(ll N, ll &primeSet)
 	for (ll p = 3; p * p <= N && N > 1; p += 2)
 	{
 		if (N % p == 0)
-			Set_ith_bit(primeSet, pos[p]);
+			setIthBit(primeSet, pos[p]);
 		while (N % p == 0)
 			N /= p;
 	}
 	if (N > 1)
-		Set_ith_bit(primeSet, pos[N]);
+		setIthBit(primeSet, pos[N]);
 }
 
 struct LazySegmentTree

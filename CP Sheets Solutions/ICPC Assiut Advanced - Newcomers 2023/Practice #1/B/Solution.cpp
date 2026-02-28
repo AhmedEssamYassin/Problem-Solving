@@ -2,30 +2,30 @@
 using namespace std;
 #define ll long long
 #define endl "\n"
-vector<int> Prime, LPF(1000001);
-bitset<1000001> Is_Prime;
-void Linear_Sieve_Of_Eratosthenes(int N)
-{
-	LPF[1] = 1;
-	Is_Prime.set(); // Initially Assuming all numbers to be primes
 
-	// 0 and 1 are NOT primes
-	Is_Prime[0] = 0;
-	Is_Prime[1] = 0;
-	for (int i{2}; i <= N; i++)
+vector<int> primes, LPF;
+bitset<1000001> isPrime;
+
+void linearSieveOfEratosthenes(int N)
+{
+	isPrime.set(); // Initially Assuming all numbers to be primes
+	LPF.resize(N + 1);
+	isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
+	for (long long i{2}; i <= N; i++)
 	{
-		if (Is_Prime[i])
+		if (isPrime[i])
 		{
-			Prime.push_back(i);
+			primes.push_back(i);
 			LPF[i] = i; // The least prime factor of a prime number is itself
 		}
-		for (int j{}; j < (int)Prime.size() and i * Prime[j] <= N and Prime[j] <= LPF[i]; j++)
+		for (long long j{}; j < (int)primes.size() && i * primes[j] <= N && primes[j] <= LPF[i]; j++)
 		{
-			Is_Prime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
-			LPF[i * Prime[j]] = Prime[j];
+			isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
+			LPF[i * primes[j]] = primes[j];
 		}
 	}
 }
+static int autoCall = (linearSieveOfEratosthenes(1e6), 0);
 
 int main()
 {
@@ -51,7 +51,6 @@ int main()
 	NOTE:
 	We CANNOT use an algorithm of O(sqrt(N)) checking primality, because it will be total O(t*sqrt(N)) which gives TLE
 	*/
-	Linear_Sieve_Of_Eratosthenes(1000001);
 	int t;
 	ll N;
 	cin >> t;
@@ -59,7 +58,7 @@ int main()
 	{
 		cin >> N;
 		int Sqrt_N = sqrt(N);
-		if (1LL * Sqrt_N * Sqrt_N == N && Is_Prime[Sqrt_N])
+		if (1LL * Sqrt_N * Sqrt_N == N && isPrime[Sqrt_N])
 			cout << "YES\n";
 		else
 			cout << "NO\n";

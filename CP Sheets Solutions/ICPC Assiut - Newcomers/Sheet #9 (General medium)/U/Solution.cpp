@@ -3,27 +3,29 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-vector<ll> Prime, LPF;
-bitset<1000005> isPrime;
-void Linear_Sieve_Of_Eratosthenes(ll N)
+vector<int> primes, LPF;
+bitset<1000001> isPrime;
+
+void linearSieveOfEratosthenes(int N)
 {
+	isPrime.set(); // Initially Assuming all numbers to be primes
 	LPF.resize(N + 1);
-	isPrime.set();
 	isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
-	for (ll i{2}; i <= N; i++)
+	for (long long i{2}; i <= N; i++)
 	{
 		if (isPrime[i])
 		{
-			Prime.push_back(i);
+			primes.push_back(i);
 			LPF[i] = i; // The least prime factor of a prime number is itself
 		}
-		for (ll j{}; j < (int)Prime.size() and i * Prime[j] <= N and Prime[j] <= LPF[i]; j++)
+		for (long long j{}; j < (int)primes.size() && i * primes[j] <= N && primes[j] <= LPF[i]; j++)
 		{
-			isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
-			LPF[i * Prime[j]] = Prime[j];
+			isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
+			LPF[i * primes[j]] = primes[j];
 		}
 	}
 }
+static int autoCall = (linearSieveOfEratosthenes(1e6), 0);
 
 int main()
 {
@@ -35,7 +37,6 @@ int main()
 #endif
 	int t = 1;
 	ll N, M;
-	Linear_Sieve_Of_Eratosthenes(1000000);
 	cin >> t;
 	while (t--)
 	{

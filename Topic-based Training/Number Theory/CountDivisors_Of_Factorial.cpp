@@ -27,7 +27,7 @@ T modPow(T N, T power, T mod)
     return res;
 }
 
-vector<int> Prime, LPF;
+vector<int> primes, LPF;
 bitset<100000001> isPrime;
 vector<int> cntPrimes;
 void linearSieveOfEratosthenes(int N)
@@ -39,13 +39,13 @@ void linearSieveOfEratosthenes(int N)
     {
         if (isPrime[i])
         {
-            Prime.push_back(i);
+            primes.push_back(i);
             LPF[i] = i; // The least prime factor of a prime number is itself
         }
-        for (long long j{}; j < (int)Prime.size() && i * Prime[j] <= N && Prime[j] <= LPF[i]; j++)
+        for (long long j{}; j < (int)primes.size() && i * primes[j] <= N && primes[j] <= LPF[i]; j++)
         {
-            isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
-            LPF[i * Prime[j]] = Prime[j];
+            isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
+            LPF[i * primes[j]] = primes[j];
         }
     }
     cntPrimes.resize(N + 1);
@@ -77,7 +77,7 @@ ll expFactor(ll N, int p)
 void factorialFactorize(ll N, map<ll, ll> &primeFactors)
 {
     ll ans{1};
-    for (const ll &p : Prime)
+    for (const ll &p : primes)
     {
         if (p > N)
             break;
@@ -91,7 +91,7 @@ ll countDivisors(ll N, ll mod)
     ll sqrtN = sqrt(N);
 
     // Handle primes <= sqrt(N) using Legendre's formula
-    for (const ll &p : Prime)
+    for (const ll &p : primes)
     {
         if (p > sqrtN)
             break;
@@ -103,13 +103,13 @@ ll countDivisors(ll N, ll mod)
     while (true)
     {
         ll L = i;
-        ll Q = N / Prime[L];
+        ll Q = N / primes[L];
         if (Q == 0)
             break;
         ll R = cntPrimes[N / Q];
         cnt = mult64(cnt, modPow(Q + 1, R - L, mod), mod);
         i = R;
-        if (i >= Prime.size())
+        if (i >= primes.size())
             break;
     }
 

@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-vector<int> Prime;
+vector<int> primes;
 vector<int> LPF, phi;
 void precomputePhi(int N)
 {
@@ -16,7 +16,7 @@ void precomputePhi(int N)
         {
             LPF[i] = i;
             phi[i] = i - 1;
-            Prime.push_back(i);
+            primes.push_back(i);
         }
         else
         {
@@ -26,8 +26,8 @@ void precomputePhi(int N)
             else
                 phi[i] = phi[i / LPF[i]] * (LPF[i] - 1);
         }
-        for (long long j = 0; j < (int)Prime.size() && Prime[j] <= LPF[i] && i * Prime[j] <= N; j++)
-            LPF[i * Prime[j]] = Prime[j];
+        for (long long j = 0; j < (int)primes.size() && primes[j] <= LPF[i] && i * primes[j] <= N; j++)
+            LPF[i * primes[j]] = primes[j];
     }
 }
 

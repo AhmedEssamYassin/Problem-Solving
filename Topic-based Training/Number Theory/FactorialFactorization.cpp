@@ -9,7 +9,7 @@ inline T mult64(const T &a, const T &b, T mod)
     return (__int128_t)a * b % mod;
 }
 
-vector<int> Prime, LPF;
+vector<int> primes, LPF;
 bitset<1000001> isPrime;
 
 void linearSieveOfEratosthenes(int N)
@@ -21,13 +21,13 @@ void linearSieveOfEratosthenes(int N)
     {
         if (isPrime[i])
         {
-            Prime.push_back(i);
+            primes.push_back(i);
             LPF[i] = i; // The least prime factor of a prime number is itself
         }
-        for (long long j{}; j < (int)Prime.size() && i * Prime[j] <= N && Prime[j] <= LPF[i]; j++)
+        for (long long j{}; j < (int)primes.size() && i * primes[j] <= N && primes[j] <= LPF[i]; j++)
         {
-            isPrime[i * Prime[j]] = 0; // Crossing out all the multiples of prime numbers
-            LPF[i * Prime[j]] = Prime[j];
+            isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
+            LPF[i * primes[j]] = primes[j];
         }
     }
 }
@@ -56,7 +56,7 @@ ll expFactor(ll N, int p)
 void factorialFactorize(ll N, map<ll, ll> &primeFactors)
 {
     ll ans{1};
-    for (const ll &p : Prime)
+    for (const ll &p : primes)
     {
         if (p > N)
             break;

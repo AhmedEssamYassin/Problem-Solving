@@ -230,7 +230,7 @@ Mint operator""_m(unsigned long long literal)
 	return Mint(literal);
 }
 
-vector<int> Prime, mu, omega;
+vector<int> primes, mu, omega;
 void linearSieveOfEratosthenes(ll N)
 {
 	omega.assign(N + 1, 0);
@@ -243,15 +243,15 @@ void linearSieveOfEratosthenes(ll N)
 	{
 		if (isPrime[i])
 		{
-			Prime.push_back(i);
+			primes.push_back(i);
 			omega[i] = 1;
 			mu[i] = -1;
 		}
-		for (ll j = 0; j < (ll)Prime.size() && i * Prime[j] <= N; j++)
+		for (ll j = 0; j < (ll)primes.size() && i * primes[j] <= N; j++)
 		{
-			ll multiple = i * Prime[j];
+			ll multiple = i * primes[j];
 			isPrime[multiple] = 0;
-			if (i % Prime[j] == 0)
+			if (i % primes[j] == 0)
 			{
 				omega[multiple] = omega[i];
 				mu[multiple] = 0;
@@ -276,7 +276,7 @@ void mobiusTransform(vector<T> &polyVec, bool inverse = false)
 	if (!inverse)
 	{
 		// Fast Zeta Transform (Sum over multiples)
-		for (const int &p : Prime)
+		for (const int &p : primes)
 		{
 			if (p >= vecSize)
 				break;
@@ -288,7 +288,7 @@ void mobiusTransform(vector<T> &polyVec, bool inverse = false)
 	else
 	{
 		// Fast Mobius Transform (Exact Inversion)
-		for (const int &p : Prime)
+		for (const int &p : primes)
 		{
 			if (p >= vecSize)
 				break;
