@@ -12,15 +12,15 @@ private:
     struct Node
     {
         ll value;
-        Node() {}
+        Node() { value = 0; }
         Node(const ll &N) : value(N) {}
     };
     struct LazyNode
     {
         ll value;
-        LazyNode() {}
+        LazyNode() { value = 0; } // Assign it to Not-possible/Neutral value
         LazyNode(const ll &N) : value(N) {}
-        LazyNode operator+(const LazyNode &RHS)
+        LazyNode operator+=(const LazyNode &RHS)
         {
             value += RHS.value;
             return *this;
@@ -52,17 +52,16 @@ private:
     }
     void push(int left, int right, int node)
     {
-        // Propagate the value
         if (lazy[node].value == 0)
             return;
         seg[node].value += (right - left + 1) * lazy[node].value;
-        // If the node is not a leaf
+        // If the node is not a leaf, propagate the value
         if (left != right)
         {
             // Update the lazy values for the left child
-            lazy[L].value += lazy[node].value;
+            lazy[L] += lazy[node];
             // Update the lazy values for the right child
-            lazy[R].value += lazy[node].value;
+            lazy[R] += lazy[node];
         }
         // Reset the lazy value
         lazy[node] = 0;
@@ -95,7 +94,7 @@ private:
         push(left, right, node);
         // If the range is invalid, return a value that does NOT to affect other queries
         if (left > rightQuery || right < leftQuery)
-            return 0;
+            return Node();
 
         // If the range matches the segment
         if (left >= leftQuery && right <= rightQuery)
@@ -111,8 +110,8 @@ public:
         int n = arr.size();
         while (size < n)
             size <<= 1;
-        seg = vector<Node>(2 * size, 0);
-        lazy = vector<LazyNode>(2 * size, 0); // Assign it to Not-possible/Neutral value
+        seg = vector<Node>(2 * size);
+        lazy = vector<LazyNode>(2 * size);
         build(0, size - 1, 0, arr);
     }
     void update(int left, int right, const ll &val)
@@ -156,9 +155,7 @@ int main()
                 segTree.update(L, R - 1, val);
             }
             else
-            {
                 cout << segTree.query(L, R - 1) << endl;
-            }
         }
     }
     return 0;
