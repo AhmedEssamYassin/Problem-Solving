@@ -27,30 +27,25 @@ T modPow(T N, T power, T mod)
     return res;
 }
 
-vector<int> primes, LPF;
+vector<int> primes, cntPrimes;
 bitset<100000001> isPrime;
-vector<int> cntPrimes;
 void linearSieveOfEratosthenes(int N)
 {
     isPrime.set(); // Initially Assuming all numbers to be primes
-    LPF.resize(N + 1);
+    cntPrimes.resize(N + 1);
     isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
     for (long long i{2}; i <= N; i++)
     {
         if (isPrime[i])
-        {
             primes.push_back(i);
-            LPF[i] = i; // The least prime factor of a prime number is itself
-        }
-        for (long long j{}; j < (int)primes.size() && i * primes[j] <= N && primes[j] <= LPF[i]; j++)
+        for (long long j{}; j < (int)primes.size() && i * primes[j] <= N; j++)
         {
             isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
-            LPF[i * primes[j]] = primes[j];
+            if (i % primes[j] == 0)
+                break;
         }
-    }
-    cntPrimes.resize(N + 1);
-    for (int i = 1; i <= N; i++)
         cntPrimes[i] = cntPrimes[i - 1] + isPrime[i];
+    }
 }
 static int autoCall = (linearSieveOfEratosthenes(1e8), 0);
 
@@ -65,7 +60,8 @@ int sumOfBin(ll N, int base)
     }
     return res;
 }
-ll expFactor(ll N, int p)
+
+int expFactor(ll N, int p)
 {
     // ll exponent = (N - sumOfBin(N, p)) / (p - 1);
     ll exponent = 0;
@@ -74,33 +70,22 @@ ll expFactor(ll N, int p)
     return exponent;
 }
 
-void factorialFactorize(ll N, map<ll, ll> &primeFactors)
-{
-    ll ans{1};
-    for (const ll &p : primes)
-    {
-        if (p > N)
-            break;
-        primeFactors[p] = expFactor(N, p);
-    }
-}
-
 ll countDivisors(ll N, ll mod)
 {
     ll cnt = 1;
     ll sqrtN = sqrt(N);
 
     // Handle primes <= sqrt(N) using Legendre's formula
-    for (const ll &p : primes)
+    for (const int &p : primes)
     {
         if (p > sqrtN)
             break;
-        cnt = mult64(cnt, expFactor(N, p) + 1, mod);
+        cnt = mult64<ll>(cnt, expFactor(N, p) + 1, mod);
     }
 
-    // Group primes with same N/p
+    // Group primes with same N / p
     ll i = cntPrimes[sqrtN];
-    while (true)
+    while (i < primes.size())
     {
         ll L = i;
         ll Q = N / primes[L];
@@ -109,8 +94,6 @@ ll countDivisors(ll N, ll mod)
         ll R = cntPrimes[N / Q];
         cnt = mult64(cnt, modPow(Q + 1, R - L, mod), mod);
         i = R;
-        if (i >= primes.size())
-            break;
     }
 
     return cnt;

@@ -4,8 +4,6 @@ using namespace std;
 #define endl "\n"
 
 const ll mod = 1e9 + 7;
-ll primes[100];
-map<int, int> pos;
 
 #define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
 inline ll add64(const ll &a, const ll &b)
@@ -49,31 +47,29 @@ ll modPow(ll N, ll power)
 	return res;
 }
 
-void sieveOfEratosthenes()
+int pos[301];
+vector<int> primes;
+bitset<3001> isPrime;
+void linearSieveOfEratosthenes(int N)
 {
-	bitset<311> isPrime;
-	isPrime.set();
-	isPrime[0] = 0;
-	isPrime[1] = 0;
-	int idx = 0;
-	for (int i{2}; i * i <= 310; i++)
+	isPrime.set();				 // Initially Assuming all numbers to be primes
+	isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
+	for (long long i{2}; i <= N; i++)
 	{
 		if (isPrime[i])
+			primes.push_back(i);
+		for (long long j = 0; j < (int)primes.size() && i * primes[j] <= N; j++)
 		{
-			primes[idx] = i;
-			pos[i] = idx;
-			idx++;
-			for (int j = i * i; j <= 310; j += i)
-				isPrime[j] = 0;
+			isPrime[i * primes[j]] = 0;
+			if (i % primes[j] == 0)
+				break;
 		}
 	}
-	int maxPrime = primes[idx - 1];
-	for (int i = maxPrime + 1; i < 311; i++)
-	{
-		if (isPrime[i])
-			primes[idx] = i, pos[i] = idx, idx++;
-	}
+	int i = 0;
+	for (const int &p : primes)
+		pos[p] = i++;
 }
+static int autoCall = (linearSieveOfEratosthenes(300), 0);
 
 inline void setIthBit(ll &N, uint16_t i) // 0-based
 {
@@ -250,7 +246,6 @@ int main()
 	int t = 1;
 	ll N, Q;
 	// cin >> t;
-	sieveOfEratosthenes();
 	while (t--)
 	{
 		cin >> N >> Q;
