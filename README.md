@@ -47,6 +47,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - [Sparse Table](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Sparse%20Tables)
 - [Merge Sort](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Merge%20Sort)
 - [Coordinate Compression](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Coordinate%20Compression)
+- [Wavelet Tree and Wavelet Matrix](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Wavelet%20Trees)
 - [Trie](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Trie)
 - [Graph theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Graph%20Theory)
 > - Types of Graphs and Terminologies
@@ -94,8 +95,8 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 
 ---
 
-## Advanced Data Structures
-- [Fast Fourier Transform (FFT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/FFT%2C%20NTT)
+## Advanced Data Structures and Algorithms
+- [Fast Fourier Transform (FFT) and Number Theoretic Transform (NTT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/FFT%2C%20NTT)
 - [Merge Sort Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Merge%20Sort%20Tree)
 - Segment Tree Beats
 - [Persistent Segment Trees](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Persistent%20Segment%20Tree)
@@ -104,10 +105,11 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 ---
 
 ## Miscellaneous Topics
+- [Mo's Algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/MO%27s%20algorithm)
 - [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory) (Too deep topics, detailed in separate point)
-- [Dynamic programming]()
+- [Dynamic Programming](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Dynamic%20Programming)
 - [Game Theory (Nim game and Sprague-Grundy numbers)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Game%20Theory)
-- [Matrix binary exponentiation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Matrix%20Exponentiation)
+- [Matrix Exponentiation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Matrix%20Exponentiation)
 
 - [KMP (Knuth–Morris–Pratt) algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Z_Function%20and%20KMP)
 - [String Hashing (single and double hashing)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/String%20Hashing)
@@ -115,7 +117,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 
 ---
 
-## Number Theory
+## [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory)
 - Modular arithmetic
 - Modular multiplication
 - Modular exponentiation
@@ -137,6 +139,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
     - Birthday paradox
     - Floyd’s cycle detection
     - Brent-Pollard-rho
+    - Brent-Pollard-rho with Montgomery multiplication
     - Prime factorization using pollard-rho
 - Generating all factors from prime factorization
 - Prime factorization of $(N^x)$
