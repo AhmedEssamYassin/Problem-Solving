@@ -19,11 +19,11 @@ int main()
 		cin >> arr[i];
 
 	// Given an array of size N, Count all subsets that have EVEN numbers greater than odd numbers
-	int Subsets_cnt{};
+	int cntSubsets{};
 	for (int i = 0; i < (1 << N); i++)
 	{
 		// Loop through all elements of the input array
-		int EVEN_cnt{}, ODD_cnt{};
+		int cntEven{}, cntOdd{};
 		for (int j = 0; j < N; j++)
 		{
 			// Check if the jth bit is set in the current subset
@@ -31,15 +31,15 @@ int main()
 			{
 				// If the jth bit is set, add the jth element to the subset
 				if (arr[j] & 1) // ODD
-					ODD_cnt++;
+					cntOdd++;
 				else
-					EVEN_cnt++;
+					cntEven++;
 			}
 		}
-		if (EVEN_cnt > ODD_cnt)
-			Subsets_cnt++;
+		if (cntEven > cntOdd)
+			cntSubsets++;
 	}
-	cout << Subsets_cnt;
+	cout << cntSubsets;
 	delete[] arr;
 	return 0;
 }

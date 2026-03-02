@@ -172,28 +172,28 @@ it simply clears the rightmost set bit and counts it iteratively until the numbe
 // Bits indices are traversed from right to left, i.e., the bit at index 0 is the rightmost bit (LSB)
 
 template <typename T>
-void Set_ith_bit(T &N, uint16_t i) // 0-based
+void setIthBit(T &N, uint16_t i) // 0-based
 {
     // 11100101(0)11 | 00000000(1)00 = 11100101(1)11
     N = (N | (T(1) << i));
 }
 
 template <typename T>
-void Flip_ith_bit(T &N, uint16_t i) // 0-based
+void flipIthBit(T &N, uint16_t i) // 0-based
 {
     // 111001010(1)1 ^ 000000000(1)0 = 111001010(0)1
     N = (N ^ (T(1) << i));
 }
 
 template <typename T>
-void Clear_ith_bit(T &N, uint16_t i) // 0-based
+void clearIthBit(T &N, uint16_t i) // 0-based
 {
     // 1110010(1)011 & 1111111(0)111 = 1110010(0)011
     N = (N & ~(T(1) << i));
 }
 
 template <typename T>
-bool Check_ith_bit_set(T &N, uint16_t i) // 0-based
+bool checkIthBitSet(T &N, uint16_t i) // 0-based
 {
     // 11100101(0)11 & 00000000(1)00 = 00000000000 (it's a cleared bit)
     return (N & (T(1) << i));
@@ -201,64 +201,64 @@ bool Check_ith_bit_set(T &N, uint16_t i) // 0-based
 }
 
 template <typename T>
-void Clear_rightmost_set_bit(T &N)
+void clearRightmostSetBit(T &N)
 {
     // 11100101(1)00 & 11100101(0)11 = 11100101(0)00
     N = (N & (N - 1));
 }
 
 template <typename T>
-int Count_set_bits(T N)
+int countSetBits(T N)
 {
     int cnt{};
 
     while (N)
     {
-        Clear_rightmost_set_bit(N);
+        clearRightmostSetBit(N);
         cnt++;
     }
     return cnt;
 }
 
 template <typename T>
-int Count_cleared_bits(T N)
+int countClearedBits(T N)
 {
     int MSB = 31 - __builtin_clz(N); // For signed integers
     return __builtin_popcount(N ^ ((T(1) << ++MSB) - 1));
 }
 
 template <typename T>
-void Clear_all_trailing_ones(T &N)
+void clearTrailingOnes(T &N)
 {
     // 111001010(11) & 111001011(00) = 111001010(00)
     N = (N & (N + 1));
 }
 
 template <typename T>
-void Set_last_cleared_bit(T &N)
+void setLastClearedBit(T &N)
 {
     // 11100101(0)11 | 11100101(1)00 = 11100101(1)11
     N = (N | (N + 1));
 }
 
 template <typename T>
-int Get_rightmost_set_bit_number(const T &N)
+int getRightmostSetBitNumber(const T &N)
 {
     // 11100101(1)00 & ~(11100101(0)11) = 11100101(1)00 & 00011010(1)00 = 00000000(1)00
     return (N & ~(N - 1));
     // return (N & (-N));
-    // return log2(N & (N - 1)) + 1; // gives the index of the rightmost_set_bit (0-indexed)
+    // return log2(N & (N - 1)) + 1; // gives the index of the rightmost set bit (0-indexed)
 }
 
 /*
 Count numbers up to (N) having the Kth bit set
 --------------------------------------------------
 1. Right-shift N, K+1 times followed by left-shifting the result K times
-   which gives the count of numbers satisfying the given condition till the nearest Power_of_2 less than N
+   which gives the count of numbers satisfying the given condition till the nearest power of 2 less than N
 
 2. Now, check if the Kth bit is set in N or NOT
 
-3. If the Kth bit is set in N, then add the count of numbers from the nearest Power_of_2 less than N to the answer
+3. If the Kth bit is set in N, then add the count of numbers from the nearest power of 2 less than N to the answer
    Then add 1 to count N itself
 
 Let's figure out why this method works!
@@ -314,7 +314,7 @@ Then add 1 to count N itself
 */
 
 template <typename T>
-int Count_Kth_set_bit(const T &N, const int &K)
+int countKthBitSet(const T &N, const int &K)
 {
     int res = (N >> (K + 1)) << K;
 
@@ -334,7 +334,7 @@ It's also a way to count the  number of times a number N can be divided by 2
 */
 
 template <typename T>
-bool Is_Divisible(const T &N, const int &K)
+bool isDivisibleBy2pK(const T &N, const int &K)
 {
     int Val = __builtin_ctz(N); // Number of times a number N can be divided by 2
     return (Val >= K);
@@ -430,16 +430,16 @@ After removing duplicates final result will be { }, { 1 }, { 2 }, { 1 , 2 }, { 2
 
 Code:
 -----
-for (int Bitmask = 0; Bitmask < (1 << N); Bitmask++)
+for (int bitmask = 0; bitmask < (1 << N); bitmask++)
 {
     for (int ith_bit = 0; ith_bit < N; ith_bit++)
     {
-        if (Bitmask & (1 << ith_bit)) // If ith_bit is set
+        if (bitmask & (1 << ith_bit)) // If ith_bit is set
         {
             //Include it in this subset
         }
     }
-    //A possible subset has been formed or traversed
+    // A possible subset has been formed or traversed
 }
 */
 

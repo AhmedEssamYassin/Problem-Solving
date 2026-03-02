@@ -4,7 +4,7 @@ using namespace std;
 #define endl "\n"
 
 template <typename T>
-void Flip_ith_bit(T &N, short int i) // 0-based
+void flipIthBit(T &N, short int i) // 0-based
 {
 	// 111001010(1)1 ^ 000000000(1)0 = 111001010(0)1
 	N = (N ^ (T(1) << i));
@@ -65,7 +65,7 @@ int main()
 			__int128_t Bitmask = 0;
 			for (int k{i}; k <= j; k++)
 				// Bitmask.flip(Input[k] + 1); // Flip that bit representing the character
-				Flip_ith_bit(Bitmask, Input[k] + 1);
+				flipIthBit(Bitmask, Input[k] + 1);
 
 			short int len = j - i + 1;
 			if (len >= 3)

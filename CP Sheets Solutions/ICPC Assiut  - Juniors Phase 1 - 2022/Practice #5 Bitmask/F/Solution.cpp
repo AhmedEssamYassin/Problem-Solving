@@ -7,11 +7,11 @@ using namespace std;
 Count numbers up to (N) having the Kth bit set
 --------------------------------------------------
 1. Right-shift N, K+1 times followed by left-shifting the result K times
-   which gives the count of numbers satisfying the given condition till the nearest Power_of_2 less than N
+   which gives the count of numbers satisfying the given condition till the nearest power of 2 less than N
 
 2. Now, check if the Kth bit is set in N or NOT
 
-3. If the Kth bit is set in N, then add the count of numbers from the nearest Power_of_2 less than N to the answer
+3. If the Kth bit is set in N, then add the count of numbers from the nearest power of 2 less than N to the answer
    Then add 1 to count N itself
 
 Let's figure out why this method works!
@@ -67,7 +67,7 @@ Then add 1 to count N itself
 */
 
 template <typename T>
-int count_kth_set_bit(const T &N, const int &K)
+int countKthBitSet(const T &N, const int &K)
 {
 	int res = (N >> (K + 1)) << K;
 
@@ -140,10 +140,10 @@ int main()
 		cin >> L >> R;
 		int Ans = R - L + 1; // Number of element in range [L, R]
 		int N = R - L + 1;
-		for (int ith_bit{}; ith_bit < 31; ith_bit++) // Iterate over ALL bits
+		for (int ithBit{}; ithBit < 31; ithBit++) // Iterate over ALL bits
 		{
-			int X = count_kth_set_bit(L - 1, ith_bit);
-			int Y = count_kth_set_bit(R, ith_bit);
+			int X = countKthBitSet(L - 1, ithBit);
+			int Y = countKthBitSet(R, ithBit);
 			// (Y - X) evaluates the number of elements with Kth bit set in range [L, R]
 			Ans = min(Ans, N - (Y - X));
 		}

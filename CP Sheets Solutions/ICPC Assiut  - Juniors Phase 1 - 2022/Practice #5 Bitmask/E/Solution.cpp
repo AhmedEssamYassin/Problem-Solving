@@ -4,7 +4,7 @@ using namespace std;
 #define endl "\n"
 
 template <typename T>
-bool Check_ith_bit_set(T &N, uint16_t i) // 0-based
+bool checkIthBitSet(T &N, uint16_t i) // 0-based
 {
 	// 11100101(0)11 & 00000000(1)00 = 00000000000 (it's a cleared bit)
 	return (N & (1 << i));
@@ -55,13 +55,13 @@ int main()
 	}
 
 	vector<pair<int, int>> Team, ans;
-	for (int Bitmask = 0; Bitmask < (1 << N); Bitmask++) // 2^N possible Subsets (teams)
+	for (int bitmask = 0; bitmask < (1 << N); bitmask++) // 2^N possible Subsets (teams)
 	{
-		for (int ith_bit = 0; ith_bit < N; ith_bit++) // To include elements of this Subset
+		for (int ithBit = 0; ithBit < N; ithBit++) // To include elements of this Subset
 		{
-			// If ith_bit is set, we include the ith player in this subset (team)
-			if (Bitmask & (1 << ith_bit))
-				Team.push_back({ith_bit + 1, playersBitmasks[ith_bit]}); // Storing pairs of {1-based Player order,Player's Bitmask}
+			// If ithBit is set, we include the ith player in this subset (team)
+			if (bitmask & (1 << ithBit))
+				Team.push_back({ithBit + 1, playersBitmasks[ithBit]}); // Storing pairs of {1-based Player order,Player's Bitmask}
 		}
 
 		int val = 0;
@@ -71,19 +71,19 @@ int main()
 		for (int i{1}; i < Team.size(); i++)
 			val &= Team[i].second;
 
-		bool valid_subset = true;
+		bool validSubset = true;
 		// ALL remaining set bits represent the players who can play with each other
 		// If the Players in this subset are marked as "Can play with each other" in the bitmask, then it's a valid subset
 		for (int i{}; i < Team.size(); i++)
 		{
-			if (Check_ith_bit_set(val, Team[i].first - 1) == 0)
+			if (checkIthBitSet(val, Team[i].first - 1) == 0)
 			{
-				valid_subset = false;
+				validSubset = false;
 				break;
 			}
 		}
 
-		if (valid_subset && (Team.size() > ans.size()))
+		if (validSubset && (Team.size() > ans.size()))
 			ans = Team; // A candidate answer
 
 		Team.clear();

@@ -50,28 +50,28 @@ it simply clears the rightmost set bit and counts it iteratively until the numbe
 // Bits indices are traversed from right to left
 
 template <typename T>
-void Set_ith_bit(T &N, uint16_t i) // 0-based
+void setIthBit(T &N, uint16_t i) // 0-based
 {
 	// 11100101(0)11 | 00000000(1)00 = 11100101(1)11
 	N = (N | (T(1) << i));
 }
 
 template <typename T>
-void Flip_ith_bit(T &N, uint16_t i) // 0-based
+void flipIthBit(T &N, uint16_t i) // 0-based
 {
 	// 111001010(1)1 ^ 000000000(1)0 = 111001010(0)1
 	N = (N ^ (T(1) << i));
 }
 
 template <typename T>
-void Clear_ith_bit(T &N, uint16_t i) // 0-based
+void clearIthBit(T &N, uint16_t i) // 0-based
 {
 	// 1110010(1)011 & 1111111(0)111 = 1110010(0)011
 	N = (N & ~(T(1) << i));
 }
 
 template <typename T>
-bool Check_ith_bit_set(T &N, uint16_t i) // 0-based
+bool checkIthBitSet(T &N, uint16_t i) // 0-based
 {
 	// 11100101(0)11 & 00000000(1)00 = 00000000000 (it's a cleared bit)
 	return (N & (T(1) << i));
@@ -79,46 +79,46 @@ bool Check_ith_bit_set(T &N, uint16_t i) // 0-based
 }
 
 template <typename T>
-void Clear_rightmost_set_bit(T &N)
+void clearRightmostSetBit(T &N)
 {
 	// 11100101(1)00 & 11100101(0)11 = 11100101(0)00
 	N = (N & (N - 1));
 }
 
 template <typename T>
-int Count_set_bits(T N)
+int countSetBits(T N)
 {
 	int cnt{};
 
 	while (N)
 	{
-		Clear_rightmost_set_bit(N);
+		clearRightmostSetBit(N);
 		cnt++;
 	}
 	return cnt;
 }
 
 template <typename T>
-void Clear_all_trailing_ones(T &N)
+void clearTrailingOnes(T &N)
 {
 	// 111001010(11) & 111001011(00) = 111001010(00)
 	N = (N & (N + 1));
 }
 
 template <typename T>
-void Set_last_cleared_bit(T &N)
+void setLastClearedBit(T &N)
 {
 	// 11100101(0)11 | 11100101(1)00 = 11100101(1)11
 	N = (N | (N + 1));
 }
 
 template <typename T>
-int Get_rightmost_set_bit_number(const T &N)
+int getRightmostSetBitNumber(const T &N)
 {
 	// 11100101(1)00 & ~(11100101(0)11) = 11100101(1)00 & 00011010(1)00 = 00000000(1)00
 	return (N & ~(N - 1));
 	// return (N & (-N));
-	// return log2(N & (N-1)) + 1; // gives the index of the rightmost_set_bit (0-indexed)
+	// return log2(N & (N-1)) + 1; // gives the index of the rightmost set bit (0-indexed)
 }
 
 int main()
@@ -132,29 +132,24 @@ int main()
 
 	int N, Q, X;
 	cin >> Q >> N;
-
 	int Query;
 	while (Q--)
 	{
-		cin >> Query;
-		switch (Query)
+		cin >> Query >> X;
+		if (Query == 1)
 		{
-		case 1:
-			cin >> X;
-			N |= X;
-			break;
-		case 2:
-			cin >> X;
-			N &= X;
-			break;
-		case 3:
-			cin >> X;
-			N ^= X;
-			break;
-		case 4:
-			N = ~N;
-			break;
+			cout << checkIthBitSet(N, X) << endl;
+			continue;
 		}
+
+		else if (Query == 2)
+			setIthBit(N, X);
+
+		else if (Query == 3)
+			clearIthBit(N, X);
+
+		else if (Query == 4)
+			flipIthBit(N, X);
 		cout << N << endl;
 	}
 	return 0;

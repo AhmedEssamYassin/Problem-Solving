@@ -4,7 +4,7 @@ using namespace std;
 #define endl "\n"
 
 template <typename T>
-void Flip_ith_bit(T &N, short int i) // 0-based
+void flipIthBit(T &N, short int i) // 0-based
 {
 	// 111001010(1)1 ^ 000000000(1)0 = 111001010(0)1
 	N = (N ^ (T(1) << i));
@@ -73,7 +73,7 @@ int main()
 			for (const char &C : str)
 			{
 				int idx = C - 97; // lowercase letters
-				Flip_ith_bit(bitmask, idx);
+				flipIthBit(bitmask, idx);
 			}
 			cnt += mp[bitmask]; // The possibility of XORing with 0
 			for (int i{}; i < 26; i++)
