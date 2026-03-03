@@ -39,8 +39,10 @@ public:
 
     ll rangeQuery(int L, int R)
     {
-        if (L > R || L <= 0)
+        if (L > R)
             return 0; // Neutral value
+        if (L == 0)
+            return query(R);
         return (query(R) - query(L - 1));
     }
 };
