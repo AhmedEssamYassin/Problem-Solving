@@ -50,6 +50,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - [Disjoint Sets Union (Union-Find)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Disjoint%20Sets%20Union%20(DSU))
 - [Persistent Segment Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Persistent%20Segment%20Tree)
 - [Wavelet Tree and Wavelet Matrix](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Wavelet%20Trees)
+- [Palindromic Tree (Eer Tree)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Palindromic%20Tree%20(Eer%20Tree))
 - [Trie](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Trie)
 - [Graph theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Graph%20Theory)
 > - Types of Graphs and Terminologies
@@ -107,9 +108,10 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 ---
 
 ## Miscellaneous Topics
-- [Mo's Algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/MO%27s%20algorithm)
-- [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory) (Too deep topics, detailed in separate point)
 - [Dynamic Programming](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Dynamic%20Programming)
+- [Mo's Algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Mo%27s%20Algorithm)
+- [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory) (Too deep topics, detailed in separate point)
+- [Manacher's Algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Manacher%27s%20Algorithm)
 - [Game Theory (Nim game and Sprague-Grundy numbers)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Game%20Theory)
 - [Matrix Exponentiation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Matrix%20Exponentiation)
 
