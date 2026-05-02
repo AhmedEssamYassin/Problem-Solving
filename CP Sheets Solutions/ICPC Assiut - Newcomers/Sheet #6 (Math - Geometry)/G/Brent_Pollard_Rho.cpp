@@ -16,7 +16,7 @@ inline T F(T x, T c, T mod) // Pollard-rho function
 }
 
 template <typename T>
-inline T __abs(T N)
+inline T absVal(T N)
 {
 	if (N < 0)
 		return -N;
@@ -57,7 +57,7 @@ T Pollard_Brent(T N)
 			for (size_t i = 0; i < m && i < L - k; i++)
 			{
 				X = F(X, C, N);
-				q = mult64(q, __abs(Xt - X), N);
+				q = mult64(q, absVal(Xt - X), N);
 			}
 			gcd_val = __gcd(q, N);
 			k += m;
@@ -69,7 +69,7 @@ T Pollard_Brent(T N)
 		do
 		{
 			Xs = F(Xs, C, N);
-			gcd_val = __gcd(__abs(Xs - Xt), N);
+			gcd_val = __gcd(absVal(Xs - Xt), N);
 		} while (gcd_val == 1);
 	}
 	return gcd_val;

@@ -159,8 +159,12 @@ T modPow(T N, T power, T mod)
 template <typename T>
 bool isPrime(T N)
 {
-    if (N < 2 || N % 6 % 4 != 1)
-        return (N | 1) == 3;
+    constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+    constexpr uint32_t WHEEL30 = 0x208A2882;
+    if (N < 64)
+        return (MASK >> N) & 1;
+    if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+        return false;
     T d = N - 1;
     int s{};
     while (!(d & 1))

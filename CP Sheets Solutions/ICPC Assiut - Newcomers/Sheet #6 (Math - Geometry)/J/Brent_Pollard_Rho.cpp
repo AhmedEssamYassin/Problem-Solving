@@ -16,7 +16,7 @@ inline T F(T x, T c, T mod) // Pollard-rho function
 }
 
 template <typename T>
-inline T __abs(T N)
+inline T absVal(T N)
 {
 	if (N < 0)
 		return -N;
@@ -57,7 +57,7 @@ T Pollard_Brent(T N)
 			for (size_t i = 0; i < m && i < L - k; i++)
 			{
 				X = F(X, C, N);
-				q = mult64(q, __abs(Xt - X), N);
+				q = mult64(q, absVal(Xt - X), N);
 			}
 			gcd_val = __gcd(q, N);
 			k += m;
@@ -69,7 +69,7 @@ T Pollard_Brent(T N)
 		do
 		{
 			Xs = F(Xs, C, N);
-			gcd_val = __gcd(__abs(Xs - Xt), N);
+			gcd_val = __gcd(absVal(Xs - Xt), N);
 		} while (gcd_val == 1);
 	}
 	return gcd_val;
@@ -96,8 +96,12 @@ T modPow(T N, T power, T mod)
 template <typename T>
 bool isPrime(T N)
 {
-	if (N < 2 || N % 6 % 4 != 1)
-		return (N | 1) == 3;
+	constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+	constexpr uint32_t WHEEL30 = 0x208A2882;
+	if (N < 64)
+		return (MASK >> N) & 1;
+	if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+		return false;
 	T d = N - 1;
 	int s{};
 	while (!(d & 1))

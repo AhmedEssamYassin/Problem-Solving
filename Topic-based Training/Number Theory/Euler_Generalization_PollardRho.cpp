@@ -13,37 +13,56 @@ inline T add64(const T &a, const T &b, const T &mod)
     return res;
 }
 
-template <typename T>
-inline T mult64(const T &a, const T &b, T mod)
+// Use type u64
+namespace Montgomery64
 {
-    return (__int128_t)a * b % mod;
+    using u64 = uint64_t;
+    using u128 = __uint128_t;
+
+    inline u64 mult64(u64 a, u64 b, u64 mod) { return (u128)a * b % mod; }
+
+    static inline u64 inv64_2k(u64 n0)
+    {
+        u64 x = 1;
+        for (int i = 6; i > 0; i--)
+            x *= 2 - n0 * x;
+        return x;
+    }
+
+    inline u64 montModInv(u64 n) { return 0 - inv64_2k(n); }
+    inline u64 montMult(u64 a, u64 b, u64 n, u64 n0Prime)
+    {
+        u128 t = (u128)a * b;
+        u64 m = (u64)t * n0Prime;
+        u128 res = (t >> 64) + (((u128)m * n) >> 64) + ((u64)t != 0);
+        if (res >= n)
+            res -= n;
+        return res;
+    }
+}
+using namespace Montgomery64;
+
+template <typename T>
+inline T absVal(T N) { return N < 0 ? -N : N; }
+
+template <typename T>
+inline T F(T x, T c, T mod, T inv) // Pollard-Rho function
+{
+    x = montMult(x, x, mod, inv);
+    x = x >= mod - c ? x - mod + c : x + c;
+    return x;
 }
 
 template <typename T>
-inline T F(T x, T c, T mod) // Pollard-rho function
-{
-    return (mult64(x, x, mod) + c) % mod;
-}
-
-template <typename T>
-inline T __abs(T N)
-{
-    if (N < 0)
-        return -N;
-
-    return N;
-}
-
-template <typename T>
-T Pollard_Brent(T N)
+T pollardBrent(T N)
 {
     if (!(N & 1))
         return 2;
 
     // Random Number Linear Congruential Generator MMIX from D.E. Knuth
-    static i128 rng = 0xdeafbeefff;
-    uint64_t a = rng * 6364136223846793005ull + 1442695040888963407ull;
-    uint64_t b = a * 6364136223846793005ull + 1442695040888963407ull;
+    static u128 rng = 0xdeafbeefff;
+    uint64_t a = rng * 6364136223846793005ULL + 1442695040888963407ULL;
+    uint64_t b = a * 6364136223846793005ULL + 1442695040888963407ULL;
     rng = (a + b) ^ (a * b);
 
     T X0 = 1 + a % (N - 1);
@@ -53,21 +72,22 @@ T Pollard_Brent(T N)
     T q = 1;
     T Xs, Xt;
     T m = 128;
+    u64 inv = montModInv(N);
     T L = 1;
     while (gcdVal == 1)
     {
         Xt = X;
         for (size_t i = 1; i < L; i++)
-            X = F(X, C, N);
+            X = F(X, C, N, inv);
 
-        int k = 0;
+        uint64_t k = 0;
         while (k < L && gcdVal == 1)
         {
             Xs = X;
-            for (size_t i = 0; i < m && i < L - k; i++)
+            for (size_t i = 0; i < m && i + k < L; i++)
             {
-                X = F(X, C, N);
-                q = mult64(q, __abs(Xt - X), N);
+                X = F(X, C, N, inv);
+                q = montMult(q, Xt > X ? Xt - X : X - Xt, N, inv);
             }
             gcdVal = __gcd(q, N);
             k += m;
@@ -78,8 +98,8 @@ T Pollard_Brent(T N)
     {
         do
         {
-            Xs = F(Xs, C, N);
-            gcdVal = __gcd(__abs(Xs - Xt), N);
+            Xs = F(Xs, C, N, inv);
+            gcdVal = __gcd(Xs > Xt ? Xs - Xt : Xt - Xs, N);
         } while (gcdVal == 1);
     }
     return gcdVal;
@@ -92,7 +112,6 @@ T modPow(T N, T power, T mod)
         return 0;
     if (N == 1 || power == 0)
         return 1;
-
     T res{1};
     while (power)
     {
@@ -107,8 +126,13 @@ T modPow(T N, T power, T mod)
 template <typename T>
 bool isPrime(T N)
 {
-    if (N < 2 || N % 6 % 4 != 1)
-        return (N | 1) == 3;
+    constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+    constexpr uint32_t WHEEL30 = 0x208A2882;
+    if (N < 64)
+        return (MASK >> N) & 1;
+    if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+        return false;
+
     T d = N - 1;
     int s{};
     while (!(d & 1))
@@ -125,22 +149,19 @@ bool isPrime(T N)
 }
 
 template <typename T>
-void primeFactorize(T N, map<T, T> &primeFactors)
+void primeFactorize(T N, vector<T> &primeFactors)
 {
     if (N == 1)
         return;
 
-    if (!isPrime(N))
+    if (isPrime(N))
     {
-        T Y = Pollard_Brent(N);
-        primeFactorize(Y, primeFactors);
-        primeFactorize(N / Y, primeFactors);
-    }
-    else
-    {
-        primeFactors[N]++;
+        primeFactors.push_back(N);
         return;
     }
+    T Y = pollardBrent(N);
+    primeFactorize(Y, primeFactors);
+    primeFactorize(N / Y, primeFactors);
 }
 
 template <typename T>
@@ -170,78 +191,6 @@ T phi(T N)
         ans *= (binPow(p, exp) - binPow(p, exp - 1));
     return ans;
 }
-
-// GCC's implementation for I/O of 128-bit integers
-using int128 = signed __int128;
-using uint128 = unsigned __int128;
-
-namespace int128_io
-{
-
-    inline auto char_to_digit(int chr)
-    {
-        return static_cast<int>(isalpha(chr) ? 10 + tolower(chr) - 'a' : chr - '0');
-    }
-
-    inline auto digit_to_char(int digit)
-    {
-        return static_cast<char>(digit > 9 ? 'a' + digit - 10 : '0' + digit);
-    }
-
-    template <class integer>
-    inline auto to_int(const std::string &str, size_t *idx = nullptr, int base = 10)
-    {
-        size_t i = idx != nullptr ? *idx : 0;
-        const auto n = str.size();
-        const auto neg = str[i] == '-';
-        integer num = 0;
-        if (neg)
-            ++i;
-        while (i < n)
-            num *= base, num += char_to_digit(str[i++]);
-        if (idx != nullptr)
-            *idx = i;
-        return neg ? -num : num;
-    }
-
-    template <class integer>
-    inline auto to_string(integer num, int base = 10)
-    {
-        const auto neg = num < 0;
-        std::string str;
-        if (neg)
-            num = -num;
-        do
-            str += digit_to_char(num % base), num /= base;
-        while (num > 0);
-        if (neg)
-            str += '-';
-        std::reverse(str.begin(), str.end());
-        return str;
-    }
-
-    inline auto next_str(std::istream &stream)
-    {
-        std::string str;
-        stream >> str;
-        return str;
-    }
-
-    template <class integer>
-    inline auto &read(std::istream &stream, integer &num)
-    {
-        num = to_int<integer>(next_str(stream));
-        return stream;
-    }
-
-    template <class integer>
-    inline auto &write(std::ostream &stream, integer num) { return stream << to_string(num); }
-}
-
-inline auto &operator>>(istream &stream, int128 &num) { return int128_io::read(stream, num); }
-inline auto &operator<<(ostream &stream, int128 num) { return int128_io::write(stream, num); }
-inline auto &operator>>(istream &stream, uint128 &num) { return int128_io::read(stream, num); }
-inline auto &operator<<(ostream &stream, uint128 num) { return int128_io::write(stream, num); }
 
 ll normalize(__int128_t x, ll m)
 {
@@ -276,13 +225,13 @@ int main()
     // freopen("calc.in", "r", stdin);
     // freopen("calc.out", "w", stdout);
     int t = 1;
-    ll N, k;
+    u64 N, k;
     // cin >> t;
     while (t--)
     {
         cin >> N >> k;
         if (N == 0)
-            return cout << add64(2 % k, 1LL, k), 0;
+            return cout << add64(2 % k, 1ULL, k), 0;
         ll w[] = {0, 2, 2, N}; // 0 is padding
         function<ll(ll, ll, ll)> solve = [&](ll l, ll r, ll m) -> ll
         {
@@ -293,7 +242,7 @@ int main()
             ll res = Exp(w[l], power, m);
             return res; // Don't take mod here
         };
-        cout << add64(solve(1, 3, k) % k, 1LL, k);
+        cout << add64(solve(1, 3, k) % k, 1ULL, k);
     }
     return 0;
 }

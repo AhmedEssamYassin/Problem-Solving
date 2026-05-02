@@ -155,30 +155,21 @@ void primeFactorize(T N, vector<T> &primeFactors)
 }
 
 template <typename T>
-T binPow(T N, T power)
+T countDivisors(T N)
 {
-    T res = 1;
-    while (power)
-    {
-        if (power & 1)
-            res *= N;
-        N *= N;
-        power >>= 1;
-    }
-    return res;
-}
+    vector<T> primeFactors;
+    primeFactorize(N, primeFactors);
+    sort(primeFactors.begin(), primeFactors.end());
 
-// Euler Totient Function
-template <typename T>
-T Phi(T N)
-{
-    if (isPrime(N))
-        return (N - 1);
-    map<T, T> pf;
-    primeFactorize(N, pf);
     T ans = 1;
-    for (auto &[p, exp] : pf) // O(log² N)
-        ans *= (binPow(p, exp) - binPow(p, exp - 1));
+    for (size_t i = 0, sz = primeFactors.size(); i < sz;)
+    {
+        size_t j = i;
+        while (j < sz && primeFactors[i] == primeFactors[j])
+            ++j;
+        ans *= (j - i + 1);
+        i = j;
+    }
     return ans;
 }
 
@@ -191,12 +182,29 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif
     int t = 1;
-    u64 N;
-    cin >> t;
+    // cin >> t;
     while (t--)
     {
+        u64 N;
         cin >> N;
-        cout << Phi(N) << endl;
+        u64 x = 1;
+        vector<u64> pf;
+        while (N--)
+        {
+            u64 a;
+            cin >> a;
+            primeFactorize(a, pf);
+        }
+        sort(pf.begin(), pf.end());
+        for (size_t i = 0, sz = pf.size(); i < sz;)
+        {
+            size_t j = i;
+            while (j < sz && pf[i] == pf[j])
+                ++j;
+            (x *= (j - i + 1)) %= 998244353;
+            i = j;
+        }
+        cout << x << endl;
     }
     return 0;
 }

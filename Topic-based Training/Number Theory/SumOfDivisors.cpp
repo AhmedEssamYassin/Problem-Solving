@@ -93,7 +93,7 @@ inline T F(T x, T c, T mod, T inv) // Pollard-rho function
 }
 
 template <typename T>
-inline T __abs(T N)
+inline T absVal(T N)
 {
     if (N < 0)
         return -N;
@@ -307,77 +307,81 @@ T sumDivisors(T N)
     return sigma;
 }
 
-// GCC's implementation for I/O of 128-bit integers
+// Fast I/O for 128-bit integers
 using int128 = signed __int128;
 using uint128 = unsigned __int128;
-
-namespace int128_io
+ostream &operator<<(ostream &stream, int128 n)
 {
-
-    inline auto char_to_digit(int chr)
+    if (__builtin_expect(n == 0, 0))
+        return stream.put('0');
+    char buf[41];
+    char *end = buf + 41;
+    char *p = end;
+    bool neg = (n < 0);
+    uint128 u = neg ? -(uint128)n : (uint128)n;
+    do
     {
-        return static_cast<int>(isalpha(chr) ? 10 + tolower(chr) - 'a' : chr - '0');
-    }
-
-    inline auto digit_to_char(int digit)
-    {
-        return static_cast<char>(digit > 9 ? 'a' + digit - 10 : '0' + digit);
-    }
-
-    template <class integer>
-    inline auto to_int(const std::string &str, size_t *idx = nullptr, int base = 10)
-    {
-        size_t i = idx != nullptr ? *idx : 0;
-        const auto n = str.size();
-        const auto neg = str[i] == '-';
-        integer num = 0;
-        if (neg)
-            ++i;
-        while (i < n)
-            num *= base, num += char_to_digit(str[i++]);
-        if (idx != nullptr)
-            *idx = i;
-        return neg ? -num : num;
-    }
-
-    template <class integer>
-    inline auto to_string(integer num, int base = 10)
-    {
-        const auto neg = num < 0;
-        std::string str;
-        if (neg)
-            num = -num;
-        do
-            str += digit_to_char(num % base), num /= base;
-        while (num > 0);
-        if (neg)
-            str += '-';
-        std::reverse(str.begin(), str.end());
-        return str;
-    }
-
-    inline auto next_str(std::istream &stream)
-    {
-        std::string str;
-        stream >> str;
-        return str;
-    }
-
-    template <class integer>
-    inline auto &read(std::istream &stream, integer &num)
-    {
-        num = to_int<integer>(next_str(stream));
-        return stream;
-    }
-
-    template <class integer>
-    inline auto &write(std::ostream &stream, integer num) { return stream << to_string(num); }
+        *--p = (char)('0' + (unsigned)(u % 10));
+        u /= 10;
+    } while (u);
+    if (neg)
+        *--p = '-';
+    return stream.write(p, end - p);
 }
 
-inline auto &operator>>(istream &stream, int128 &num) { return int128_io::read(stream, num); }
-inline auto &operator<<(ostream &stream, int128 num) { return int128_io::write(stream, num); }
-inline auto &operator>>(istream &stream, uint128 &num) { return int128_io::read(stream, num); }
-inline auto &operator<<(ostream &stream, uint128 num) { return int128_io::write(stream, num); }
+ostream &operator<<(ostream &stream, uint128 n)
+{
+    if (__builtin_expect(n == 0, 0))
+        return stream.put('0');
+    char buf[40];
+    char *end = buf + 40;
+    char *p = end;
+    do
+    {
+        *--p = (char)('0' + (unsigned)(n % 10));
+        n /= 10;
+    } while (n);
+    return stream.write(p, end - p);
+}
+
+istream &operator>>(istream &stream, int128 &n)
+{
+    n = 0;
+    char c;
+    if (!(stream >> c))
+        return stream;
+    bool neg = (c == '-');
+    if (neg && !stream.get(c))
+        return stream;
+    while (isdigit((unsigned char)c))
+    {
+        n = n * 10 + (c - '0');
+        if (!stream.get(c))
+            break;
+    }
+    if (stream)
+        stream.putback(c);
+    if (neg)
+        n = -n;
+    return stream;
+}
+
+istream &operator>>(istream &stream, uint128 &n)
+{
+    n = 0;
+    char c;
+    if (!(stream >> c))
+        return stream;
+    while (isdigit((unsigned char)c))
+    {
+        n = n * 10 + (c - '0');
+        if (!stream.get(c))
+            break;
+    }
+    if (stream)
+        stream.putback(c);
+    return stream;
+}
 
 int main()
 {
