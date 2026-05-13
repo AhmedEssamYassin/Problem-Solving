@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-map<ll, ll> Prime_factorize(ll N)
+map<ll, ll> primeFactorize(ll N)
 {
 	map<ll, ll> primeFactors;
 	while (!(N & 1))
@@ -18,17 +18,23 @@ map<ll, ll> Prime_factorize(ll N)
 	return primeFactors;
 }
 
-ll sigma_1(ll N)
+ll sigma1(ll N)
 {
 	if (N == 1)
 		return 1;
 
 	ll sigma{1};
-	map<ll, ll> primeFactors = Prime_factorize(N);
-	for (auto &&[prime, power] : primeFactors)
+	map<ll, ll> primeFactors = primeFactorize(N);
+	for (auto [p, a] : primeFactors)
 	{
-		ll val = (powl(prime, power + 1) - 1) / (prime - 1);
-		sigma *= val;
+		ll sum{1}, term{1};
+		while (a--)
+		{
+			term *= p;
+			sum += term;
+		}
+
+		sigma *= sum;
 	}
 	return sigma;
 }
@@ -47,7 +53,7 @@ int main()
 	while (t--)
 	{
 		cin >> N;
-		cout << sigma_1(N);
+		cout << sigma1(N);
 	}
 	return 0;
 }

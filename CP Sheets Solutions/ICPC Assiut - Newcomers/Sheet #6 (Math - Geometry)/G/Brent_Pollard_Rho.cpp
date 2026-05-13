@@ -3,95 +3,110 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-template <typename T>
-T mult64(T a, T b, T mod)
+// Use type u64
+namespace Montgomery64
 {
-	return (__int128_t)a * b % mod;
+	using u64 = uint64_t;
+	using u128 = __uint128_t;
+
+	inline u64 mult64(u64 a, u64 b, u64 mod) { return (u128)a * b % mod; }
+
+	static inline u64 inv64_2k(u64 n0)
+	{
+		u64 x = 1;
+		for (int i = 6; i > 0; i--)
+			x *= 2 - n0 * x;
+		return x;
+	}
+
+	inline u64 montModInv(u64 n) { return 0 - inv64_2k(n); }
+	inline u64 montMult(u64 a, u64 b, u64 n, u64 n0Prime)
+	{
+		u128 t = (u128)a * b;
+		u64 m = (u64)t * n0Prime;
+		u128 res = (t >> 64) + (((u128)m * n) >> 64) + ((u64)t != 0);
+		if (res >= n)
+			res -= n;
+		return res;
+	}
+}
+using namespace Montgomery64;
+
+template <typename T>
+inline T absVal(T N) { return N < 0 ? -N : N; }
+
+template <typename T>
+inline T F(T x, T c, T mod, T inv) // Pollard-Rho function
+{
+	x = montMult(x, x, mod, inv);
+	x = x >= mod - c ? x - mod + c : x + c;
+	return x;
 }
 
 template <typename T>
-inline T F(T x, T c, T mod) // Pollard-rho function
-{
-	return (mult64(x, x, mod) + c) % mod;
-}
-
-template <typename T>
-inline T absVal(T N)
-{
-	if (N < 0)
-		return -N;
-
-	return N;
-}
-
-template <typename T>
-T Pollard_Brent(T N)
+T pollardBrent(T N)
 {
 	if (!(N & 1))
 		return 2;
 
 	// Random Number Linear Congruential Generator MMIX from D.E. Knuth
-	static uint64_t rng = 0xdeafbeefff;
-	uint64_t a = rng * 6364136223846793005ull + 1442695040888963407ull;
-	uint64_t b = a * 6364136223846793005ull + 1442695040888963407ull;
+	static u128 rng = 0xdeafbeefff;
+	uint64_t a = rng * 6364136223846793005ULL + 1442695040888963407ULL;
+	uint64_t b = a * 6364136223846793005ULL + 1442695040888963407ULL;
 	rng = (a + b) ^ (a * b);
 
 	T X0 = 1 + a % (N - 1);
 	T C = 1 + b % (N - 1);
 	T X = X0; // X1
-	T gcd_val = 1;
+	T gcdVal = 1;
 	T q = 1;
 	T Xs, Xt;
 	T m = 128;
+	u64 inv = montModInv(N);
 	T L = 1;
-	while (gcd_val == 1)
+	while (gcdVal == 1)
 	{
 		Xt = X;
 		for (size_t i = 1; i < L; i++)
-			X = F(X, C, N);
+			X = F(X, C, N, inv);
 
-		int k = 0;
-		while (k < L && gcd_val == 1)
+		uint64_t k = 0;
+		while (k < L && gcdVal == 1)
 		{
 			Xs = X;
-			for (size_t i = 0; i < m && i < L - k; i++)
+			for (size_t i = 0; i < m && i + k < L; i++)
 			{
-				X = F(X, C, N);
-				q = mult64(q, absVal(Xt - X), N);
+				X = F(X, C, N, inv);
+				q = montMult(q, Xt > X ? Xt - X : X - Xt, N, inv);
 			}
-			gcd_val = __gcd(q, N);
+			gcdVal = __gcd(q, N);
 			k += m;
 		}
 		L += L;
 	}
-	if (gcd_val == N) // Failure
+	if (gcdVal == N) // Failure
 	{
 		do
 		{
-			Xs = F(Xs, C, N);
-			gcd_val = __gcd(absVal(Xs - Xt), N);
-		} while (gcd_val == 1);
+			Xs = F(Xs, C, N, inv);
+			gcdVal = __gcd(Xs > Xt ? Xs - Xt : Xt - Xs, N);
+		} while (gcdVal == 1);
 	}
-	return gcd_val;
+	return gcdVal;
 }
 
 template <typename T>
-T modBinExp(T N, T power, T mod) //(N^power) % mod
+T modPow(T N, T power, T mod)
 {
 	if (N % mod == 0 || N == 0)
 		return 0;
 	if (N == 1 || power == 0)
 		return 1;
-
-	if (N >= mod)
-		N -= mod;
-
 	T res{1};
 	while (power)
 	{
-		if (power & 1) // ODD
+		if (power & 1)
 			res = mult64(res, N, mod);
-
 		N = mult64(N, N, mod);
 		power >>= 1;
 	}
@@ -99,94 +114,68 @@ T modBinExp(T N, T power, T mod) //(N^power) % mod
 }
 
 template <typename T>
-bool Check_Composite(T N, T a, T d, int s)
+bool isPrime(T N)
 {
-	T X = modBinExp(a, d, N);
-	if (X == 1 || X == N - 1)
-		return false; // Not composite
+	constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+	constexpr uint32_t WHEEL30 = 0x208A2882;
+	if (N < 64)
+		return (MASK >> N) & 1;
+	if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+		return false;
 
-	for (int r = 1; r < s; r++)
-	{
-		X = mult64(X, X, N);
-		if (X == 1 || X == N - 1)
-			return false; // Not composite
-	}
-	return true; // Composite
-}
-
-template <typename T>
-bool Miller_Rabin(T N, int K = 5) // k is the number of trials (bases). If k increases the accuracy increases
-{
 	T d = N - 1;
 	int s{};
 	while (!(d & 1))
 		d >>= 1, ++s;
-
-	for (const T &a : {11, 13, 17, 19, 23, 29, 31})
+	for (const T &a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022})
 	{
-		if (N == a)
-			return true;
-		if (Check_Composite(N, a, d, s))
+		T p = modPow(a % N, d, N), i = s;
+		while (p != 1 && p != N - 1 && a % N && i--)
+			p = mult64(p, p, N);
+		if (p != N - 1 && i != s)
 			return false;
 	}
 	return true;
 }
 
 template <typename T>
-bool Is_Prime(T N)
-{
-	if (N < 2)
-		return false;
-
-	if (N <= 3)
-		return true;
-	if (N == 5 || N == 7)
-		return true;
-
-	if (!(N & 1) || N % 3 == 0 || N % 5 == 0 || N % 7 == 0)
-		return false;
-
-	return Miller_Rabin(N);
-}
-
-template <typename T>
-void Factor(T N, map<T, ll> &Prime_factors)
+void primeFactorize(T N, vector<T> &primeFactors)
 {
 	if (N == 1)
 		return;
 
-	if (!Is_Prime(N))
+	if (isPrime(N))
 	{
-		T Y = Pollard_Brent(N);
-		Factor(Y, Prime_factors);
-		Factor(N / Y, Prime_factors);
-	}
-	else
-	{
-		Prime_factors[N]++;
+		primeFactors.push_back(N);
 		return;
 	}
+	T Y = pollardBrent(N);
+	primeFactorize(Y, primeFactors);
+	primeFactorize(N / Y, primeFactors);
 }
 
-template <typename T>
-map<T, ll> Prime_factorize(T N)
+u64 sigma1(u64 n)
 {
-	map<T, ll> Prime_factors;
-	Factor(N, Prime_factors);
-	return Prime_factors;
-}
-ll sigma_1(ll N)
-{
-	if (N == 1)
+	if (n == 1)
 		return 1;
 
-	ll sigma{1};
-	map<ll, ll> primeFactors = Prime_factorize(N);
-	for (auto &&[prime, power] : primeFactors)
+	u64 sigma{1};
+	vector<u64> pf;
+	primeFactorize(n, pf);
+	sort(pf.begin(), pf.end());
+	for (size_t i = 0; i < pf.size();)
 	{
-		ll val = (powl(prime, power + 1) - 1) / (prime - 1);
-		sigma *= val;
+		ll p = pf[i];
+		ll sum{1}, term{1};
+		while (i < pf.size() && pf[i] == p)
+		{
+			term *= p;
+			sum += term;
+			i++;
+		}
+		sigma *= sum;
 	}
+
 	return sigma;
 }
 
@@ -199,12 +188,12 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N;
+	u64 N;
 	// cin >> t;
 	while (t--)
 	{
 		cin >> N;
-		cout << sigma_1(N);
+		cout << sigma1(N);
 	}
 	return 0;
 }

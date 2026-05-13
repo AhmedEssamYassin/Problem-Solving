@@ -84,20 +84,6 @@ void primeFactorize(T N, map<T, T> &primeFactors)
         primeFactors[N]++;
 }
 
-template <typename T>
-T binPow(T N, T power)
-{
-    T res = 1;
-    while (power)
-    {
-        if (power & 1)
-            res *= N;
-        N *= N;
-        power >>= 1;
-    }
-    return res;
-}
-
 // Euler Totient Function
 template <typename T>
 T Phi(T N)
@@ -106,9 +92,9 @@ T Phi(T N)
         return (N - 1);
     map<T, T> pf;
     primeFactorize(N, pf);
-    T ans = 1;
-    for (auto &[p, exp] : pf) // O(log² N)
-        ans *= (binPow(p, exp) - binPow(p, exp - 1));
+    T ans = N;
+    for (auto &[p, exp] : pf)
+        ans -= ans / p;
     return ans;
 }
 

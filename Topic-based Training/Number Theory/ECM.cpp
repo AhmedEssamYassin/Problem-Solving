@@ -121,12 +121,15 @@ namespace Montgomery128
     // Fallback generic (slow): kept for setup (e.g., computing R^2 mod N once)
     u128 mult128(u128 a, u128 b, u128 mod)
     {
+        if ((a | b) >> 64 == 0)
+            return a * b % mod;
         u128 result = 0;
-        for (a %= mod; b > 0; a <<= 1, b >>= 1)
+        for (a %= mod; b; b >>= 1)
         {
-            a >= mod ? a -= mod : 0;
-            if (b & 1)
-                result += a, result >= mod ? result -= mod : 0;
+            result += a & -(u128)(b & 1);
+            result -= mod & -(result >= mod);
+            a += a;
+            a -= mod & -(a >= mod);
         }
         return result;
     }

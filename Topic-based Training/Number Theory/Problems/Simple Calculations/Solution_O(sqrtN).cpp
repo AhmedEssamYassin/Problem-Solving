@@ -72,20 +72,6 @@ void primeFactorize(T N, map<T, T> &primeFactors) // Use a vector if generating 
         primeFactors[N]++;
 }
 
-template <typename T>
-T binPow(T N, T power)
-{
-    T res = 1;
-    while (power)
-    {
-        if (power & 1)
-            res *= N;
-        N *= N;
-        power >>= 1;
-    }
-    return res;
-}
-
 // Euler Totient Function
 template <typename T>
 T phi(T N)
@@ -94,13 +80,14 @@ T phi(T N)
         return (N - 1);
     map<T, T> pf;
     primeFactorize(N, pf);
-    T ans = 1;
-    for (auto &[p, exp] : pf) // O(log² N)
-        ans *= (binPow(p, exp) - binPow(p, exp - 1));
+    T ans = N;
+    for (auto &[p, exp] : pf)
+        ans -= ans / p;
     return ans;
 }
 
-ll normalize(__int128_t x, ll m)
+using u64 = uint64_t;
+u64 normalize(u64 x, u64 m)
 {
     if (x < m)
         return x;
@@ -114,9 +101,9 @@ T Exp(T N, T power, T mod)
     while (power)
     {
         if (power & 1)
-            res = normalize((__int128_t)res * N, mod);
+            res = normalize((u64)res * N, mod);
 
-        N = normalize((__int128_t)N * N, mod);
+        N = normalize((u64)N * N, mod);
         power >>= 1;
     }
     return res;
@@ -130,28 +117,28 @@ int main()
     freopen("input.txt", "r", stdin);
     freopen("Output.txt", "w", stdout);
 #endif
-    freopen("calc.in", "r", stdin);
-    freopen("calc.out", "w", stdout);
+    // freopen("calc.in", "r", stdin);
+    // freopen("calc.out", "w", stdout);
     int t = 1;
-    ll N, k;
+    u64 N, k;
     // cin >> t;
     while (t--)
     {
         cin >> N >> k;
         if (N == 0)
-            return cout << add64<ll>(2 % k, 1, k), 0;
+            return cout << add64<u64>(2 % k, 1, k), 0;
 
-        ll w[] = {0, 2, 2, N}; // 0 is padding
-        function<ll(ll, ll, ll)> solve = [&](ll l, ll r, ll m) -> ll
+        u64 w[] = {0, 2, 2, N}; // 0 is padding
+        function<u64(u64, u64, u64)> solve = [&](u64 l, u64 r, u64 m) -> u64
         {
             if (l == r + 1 || m == 1)
                 return 1;
 
-            ll power = solve(l + 1, r, phi(m));
-            ll res = Exp(w[l], power, m);
+            u64 power = solve(l + 1, r, phi(m));
+            u64 res = Exp(w[l], power, m);
             return res; // Don't take mod here
         };
-        cout << add64(solve(1, 3, k) % k, 1LL, k);
+        cout << add64(solve(1, 3, k) % k, 1ULL, k);
     }
     return 0;
 }

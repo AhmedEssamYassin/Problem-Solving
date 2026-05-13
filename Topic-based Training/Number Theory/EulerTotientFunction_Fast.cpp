@@ -174,11 +174,17 @@ T Phi(T N)
 {
     if (isPrime(N))
         return (N - 1);
-    map<T, T> pf;
+    vector<T> pf;
     primeFactorize(N, pf);
-    T ans = 1;
-    for (auto &[p, exp] : pf) // O(log² N)
-        ans *= (binPow(p, exp) - binPow(p, exp - 1));
+    sort(pf.begin(), pf.end());
+    T ans = N;
+    for (int i = 0; i < pf.size();)
+    {
+        u64 p = pf[i];
+        while (p == pf[i])
+            i++;
+        ans -= ans / p;
+    }
     return ans;
 }
 

@@ -164,31 +164,23 @@ void primeFactorize(T N, vector<T> &primeFactors)
     primeFactorize(N / Y, primeFactors);
 }
 
-template <typename T>
-T binPow(T N, T power)
-{
-    T res = 1;
-    while (power)
-    {
-        if (power & 1)
-            res *= N;
-        N *= N;
-        power >>= 1;
-    }
-    return res;
-}
-
 // Euler Totient Function
 template <typename T>
 T phi(T N)
 {
     if (isPrime(N))
         return (N - 1);
-    map<T, T> pf;
+    vector<T> pf;
     primeFactorize(N, pf);
-    T ans = 1;
-    for (auto &[p, exp] : pf) // O(log² N)
-        ans *= (binPow(p, exp) - binPow(p, exp - 1));
+    sort(pf.begin(), pf.end());
+    T ans = N;
+    for (int i = 0; i < pf.size();)
+    {
+        T p = pf[i];
+        while (p == pf[i])
+            i++;
+        ans -= ans / p;
+    }
     return ans;
 }
 
@@ -232,14 +224,14 @@ int main()
         cin >> N >> k;
         if (N == 0)
             return cout << add64(2 % k, 1ULL, k), 0;
-        ll w[] = {0, 2, 2, N}; // 0 is padding
-        function<ll(ll, ll, ll)> solve = [&](ll l, ll r, ll m) -> ll
+        u64 w[] = {0, 2, 2, N}; // 0 is padding
+        function<u64(u64, u64, u64)> solve = [&](u64 l, u64 r, u64 m) -> u64
         {
             if (l == r + 1 || m == 1)
                 return 1;
 
-            ll power = solve(l + 1, r, phi(m));
-            ll res = Exp(w[l], power, m);
+            u64 power = solve(l + 1, r, phi(m));
+            u64 res = Exp(w[l], power, m);
             return res; // Don't take mod here
         };
         cout << add64(solve(1, 3, k) % k, 1ULL, k);

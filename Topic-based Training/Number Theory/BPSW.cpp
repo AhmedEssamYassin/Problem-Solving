@@ -80,14 +80,18 @@ istream &operator>>(istream &stream, uint128 &n)
 }
 
 using u128 = __uint128_t;
+using u64 = unsigned long long;
 u128 mult128(u128 a, u128 b, u128 mod)
 {
+    if ((a | b) >> 64 == 0)
+        return a * b % mod;
     u128 result = 0;
-    for (a %= mod; b > 0; a <<= 1, b >>= 1)
+    for (a %= mod; b; b >>= 1)
     {
-        a >= mod ? a -= mod : 0;
-        if (b & 1)
-            result += a, result >= mod ? result -= mod : 0;
+        result += a & -(u128)(b & 1);
+        result -= mod & -(result >= mod);
+        a += a;
+        a -= mod & -(a >= mod);
     }
     return result;
 }
@@ -301,16 +305,11 @@ bool strongLucasSelfridge(u128 n)
 template <typename T>
 bool isBPSWPrime(T n)
 {
-    if (n < 64)
-    {
-        constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
-        return (MASK >> n) & 1;
-    }
-
-    uint32_t x = (uint32_t)(n % 30);
+    constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
     constexpr uint32_t WHEEL30 = 0x208A2882;
-
-    if (!((WHEEL30 >> x) & 1))
+    if (n < 64)
+        return (MASK >> n) & 1;
+    if (!((WHEEL30 >> (uint32_t)(n % 30)) & 1))
         return false;
 
     if (!millerRabin(n))

@@ -3,76 +3,96 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-template <typename T>
-T mult64(T a, T b, T mod)
+// Use type u64
+namespace Montgomery64
 {
-	return (__int128_t)a * b % mod;
+	using u64 = uint64_t;
+	using u128 = __uint128_t;
+
+	inline u64 mult64(u64 a, u64 b, u64 mod) { return (u128)a * b % mod; }
+
+	static inline u64 inv64_2k(u64 n0)
+	{
+		u64 x = 1;
+		for (int i = 6; i > 0; i--)
+			x *= 2 - n0 * x;
+		return x;
+	}
+
+	inline u64 montModInv(u64 n) { return 0 - inv64_2k(n); }
+	inline u64 montMult(u64 a, u64 b, u64 n, u64 n0Prime)
+	{
+		u128 t = (u128)a * b;
+		u64 m = (u64)t * n0Prime;
+		u128 res = (t >> 64) + (((u128)m * n) >> 64) + ((u64)t != 0);
+		if (res >= n)
+			res -= n;
+		return res;
+	}
+}
+using namespace Montgomery64;
+
+template <typename T>
+inline T absVal(T N) { return N < 0 ? -N : N; }
+
+template <typename T>
+inline T F(T x, T c, T mod, T inv) // Pollard-Rho function
+{
+	x = montMult(x, x, mod, inv);
+	x = x >= mod - c ? x - mod + c : x + c;
+	return x;
 }
 
 template <typename T>
-inline T F(T x, T c, T mod) // Pollard-rho function
-{
-	return (mult64(x, x, mod) + c) % mod;
-}
-
-template <typename T>
-inline T absVal(T N)
-{
-	if (N < 0)
-		return -N;
-
-	return N;
-}
-
-template <typename T>
-T Pollard_Brent(T N)
+T pollardBrent(T N)
 {
 	if (!(N & 1))
 		return 2;
 
 	// Random Number Linear Congruential Generator MMIX from D.E. Knuth
-	static uint64_t rng = 0xdeafbeefff;
-	uint64_t a = rng * 6364136223846793005ull + 1442695040888963407ull;
-	uint64_t b = a * 6364136223846793005ull + 1442695040888963407ull;
+	static u128 rng = 0xdeafbeefff;
+	uint64_t a = rng * 6364136223846793005ULL + 1442695040888963407ULL;
+	uint64_t b = a * 6364136223846793005ULL + 1442695040888963407ULL;
 	rng = (a + b) ^ (a * b);
 
 	T X0 = 1 + a % (N - 1);
 	T C = 1 + b % (N - 1);
 	T X = X0; // X1
-	T gcd_val = 1;
+	T gcdVal = 1;
 	T q = 1;
 	T Xs, Xt;
 	T m = 128;
+	u64 inv = montModInv(N);
 	T L = 1;
-	while (gcd_val == 1)
+	while (gcdVal == 1)
 	{
 		Xt = X;
 		for (size_t i = 1; i < L; i++)
-			X = F(X, C, N);
+			X = F(X, C, N, inv);
 
-		int k = 0;
-		while (k < L && gcd_val == 1)
+		uint64_t k = 0;
+		while (k < L && gcdVal == 1)
 		{
 			Xs = X;
-			for (size_t i = 0; i < m && i < L - k; i++)
+			for (size_t i = 0; i < m && i + k < L; i++)
 			{
-				X = F(X, C, N);
-				q = mult64(q, absVal(Xt - X), N);
+				X = F(X, C, N, inv);
+				q = montMult(q, Xt > X ? Xt - X : X - Xt, N, inv);
 			}
-			gcd_val = __gcd(q, N);
+			gcdVal = __gcd(q, N);
 			k += m;
 		}
 		L += L;
 	}
-	if (gcd_val == N) // Failure
+	if (gcdVal == N) // Failure
 	{
 		do
 		{
-			Xs = F(Xs, C, N);
-			gcd_val = __gcd(absVal(Xs - Xt), N);
-		} while (gcd_val == 1);
+			Xs = F(Xs, C, N, inv);
+			gcdVal = __gcd(Xs > Xt ? Xs - Xt : Xt - Xs, N);
+		} while (gcdVal == 1);
 	}
-	return gcd_val;
+	return gcdVal;
 }
 
 template <typename T>
@@ -102,6 +122,7 @@ bool isPrime(T N)
 		return (MASK >> N) & 1;
 	if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
 		return false;
+
 	T d = N - 1;
 	int s{};
 	while (!(d & 1))
@@ -118,22 +139,19 @@ bool isPrime(T N)
 }
 
 template <typename T>
-void Factor(T N, map<T, int> &primeFactors)
+void primeFactorize(T N, vector<T> &primeFactors)
 {
 	if (N == 1)
 		return;
 
-	if (!isPrime(N))
+	if (isPrime(N))
 	{
-		T Y = Pollard_Brent(N);
-		Factor(Y, primeFactors);
-		Factor(N / Y, primeFactors);
-	}
-	else
-	{
-		primeFactors[N]++;
+		primeFactors.push_back(N);
 		return;
 	}
+	T Y = pollardBrent(N);
+	primeFactorize(Y, primeFactors);
+	primeFactorize(N / Y, primeFactors);
 }
 
 int main()
@@ -145,20 +163,23 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N;
+	u64 N;
 	// cin >> t;
 	while (t--)
 	{
 		cin >> N;
-		map<ll, int> primeFactors;
-		Factor(N, primeFactors);
-
+		vector<u64> pf;
+		primeFactorize(N, pf);
+		sort(pf.begin(), pf.end());
 		bool first = true;
-		for (const auto &[prime, power] : primeFactors)
+		for (int i = 0; i < pf.size();)
 		{
 			if (!first)
 				cout << "*";
-			cout << "(" << prime << "^" << power << ")";
+			u64 power = 0, p = pf[i];
+			while (p == pf[i])
+				i++, power++;
+			cout << "(" << p << "^" << power << ")";
 			first = false;
 		}
 	}
