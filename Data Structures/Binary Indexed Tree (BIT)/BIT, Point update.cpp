@@ -24,7 +24,7 @@ public:
     }
     void update(int pos, const int &delta)
     {
-        for (int i = pos; i < N; i |= (i + 1))
+        for (int i = pos; i <= N; i |= (i + 1))
             BIT[i] += delta;
     }
 
@@ -41,8 +41,6 @@ public:
     {
         if (L > R)
             return 0; // Neutral value
-        if (L == 0)
-            return query(R);
         return (query(R) - query(L - 1));
     }
 };

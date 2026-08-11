@@ -19,53 +19,76 @@ int main()
         cin >> n;
         vector<int> lcp;
 
-        stack<int> St;
+        stack<int> st;
 
         // Elements can repeat but indices can NEVER, so instead of storing elements, store indices!
-        vector<int> NGE(n, -1), NSE(n, -1), PSE(n, -1); // Next Smaller Element, Previous Smaller Element
+        vector<int> NGE(n, -1), NSE(n, -1), PGE(n, -1), PSE(n, -1); // Next/Previous Greater/Smaller Elements
 
         // Indices of NSE[], PSE[] represent indices of lcp[] and their values are the index of their NSE, PSE
         // Default value of all indices is -1 , so that if NO greater element found, they will be -1
 
-        // Compute Next Smaller Element (NSE)
+        // 1. Compute Next Smaller Element (NSE)
         for (int i = 0; i < n; i++)
         {
-            while (!St.empty() && lcp[i] < lcp[St.top()])
+            // ASYMMETRY RULE: Use '<=' (non-strict) on the "Next" side.
+            // This ensures if duplicate minimums exist, the first one stops here,
+            // preventing us from double-counting identical subarrays.
+            while (!st.empty() && lcp[i] <= lcp[st.top()])
             {
-                NSE[St.top()] = i; // Store the index of the next smaller element
-                St.pop();
+                NSE[st.top()] = i;
+                st.pop();
             }
-            St.push(i);
+            st.push(i);
         }
 
-        // Clear the stack for the next computation
-        while (!St.empty())
-            St.pop();
+        // Clear the stack
+        while (!st.empty())
+            st.pop();
 
-        // Compute Previous Smaller Element (PSE)
+        // 2. Compute Previous Smaller Element (PSE)
         for (int i = n - 1; i >= 0; i--)
         {
-            while (!St.empty() && lcp[i] < lcp[St.top()])
+            // ASYMMETRY RULE: Use '<' (strict) on the "Previous" side.
+            // Combined with '<=' above, this guarantees each duplicate takes
+            // exclusive "ownership" of a unique set of subarrays.
+            while (!st.empty() && lcp[i] < lcp[st.top()])
             {
-                PSE[St.top()] = i; // Store the index of the previous smaller element
-                St.pop();
+                PSE[st.top()] = i;
+                st.pop();
             }
-            St.push(i);
+            st.push(i);
         }
 
-        // Clear the stack for the next computation
-        while (!St.empty())
-            St.pop();
+        // Clear the stack
+        while (!st.empty())
+            st.pop();
 
-        // Compute Next Greater Element (NGE)
-        for (int i = 0; i < n - 1; i++)
+        // 3. Compute Next Greater Element (NGE)
+        for (int i = 0; i < n; i++)
         {
-            while (!St.empty() && lcp[i] > lcp[St.top()])
+            // ASYMMETRY RULE: Use '>=' (non-strict) to handle duplicate maximums
+            while (!st.empty() && lcp[i] >= lcp[st.top()])
             {
-                NGE[St.top()] = i; // Store the index of the next greater element
-                St.pop();
+                NGE[st.top()] = i;
+                st.pop();
             }
-            St.push(i);
+            st.push(i);
+        }
+
+        // Clear the stack
+        while (!st.empty())
+            st.pop();
+
+        // 4. Compute Previous Greater Element (PGE)
+        for (int i = n - 1; i >= 0; i--)
+        {
+            // ASYMMETRY RULE: Use '>' (strict) on the opposite side
+            while (!st.empty() && lcp[i] > lcp[st.top()])
+            {
+                PGE[st.top()] = i;
+                st.pop();
+            }
+            st.push(i);
         }
     }
     return 0;

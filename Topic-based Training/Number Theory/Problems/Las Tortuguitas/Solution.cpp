@@ -48,19 +48,19 @@ ll modPow(ll N, ll power)
 	return res;
 }
 
-vector<ll> factorial, invFactorial;
+vector<ll> fact, invFact;
 void preCompute(int N)
 {
-	factorial.assign(N + 1, 0);
-	invFactorial.assign(N + 1, 0);
-	factorial[0] = 1;
-	invFactorial[0] = 1;
+	fact.assign(N + 1, 0);
+	invFact.assign(N + 1, 0);
+	fact[0] = 1;
+	invFact[0] = 1;
 	for (int i = 1; i <= N; i++)
-		factorial[i] = mult64(i, factorial[i - 1]);
+		fact[i] = mult64(i, fact[i - 1]);
 
-	invFactorial[N] = modPow(factorial[N], mod - 2);
+	invFact[N] = modPow(fact[N], mod - 2);
 	for (int i = N - 1; i >= 0; i--)
-		invFactorial[i] = mult64(invFactorial[i + 1], (i + 1));
+		invFact[i] = mult64(invFact[i + 1], (i + 1));
 }
 static int autoCall = (preCompute(1000000), 0);
 
@@ -70,7 +70,7 @@ ll nCr(ll n, ll r)
 		return 0;
 	if (n == r || r == 0)
 		return 1;
-	return mult64(factorial[n], mult64(invFactorial[r], invFactorial[n - r]));
+	return mult64(fact[n], mult64(invFact[r], invFact[n - r]));
 }
 
 int main()

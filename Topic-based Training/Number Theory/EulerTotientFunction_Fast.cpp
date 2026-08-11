@@ -181,7 +181,7 @@ T Phi(T N)
     for (int i = 0; i < pf.size();)
     {
         u64 p = pf[i];
-        while (p == pf[i])
+        while (i < pf.size() && p == pf[i])
             i++;
         ans -= ans / p;
     }

@@ -230,19 +230,19 @@ Mint operator""_m(unsigned long long literal)
     return Mint(literal);
 }
 
-vector<Mint> factorial, invFactorial;
+vector<Mint> fact, invFact;
 void precompute(int N)
 {
-    factorial.assign(N + 1, 0);
-    invFactorial.assign(N + 1, 0);
-    factorial[0] = 1;
-    invFactorial[0] = 1;
+    fact.assign(N + 1, 0);
+    invFact.assign(N + 1, 0);
+    fact[0] = 1;
+    invFact[0] = 1;
     for (int i = 1; i <= N; i++)
-        factorial[i] = factorial[i - 1] * i;
+        fact[i] = fact[i - 1] * i;
 
-    invFactorial[N] = power(factorial[N], mod - 2);
+    invFact[N] = power(fact[N], mod - 2);
     for (int i = N - 1; i >= 0; i--)
-        invFactorial[i] = invFactorial[i + 1] * (i + 1);
+        invFact[i] = invFact[i + 1] * (i + 1);
 }
 static int autoCallPrecompute = (precompute(1000000), 0);
 
@@ -252,7 +252,7 @@ Mint nCr(ll n, ll r)
         return 0;
     if (n == r || r == 0)
         return 1;
-    return (factorial[n] * invFactorial[r] * invFactorial[n - r]);
+    return (fact[n] * invFact[r] * invFact[n - r]);
 }
 
 Mint nPr(ll n, ll r)
@@ -261,7 +261,7 @@ Mint nPr(ll n, ll r)
         return 0;
     if (r == 0)
         return 1;
-    return (factorial[n] * invFactorial[n - r]);
+    return (fact[n] * invFact[n - r]);
 }
 
 int main()

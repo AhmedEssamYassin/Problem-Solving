@@ -363,7 +363,7 @@ int main()
 		{
 			int u, v;
 			cin >> u >> v;
-			mat[v][u] = 1;
+			mat[v][u] += 1;
 		}
 		TransMatrix res = mat.matrixPower(k);
 		Mint cnt{};

@@ -124,7 +124,7 @@ int main()
 		{
 			int u, v, w;
 			cin >> u >> v >> w;
-			mat[u][v] = w;
+			mat[u][v] = min<ll>(mat[u][v], w);
 		}
 		TransMatrix res = mat.matrixPower(k);
 		ll minSum = 2e18;

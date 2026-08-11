@@ -92,18 +92,10 @@ public:
 	{
 		if (nums.size() == 1)
 			return true;
+		if (find(nums.begin(), nums.end(), 1) != nums.end())
+			return false;
 		int m = *max_element(nums.begin(), nums.end());
-		bitset<100001> exist;
-		for (int &x : nums)
-		{
-			if (x == 1)
-				return false;
-			exist[x] = 1;
-		}
-		nums.clear();
-		for (int i = 2; i <= m; i++)
-			if (exist[i])
-				nums.push_back(i);
+		nums.erase(unique(nums.begin(), nums.end()), nums.end());
 		int n = nums.size();
 		DSU dsu(m + 1);
 		buildPaths(dsu, nums, m);

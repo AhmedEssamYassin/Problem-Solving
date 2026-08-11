@@ -171,7 +171,7 @@ T phi(T N)
 	for (int i = 0; i < pf.size();)
 	{
 		T p = pf[i];
-		while (p == pf[i])
+		while (i < pf.size() && p == pf[i])
 			i++;
 		ans -= (ans / p);
 	}
@@ -232,7 +232,7 @@ int main()
 		{
 			int l, r;
 			cin >> l >> r;
-			cout << solve(l, r, m) % m << endl;
+			cout << solve(l, r, m) % m << endl; // Don't forget mod
 		}
 	}
 	return 0;

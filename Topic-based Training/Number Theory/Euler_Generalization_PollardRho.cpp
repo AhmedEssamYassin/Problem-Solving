@@ -177,7 +177,7 @@ T phi(T N)
     for (int i = 0; i < pf.size();)
     {
         T p = pf[i];
-        while (p == pf[i])
+        while (i < pf.size() && p == pf[i])
             i++;
         ans -= ans / p;
     }
@@ -234,7 +234,7 @@ int main()
             u64 res = Exp(w[l], power, m);
             return res; // Don't take mod here
         };
-        cout << add64(solve(1, 3, k) % k, 1ULL, k);
+        cout << add64(solve(1, 3, k) % k, 1ULL, k); // Don't forget mod
     }
     return 0;
 }
