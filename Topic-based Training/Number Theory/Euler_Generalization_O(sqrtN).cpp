@@ -47,7 +47,7 @@ bool isPrime(T N)
         return false;
     T d = N - 1;
     int s{};
-    while (~s & 1)
+    while (!(d & 1))
         d >>= 1, ++s;
     for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
     {
