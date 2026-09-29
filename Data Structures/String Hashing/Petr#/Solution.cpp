@@ -1,17 +1,4 @@
 #include <bits/stdc++.h>
-#ifdef LOCAL
-#include "debug.cpp"
-#define TIME_BLOCK(name)    \
-	if (bool _once = false) \
-	{                       \
-	}                       \
-	else                    \
-		for (__DEBUG_UTIL__::LabeledTimer _t(name); !_once; _once = true)
-#else
-#define debug(...)
-#define debugArr(...)
-#define TIME_BLOCK(name) if (true)
-#endif // Debugging locally
 using namespace std;
 #define ll long long int
 #define endl "\n"
