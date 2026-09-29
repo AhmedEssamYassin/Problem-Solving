@@ -2,13 +2,97 @@
 using namespace std;
 #define ll long long int
 #define endl "\n"
-// This INF is related to the constraints on inverse ETF, it depends on the problem.
-#define INF 200000000LL
+
+// Use type u64
+namespace Montgomery64
+{
+    using u64 = uint64_t;
+    using u128 = __uint128_t;
+
+    inline u64 mult64(u64 a, u64 b, u64 mod) { return (u128)a * b % mod; }
+
+    static inline u64 inv64_2k(u64 n0)
+    {
+        u64 x = 1;
+        for (int i = 6; i > 0; i--)
+            x *= 2 - n0 * x;
+        return x;
+    }
+
+    inline u64 montModInv(u64 n) { return 0 - inv64_2k(n); }
+    inline u64 montMult(u64 a, u64 b, u64 n, u64 n0Prime)
+    {
+        u128 t = (u128)a * b;
+        u64 m = (u64)t * n0Prime;
+        u128 res = (t >> 64) + (((u128)m * n) >> 64) + ((u64)t != 0);
+        if (res >= n)
+            res -= n;
+        return res;
+    }
+}
+using namespace Montgomery64;
 
 template <typename T>
-inline T mult64(const T &a, const T &b, T mod)
+inline T absVal(T N) { return N < 0 ? -N : N; }
+
+template <typename T>
+inline T F(T x, T c, T mod, T inv) // Pollard-Rho function
 {
-    return (__int128_t)a * b % mod;
+    x = montMult(x, x, mod, inv);
+    x = x >= mod - c ? x - mod + c : x + c;
+    return x;
+}
+
+template <typename T>
+T pollardBrent(T N)
+{
+    if (!(N & 1))
+        return 2;
+
+    // Random Number Linear Congruential Generator MMIX from D.E. Knuth
+    static u128 rng = 0xdeafbeefff;
+    uint64_t a = rng * 6364136223846793005ULL + 1442695040888963407ULL;
+    uint64_t b = a * 6364136223846793005ULL + 1442695040888963407ULL;
+    rng = (a + b) ^ (a * b);
+
+    T X0 = 1 + a % (N - 1);
+    T C = 1 + b % (N - 1);
+    T X = X0; // X1
+    T gcdVal = 1;
+    T q = 1;
+    T Xs, Xt;
+    T m = 128;
+    u64 inv = montModInv(N);
+    T L = 1;
+    while (gcdVal == 1)
+    {
+        Xt = X;
+        for (size_t i = 1; i < L; i++)
+            X = F(X, C, N, inv);
+
+        uint64_t k = 0;
+        while (k < L && gcdVal == 1)
+        {
+            Xs = X;
+            for (size_t i = 0; i < m && i + k < L; i++)
+            {
+                X = F(X, C, N, inv);
+                q = montMult(q, Xt > X ? Xt - X : X - Xt, N, inv);
+            }
+            gcdVal = __gcd(q, N);
+            k += m;
+        }
+        L += L;
+    }
+    if (gcdVal == N) // Failure
+    {
+        do
+        {
+            Xs = F(Xs, C, N, inv);
+            gcdVal = __gcd(Xs > Xt ? Xs - Xt : Xt - Xs, N);
+        } while (gcdVal == 1);
+    }
+    return gcdVal;
 }
 
 template <typename T>
@@ -30,116 +114,115 @@ T modPow(T N, T power, T mod)
 }
 
 template <typename T>
-bool checkComposite(T N, T a, T d, int s)
+bool isPrime(T N)
 {
-    T X = modPow(a, d, N);
-    if (X == 1 || X == N - 1)
-        return false; // Not composite
+    constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+    constexpr uint32_t WHEEL30 = 0x208A2882;
+    if (N < 64)
+        return (MASK >> N) & 1;
+    if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+        return false;
 
-    for (int r = 1; r < s; r++)
-    {
-        X = mult64(X, X, N);
-        if (X == 1 || X == N - 1)
-            return false; // Not composite
-    }
-    return true; // Composite
-}
-
-template <typename T>
-bool Miller_Rabin(T N, int K = 5) // k is the number of trials (bases). If k increases the accuracy increases
-{
     T d = N - 1;
     int s{};
-    while (~s & 1)
+    while (!(d & 1))
         d >>= 1, ++s;
-
-    for (const T &a : {11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47})
+    for (const T &a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022})
     {
-        if (N == a)
-            return true;
-        if (checkComposite(N, a, d, s))
+        T p = modPow(a % N, d, N), i = s;
+        while (p != 1 && p != N - 1 && a % N && i--)
+            p = mult64(p, p, N);
+        if (p != N - 1 && i != s)
             return false;
     }
     return true;
 }
 
 template <typename T>
-bool isPrime(T N)
+void primeFactorize(T N, map<T, T> &primeFactors)
 {
-    if (N < 2)
-        return false;
+    if (N == 1)
+        return;
 
-    if (N <= 3)
-        return true;
-    if (N == 5 || N == 7)
-        return true;
-
-    if (!(N & 1) || N % 3 == 0 || N % 5 == 0 || N % 7 == 0)
-        return false;
-
-    return Miller_Rabin(N);
+    if (isPrime(N))
+    {
+        primeFactors[N]++;
+        return;
+    }
+    T Y = pollardBrent(N);
+    primeFactorize(Y, primeFactors);
+    primeFactorize(N / Y, primeFactors);
 }
 
-// As a rule of thumb, if you inevitably generate all factors, use sqrt(N) factorization.
 template <typename T>
 void getAllFactors(T N, vector<T> &factors)
 {
-    for (ll d = 1; d * d <= N; d++)
+    factors = {1};
+    map<T, T> freq;
+    primeFactorize(N, freq);
+
+    for (auto &[p, cnt] : freq)
     {
-        if (N % d == 0)
+        vector<T> temp;
+        T pw = 1;
+        for (int i = 0; i <= cnt; i++, pw *= p)
         {
-            ll f1 = d;
-            ll f2 = N / d;
-            factors.push_back(f1);
-            if (f2 != f1)
-                factors.push_back(f2);
+            for (const T &f : factors)
+                temp.push_back(f * pw);
+        }
+        factors.swap(temp);
+    }
+    sort(factors.begin(), factors.end());
+}
+
+// Inverse Euler Totient Function
+vector<u64> divP;
+template <typename T>
+void solve(T phi, T Num, T pos, T &x)
+{
+    if (phi == 1)
+    {
+        x = min(x, Num);
+        return;
+    }
+    if (Num >= x || pos == (T)divP.size())
+        return;
+
+    T P = divP[pos];
+    if (P - 1 > phi)
+        return;
+
+    solve(phi, Num, pos + 1, x);
+
+    if (phi % (P - 1) == 0 && P <= x / Num)
+    {
+        T remPhi = phi / (P - 1), curNum = Num * P;
+        solve(remPhi, curNum, pos + 1, x);
+        while (remPhi % P == 0 && curNum <= x / P)
+        {
+            remPhi /= P, curNum *= P;
+            solve(remPhi, curNum, pos + 1, x);
         }
     }
 }
 
-// Inverse Euler Totient Function
-vector<int> divP;
 template <typename T>
-T solve(T phi, T Num, T pos)
-{
-    if (phi == 1)
-        return Num;
-    else if (pos == divP.size())
-        return INF;
-    else
-    {
-        T P = divP[pos];
-        T res = solve(phi, Num, pos + 1);
-        if (phi % (P - 1) == 0)
-        {
-            T remPhi = phi / (P - 1);
-            T curNum = Num * P;
-            res = min(res, solve(remPhi, curNum, pos + 1));
-            while (remPhi % P == 0)
-            {
-                remPhi /= P, curNum *= P;
-                res = min(res, solve(remPhi, curNum, pos + 1));
-            }
-        }
-        return res;
-    }
-}
-template <typename T>
-T inversePhi(T phi)
+T inversePhi(T phi, T limit) // Returns limit if there is no answer
 {
     if (phi == 1)
         return 1;
     if (phi & 1)
-        return INF;
+        return limit;
     divP.clear();
     vector<T> allFactors;
     getAllFactors(phi, allFactors);
-    for (T &factor : allFactors)
-    {
-        if (isPrime(factor + 1))
-            divP.push_back(factor + 1);
-    }
-    return solve(phi, T(1), T(1));
+    for (T &d : allFactors)
+        if (isPrime(d + 1))
+            divP.push_back(d + 1);
+
+    T x = limit;
+    solve(phi, T(1), T(0), x);
+    return x;
 }
 
 int main()
@@ -151,16 +234,15 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif
     int t = 1;
-    ll N;
     cin >> t;
     while (t--)
     {
+        u64 N;
         cin >> N;
-        ll invPhi = inversePhi(N);
-        if (invPhi == INF)
-            cout << -1 << endl;
-        else
-            cout << invPhi << endl;
+        u64 limit = N > UINT64_MAX / 8 ? UINT64_MAX : 8 * N;
+
+        u64 invPhi = inversePhi(N, limit);
+        cout << (invPhi == limit ? -1LL : (ll)invPhi) << endl;
     }
     return 0;
 }
