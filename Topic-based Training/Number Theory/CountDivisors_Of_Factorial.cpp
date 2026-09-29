@@ -27,25 +27,46 @@ T modPow(T N, T power, T mod)
     return res;
 }
 
-vector<int> primes, cntPrimes;
-bitset<100000001> isPrime;
+// composite: bit x is set if x is NOT prime (12.5 MB for 1e8)
+// blockCnt[w]: number of primes in [0, 64 * w) (6.25 MB for 1e8)
+vector<int> primes;
+vector<uint64_t> composite;
+vector<uint32_t> blockCnt;
+
+inline bool isPrime(ll x) { return !((composite[x >> 6] >> (x & 63)) & 1); }
+
+// Number of primes <= x, for 0 <= x <= sieve limit
+inline ll cntPrimes(ll x)
+{
+    ll w = x >> 6;
+    int b = x & 63;
+    uint64_t mask = (b == 63) ? ~0ULL : ((1ULL << (b + 1)) - 1);
+    return blockCnt[w] + __builtin_popcountll(~composite[w] & mask);
+}
+
 void linearSieveOfEratosthenes(int N)
 {
-    isPrime.set(); // Initially Assuming all numbers to be primes
-    cntPrimes.resize(N + 1);
-    isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
+    int W = (N >> 6) + 1;
+    composite.assign(W, 0);
+    blockCnt.assign(W + 1, 0);
+    composite[0] |= 3; // 0 and 1 are NOT primes
+    primes.reserve(N / 15 + 100);
     for (long long i{2}; i <= N; i++)
     {
-        if (isPrime[i])
+        if (isPrime(i))
             primes.push_back(i);
-        for (long long j{}; j < (int)primes.size() && i * primes[j] <= N; j++)
+        for (size_t j{}; j < primes.size() && i * primes[j] <= N; j++)
         {
-            isPrime[i * primes[j]] = 0; // Crossing out all the multiples of prime numbers
+            ll v = i * primes[j];
+            composite[v >> 6] |= 1ULL << (v & 63); // Crossing out all the multiples of prime numbers
             if (i % primes[j] == 0)
                 break;
         }
-        cntPrimes[i] = cntPrimes[i - 1] + isPrime[i];
     }
+    for (ll v = N + 1; v < 64LL * W; v++) // Bits past N are not primes
+        composite[v >> 6] |= 1ULL << (v & 63);
+    for (int w = 0; w < W; w++)
+        blockCnt[w + 1] = blockCnt[w] + __builtin_popcountll(~composite[w]);
 }
 static int autoCall = (linearSieveOfEratosthenes(1e8), 0);
 
@@ -84,14 +105,14 @@ ll countDivisors(ll N, ll mod)
     }
 
     // Group primes with same N / p
-    ll i = cntPrimes[sqrtN];
-    while (i < primes.size())
+    ll i = cntPrimes(sqrtN);
+    while (i < (ll)primes.size())
     {
         ll L = i;
         ll Q = N / primes[L];
         if (Q == 0)
             break;
-        ll R = cntPrimes[N / Q];
+        ll R = cntPrimes(N / Q);
         cnt = mult64(cnt, modPow(Q + 1, R - L, mod), mod);
         i = R;
     }
