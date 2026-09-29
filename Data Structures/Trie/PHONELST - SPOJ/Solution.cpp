@@ -3,69 +3,66 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
+template <int A = 26, char base = 'a'>
 struct Trie
 {
-	struct Node
-	{
-		map<char, Node *> character;
-		ll prefix, isEnd; // To count prefixes and strings ending at each node
-		Node()
-		{
-			prefix = 0;
-			isEnd = 0;
-		}
-	};
+	vector<array<int, A>> ch{{}};
+	vector<int> pref{0}, end{0}; // pref[u] = strings passing through u, end[u] = strings ending at u
 
-	Node *root;
-	Trie()
+	Trie(int totalLen = 0)
 	{
-		root = new Node();
+		ch.reserve(totalLen + 1);
+		pref.reserve(totalLen + 1);
+		end.reserve(totalLen + 1);
 	}
 
-	void insert(const string &str)
+	void insert(const string &s, int d = 1)
 	{
-		Node *cur = root;
-		for (const char &C : str)
+		int u = 0;
+		pref[0] += d;
+		for (const char &c : s)
 		{
-			if (cur->character[C] == nullptr)
-				cur->character[C] = new Node();
-
-			cur = cur->character[C];
-			cur->prefix++;
-		}
-		cur->isEnd++;
-	}
-
-	// Can return a boolean, or the actual number of string having `str` as a prefix
-	ll checkPrefix(const string &str)
-	{
-		Node *cur = root;
-		for (const char &C : str)
-		{
-			if (cur->character[C] == nullptr)
-				return 0;
-			cur = cur->character[C];
-		}
-		return cur->prefix;
-	}
-
-	~Trie() = default;
-	// Don't clean unless you need this memory because this makes it much slower
-	void clean()
-	{
-		stack<Node *> stk;
-		stk.push(root);
-		while (!stk.empty())
-		{
-			Node *node = stk.top();
-			stk.pop();
-			for (auto &[_, child] : node->character)
+			int b = c - base;
+			if (!ch[u][b])
 			{
-				if (child)
-					stk.push(child);
+				ch[u][b] = ch.size();
+				ch.push_back({});
+				pref.push_back(0);
+				end.push_back(0);
 			}
-			delete node;
+			u = ch[u][b];
+			pref[u] += d;
 		}
+		end[u] += d;
+	}
+
+	int find(const string &s) const // Node of s, or -1
+	{
+		int u = 0;
+		for (const char &c : s)
+			if (!(u = ch[u][c - base]))
+				return -1;
+		return u;
+	}
+
+	int countPrefix(const string &s) const // Strings having s as a prefix
+	{
+		int u = find(s);
+		return u < 0 ? 0 : pref[u];
+	}
+
+	int count(const string &s) const // Copies of s
+	{
+		int u = find(s);
+		return u < 0 ? 0 : end[u];
+	}
+
+	bool erase(const string &s) // Removes one copy, false if s is not present
+	{
+		if (!count(s))
+			return false;
+		insert(s, -1);
+		return true;
 	}
 };
 
@@ -78,14 +75,13 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N, Q;
-	string str;
 	cin >> t;
 	while (t--)
 	{
+		ll N;
 		cin >> N;
 		vector<string> vc(N);
-		Trie trie;
+		Trie<10, '0'> trie;
 		for (int i{}; i < N; i++)
 		{
 			cin >> vc[i];
@@ -93,7 +89,7 @@ int main()
 		}
 		bool check = true;
 		for (int i{}; i < N; i++)
-			check &= (trie.checkPrefix(vc[i]) == 1);
+			check &= (trie.countPrefix(vc[i]) == 1);
 		if (check)
 			cout << "YES\n";
 		else

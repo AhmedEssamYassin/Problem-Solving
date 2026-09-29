@@ -3,56 +3,68 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-vector<ll> LCP;
+vector<int> LCP;
+template <int A = 26, char base = 'a'>
 struct Trie
 {
-	struct Node
+	vector<array<int, A>> ch{{}};
+	vector<int> pref{0}, end{0}; // pref[u] = strings passing through u, end[u] = strings ending at u
+
+	Trie(int totalLen = 0)
 	{
-		map<char, Node *> character; // To use ONLY the exact needed memory
-		ll prefix, isEnd;			 // To count prefixes and strings ending at each node
-		Node()
-		{
-			prefix = 0;
-			isEnd = 0;
-		}
-	};
-
-	Node *root;
-	Trie() { root = new Node(); }
-
-	void insert(const string &str)
-	{
-		Node *cur = root;
-		int len = 1;
-		for (const char &C : str)
-		{
-			if (!cur->character[C])
-				cur->character[C] = new Node();
-
-			cur = cur->character[C];
-			LCP[len] = max(LCP[len], ++cur->prefix);
-			len++;
-		}
-		cur->isEnd++;
+		ch.reserve(totalLen + 1);
+		pref.reserve(totalLen + 1);
+		end.reserve(totalLen + 1);
 	}
 
-	~Trie() = default;
-	// Don't clean unless you need this memory because this makes it much slower
-	void clean()
+	void insert(const string &s, int d = 1)
 	{
-		stack<Node *> stk;
-		stk.push(root);
-		while (!stk.empty())
+		int u = 0, len = 1;
+		pref[0] += d;
+		for (const char &c : s)
 		{
-			Node *node = stk.top();
-			stk.pop();
-			for (auto &[_, child] : node->character)
+			int b = c - base;
+			if (!ch[u][b])
 			{
-				if (child)
-					stk.push(child);
+				ch[u][b] = ch.size();
+				ch.push_back({});
+				pref.push_back(0);
+				end.push_back(0);
 			}
-			delete node;
+			u = ch[u][b];
+			pref[u] += d;
+			LCP[len++] = max(LCP[len], pref[u]);
 		}
+		end[u] += d;
+	}
+
+	int find(const string &s) const // Node of s, or -1
+	{
+		int u = 0;
+		for (const char &c : s)
+			if (!(u = ch[u][c - base]))
+				return -1;
+		return u;
+	}
+
+	int countPrefix(const string &s) const // Strings having s as a prefix
+	{
+		int u = find(s);
+		return u < 0 ? 0 : pref[u];
+	}
+
+	int count(const string &s) const // Copies of s
+	{
+		int u = find(s);
+		return u < 0 ? 0 : end[u];
+	}
+
+	bool erase(const string &s) // Removes one copy, false if s is not present
+	{
+		if (!count(s))
+			return false;
+		insert(s, -1);
+		return true;
 	}
 };
 
@@ -70,7 +82,7 @@ int main()
 	while (t--)
 	{
 		cin >> N >> Q;
-		Trie trie;
+		Trie trie(N);
 		int maxLen{};
 		vector<string> vc(N);
 		for (int i{}; i < N; i++)

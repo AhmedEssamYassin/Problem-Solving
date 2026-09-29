@@ -3,72 +3,76 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
+template <int A = 26, char base = 'a'>
 struct Trie
 {
-	struct Node
+	vector<array<int, A>> ch{{}};
+	vector<int> pref{0}, end{0}; // pref[u] = strings passing through u, end[u] = strings ending at u
+	vector<int> rem{INT_MAX};
+	Trie(int totalLen = 0)
 	{
-		map<char, Node *> character;
-		ll prefix, isEnd; // To count prefixes and strings ending at each node
-		ll remaining;	  // To count remaining characters to form a complete existing word
-		Node()
-		{
-			prefix = 0;
-			isEnd = 0;
-			remaining = LLONG_MAX;
-		}
-	};
-
-	Node *root;
-	Trie() { root = new Node(); }
-
-	void insert(const string &str)
-	{
-		Node *cur = root;
-		ll curLen = str.length();
-		cur->remaining = min(cur->remaining, curLen);
-		for (const char &C : str)
-		{
-			if (cur->character[C] == nullptr)
-				cur->character[C] = new Node();
-
-			cur = cur->character[C];
-			cur->prefix++;
-			cur->remaining = min(cur->remaining, --curLen);
-		}
-		cur->remaining = min(cur->remaining, 0LL); // End of a word
-		cur->isEnd++;
+		ch.reserve(totalLen + 1);
+		pref.reserve(totalLen + 1);
+		end.reserve(totalLen + 1);
+		rem.reserve(totalLen + 1);
 	}
 
-	// Can return a boolean, or the actual number of string having `str` as a prefix
-	ll checkPrefix(const string &str)
+	void insert(const string &s, int d = 1)
 	{
-		Node *cur = root;
-		for (const char &C : str)
+		int u = 0, left = s.length();
+		pref[0] += d;
+		rem[0] = min(rem[0], left);
+		for (const char &c : s)
 		{
-			if (cur->character[C] == nullptr)
-				return -1;
-			cur = cur->character[C];
-		}
-		return cur->remaining;
-	}
-
-	~Trie() = default;
-	// Don't clean unless you need this memory because this makes it much slower
-	void clean()
-	{
-		stack<Node *> stk;
-		stk.push(root);
-		while (!stk.empty())
-		{
-			Node *node = stk.top();
-			stk.pop();
-			for (auto &[_, child] : node->character)
+			int b = c - base;
+			if (!ch[u][b])
 			{
-				if (child)
-					stk.push(child);
+				ch[u][b] = ch.size();
+				ch.push_back({});
+				pref.push_back(0);
+				end.push_back(0);
+				rem.push_back(INT_MAX);
 			}
-			delete node;
+			u = ch[u][b];
+			pref[u] += d;
+			rem[u] = min(rem[u], --left);
 		}
+		end[u] += d;
+	}
+
+	int find(const string &s) const // Node of s, or -1
+	{
+		int u = 0;
+		for (const char &c : s)
+			if (!(u = ch[u][c - base]))
+				return -1;
+		return u;
+	}
+
+	int checkPrefix(const string &s) const
+	{
+		int u = find(s);
+		return u < 0 ? -1 : rem[u];
+	}
+
+	int countPrefix(const string &s) const // Strings having s as a prefix
+	{
+		int u = find(s);
+		return u < 0 ? 0 : pref[u];
+	}
+
+	int count(const string &s) const // Copies of s
+	{
+		int u = find(s);
+		return u < 0 ? 0 : end[u];
+	}
+
+	bool erase(const string &s) // Removes one copy, false if s is not present
+	{
+		if (!count(s))
+			return false;
+		insert(s, -1);
+		return true;
 	}
 };
 
@@ -86,7 +90,7 @@ int main()
 	{
 		ll N, Q;
 		cin >> N >> Q;
-		Trie trie;
+		Trie trie(N);
 		string str;
 		for (int i{}; i < N; i++)
 		{

@@ -8,97 +8,91 @@ struct Trie
 	struct Node
 	{
 		map<char, Node *> character;
-		set<int> idxPref, idxEnd; // To maintain indices of strings having prefixes or ending at each node
-		int prefix, isEnd;		  // To count prefixes and strings ending at each node
-		Node()
-		{
-			prefix = 0;
-			isEnd = 0;
-		}
+		set<int> idxPref;			 // Indices of strings having a prefix at this node
+		unique_ptr<set<int>> idxEnd; // Indices of strings ending at this node, created on first use
 	};
 
-	Node *root;
-	Trie() { root = new Node(); }
+	Node *root = new Node();
+
+	Node *child(Node *cur, char C) const
+	{
+		auto it = cur->character.find(C);
+		return it == cur->character.end() ? nullptr : it->second;
+	}
+
+	static bool inRange(const set<int> &st, int L, int R) // Some index in [L..R]
+	{
+		auto it = st.lower_bound(L);
+		return it != st.end() && *it <= R;
+	}
+
+	Node *find(const string &str) const // Node of str, or nullptr
+	{
+		Node *cur = root;
+		for (const char &C : str)
+			if (!(cur = child(cur, C)))
+				return nullptr;
+		return cur;
+	}
 
 	void insert(const string &str, int j)
 	{
 		Node *cur = root;
+		cur->idxPref.insert(cur->idxPref.end(), j);
 		for (const char &C : str)
 		{
-			if (cur->character[C] == nullptr)
-				cur->character[C] = new Node();
-
-			cur = cur->character[C];
-			cur->prefix++;
-			cur->idxPref.insert(j); // A string of index j has a prefix at this node
+			Node *&nxt = cur->character[C];
+			if (!nxt)
+				nxt = new Node();
+			cur = nxt;
+			cur->idxPref.insert(cur->idxPref.end(), j); // O(1) when j is larger than every index here
 		}
-		cur->isEnd++;
-		cur->idxEnd.insert(j); // A string of index j is ending at this node
+		if (!cur->idxEnd)
+			cur->idxEnd = make_unique<set<int>>();
+		cur->idxEnd->insert(cur->idxEnd->end(), j);
 	}
 
-	// Is there any prefix of `str` occurs in a string in range [L, R]
-	bool searchPrefix(const string &str, int L, int R)
+	// Is some string with index in [L..R] a prefix of str
+	bool searchPrefix(const string &str, int L, int R) const
 	{
 		Node *cur = root;
-		for (const char &C : str)
+		for (size_t k = 0;; k++)
 		{
-			if (cur->character[C] == nullptr)
-				return false;
-			// Character exists, but is it end of word?
-			cur = cur->character[C];
-			auto &st = cur->idxEnd;
-			if (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R)
+			if (cur->idxEnd && inRange(*cur->idxEnd, L, R))
 				return true;
-		}
-		return false;
-	}
-
-	// Checks if `str` is a prefix of any string (or in range [L, R])
-	// Can also return a boolean, or even the actual number of string having `str` as a prefix
-	ll checkPrefix(const string &str, int L, int R)
-	{
-		Node *cur = root;
-		for (const char &C : str)
-		{
-			if (cur->character[C] == nullptr)
+			if (k == str.size() || !(cur = child(cur, str[k])))
 				return false;
-			cur = cur->character[C];
 		}
-		auto &st = cur->idxPref;
-		return (st.lower_bound(L) != st.end() && *st.lower_bound(L) <= R);
-		// return cur->prefix;
 	}
 
-	// Recursive function to delete a word from given Trie (Assuming it's been inserted before)
-	void erase(const string &str, int pos)
+	// Number of strings having str as a prefix
+	ll checkPrefix(const string &str) const
 	{
-		Node *cur = root;
+		Node *cur = find(str);
+		return cur ? cur->idxPref.size() : 0;
+	}
+
+	// Is str a prefix of some string with index in [L..R]
+	bool checkPrefix(const string &str, int L, int R) const
+	{
+		Node *cur = find(str);
+		return cur && inRange(cur->idxPref, L, R);
+	}
+
+	// Removes string str with index j, false if it is not present
+	bool erase(const string &str, int j)
+	{
+		Node *cur = find(str);
+		if (!cur || !cur->idxEnd || !cur->idxEnd->erase(j))
+			return false;
+		cur = root;
+		cur->idxPref.erase(j);
 		for (const char &C : str)
 		{
-			cur = cur->character[C];
-			cur->prefix--;
-			cur->idxPref.erase(pos);
+			cur = child(cur, C);
+			cur->idxPref.erase(j);
 		}
-		cur->isEnd--;
-		cur->idxEnd.erase(pos);
-	}
-	~Trie() = default;
-	// Don't clean unless you need this memory because this makes it much slower
-	void clean()
-	{
-		stack<Node *> stk;
-		stk.push(root);
-		while (!stk.empty())
-		{
-			Node *node = stk.top();
-			stk.pop();
-			for (auto &[_, child] : node->character)
-			{
-				if (child)
-					stk.push(child);
-			}
-			delete node;
-		}
+		return true;
 	}
 };
 
