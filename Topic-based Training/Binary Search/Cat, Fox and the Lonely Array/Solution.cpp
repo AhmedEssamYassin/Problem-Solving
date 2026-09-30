@@ -3,65 +3,40 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-ll bitCeil(const ll &N)
-{
-	ll res{1};
-	while (res < N)
-		res <<= 1;
-	return res;
-}
-
+template <typename T, typename F>
 struct SparseTable
 {
-	int size, LOG;
-	vector<vector<ll>> m;
-	ll (*Process)(ll, ll);
-	ll merge(const ll &a, const ll &b)
+	vector<vector<T>> t; // t[k][i] = f over a[i..i + 2^k - 1]
+	F f;
+	T id; // Returned for an empty range: min -> INF, max -> -INF, gcd / OR -> 0, & -> -1LL, lcm -> 1
+	SparseTable() = default;
+	SparseTable(const vector<T> &a, F f, T id = T()) : t{a}, f(f), id(id)
 	{
-		return Process(a, b);
-	}
-	void build(const vector<ll> &arr)
-	{
-		int N = arr.size();
-		for (int i{}; i < N; i++)
-			m[i][0] = arr[i];
-		for (int k = 1; k < LOG; k++)
+		for (int k = 1; (1 << k) <= (int)a.size(); k++)
 		{
-			for (int i{}; i + (1 << k) - 1 < N; i++)
-				m[i][k] = merge(m[i][k - 1], m[i + (1 << (k - 1))][k - 1]);
+			t.emplace_back(a.size() - (1 << k) + 1);
+			for (int i = 0; i < (int)t[k].size(); i++)
+				t[k][i] = f(t[k - 1][i], t[k - 1][i + (1 << (k - 1))]);
 		}
 	}
-	SparseTable(const vector<ll> &arr, ll (*func)(ll, ll))
-	{
-		int n = arr.size();
-		LOG = (ll)(log2l(bitCeil(n)) + 1) + 1;
-		Process = func;
-		m.resize(n, vector<ll>(LOG, 0));
-		build(arr);
-	}
 
-	ll query(int L, int R) // 0-based
+	T query(int L, int R) const // f over a[L..R], 0 <= L <= R < n
 	{
-		int len = R - L + 1;
-		int k = 31 - __builtin_clz(len);
-		return merge(m[L][k], m[R - (1 << k) + 1][k]);
+		if (L > R)
+			return id;
+		assert(0 <= L && R < (int)t[0].size());
+		int k = __lg(R - L + 1);
+		return f(t[k][L], t[k][R - (1 << k) + 1]);
 	}
 };
 
-ll OR(ll a, ll b)
-{
-	return a | b;
-}
-
-bool isOk(const vector<ll> &vc, SparseTable &ST, ll K)
+bool isOk(const vector<ll> &vc, auto &ST, ll K)
 {
 	bool isSame = true;
 	ll OR = ST.query(0, K - 1);
 	ll cur{};
-	for (int i = 1; i < vc.size(); i++)
+	for (int i = 1; i + K - 1 < vc.size(); i++)
 	{
-		if (i + K - 1 >= vc.size())
-			break;
 		cur = ST.query(i, i + K - 1);
 		isSame &= (cur == OR);
 	}
@@ -92,7 +67,8 @@ int main()
 		vector<ll> vc(N);
 		for (int i{}; i < N; i++)
 			cin >> vc[i];
-		SparseTable ST(vc, OR);
+		SparseTable ST(vc, [](ll a, ll b)
+					   { return (a | b); }, 0LL);
 		ll L{1}, R = N, ans = N;
 		while (L <= R)
 		{

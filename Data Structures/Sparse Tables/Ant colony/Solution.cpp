@@ -3,55 +3,32 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-ll bitCeil(const ll &N)
-{
-	ll res{1};
-	while (res < N)
-		res <<= 1;
-	return res;
-}
-
+template <typename T, typename F>
 struct SparseTable
 {
-	int size, LOG;
-	vector<vector<ll>> m;
-	ll (*Process)(ll, ll);
-	ll merge(const ll &a, const ll &b)
+	vector<vector<T>> t; // t[k][i] = f over a[i..i + 2^k - 1]
+	F f;
+	T id; // Returned for an empty range: min -> INF, max -> -INF, gcd / OR -> 0, & -> -1LL, lcm -> 1
+	SparseTable() = default;
+	SparseTable(const vector<T> &a, F f, T id = T()) : t{a}, f(f), id(id)
 	{
-		return Process(a, b);
-	}
-	void build(const vector<ll> &arr)
-	{
-		int N = arr.size();
-		for (int i{}; i < N; i++)
-			m[i][0] = arr[i];
-		for (int k = 1; k < LOG; k++)
+		for (int k = 1; (1 << k) <= (int)a.size(); k++)
 		{
-			for (int i{}; i + (1 << k) - 1 < N; i++)
-				m[i][k] = merge(m[i][k - 1], m[i + (1 << (k - 1))][k - 1]);
+			t.emplace_back(a.size() - (1 << k) + 1);
+			for (int i = 0; i < (int)t[k].size(); i++)
+				t[k][i] = f(t[k - 1][i], t[k - 1][i + (1 << (k - 1))]);
 		}
 	}
-	SparseTable(const vector<ll> &arr, ll (*func)(ll, ll))
-	{
-		int n = arr.size();
-		LOG = (ll)(log2l(bitCeil(n)) + 1) + 1;
-		Process = func;
-		m.resize(n, vector<ll>(LOG, 0));
-		build(arr);
-	}
 
-	ll query(int L, int R) // 0-based
+	T query(int L, int R) const // f over a[L..R], 0 <= L <= R < n
 	{
-		int len = R - L + 1;
-		int k = 31 - __builtin_clz(len);
-		return merge(m[L][k], m[R - (1 << k) + 1][k]);
+		if (L > R)
+			return id;
+		assert(0 <= L && R < (int)t[0].size());
+		int k = __lg(R - L + 1);
+		return f(t[k][L], t[k][R - (1 << k) + 1]);
 	}
 };
-
-ll GCD(ll a, ll b)
-{
-	return std::gcd(a, b);
-}
 
 int main()
 {
@@ -69,7 +46,8 @@ int main()
 	for (int i{}; i < N; i++)
 		cin >> S[i], idx[S[i]].push_back(i + 1); // Map elements to their indices (1-based)
 
-	SparseTable ST(S, GCD);
+	SparseTable ST(S, [](ll x, ll y)
+				   { return gcd(x, y); }, 0LL);
 	cin >> t;
 	while (t--)
 	{

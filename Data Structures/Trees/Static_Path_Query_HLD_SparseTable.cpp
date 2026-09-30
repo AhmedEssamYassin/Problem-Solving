@@ -12,49 +12,30 @@ A heavy path is the path formed by a collection heavy edges.
 A light path is the path formed by a collection light edges.
 */
 
-// Can be used for Idempotent functions: GCD, LCM, Maximum, Minimum, OR, AND and also XORBasis
-ll bitCeil(const ll &N)
-{
-    ll res{1};
-    while (res < N)
-        res <<= 1;
-    return res;
-}
-
-template <typename T>
+template <typename T, typename F>
 struct SparseTable
 {
-    int size, LOG;
-    vector<vector<T>> m;
-    T merge(const T &a, const T &b)
+    vector<vector<T>> t; // t[k][i] = f over a[i..i + 2^k - 1]
+    F f;
+    T id; // Returned for an empty range: min -> INF, max -> -INF, gcd / OR -> 0, & -> -1LL, lcm -> 1
+    SparseTable() = default;
+    SparseTable(const vector<T> &a, F f, T id = T()) : t{a}, f(f), id(id)
     {
-        return min(a, b);
-    }
-    void build(const vector<ll> &arr)
-    {
-        int N = arr.size();
-        for (int i{}; i < N; i++)
-            m[i][0] = arr[i];
-        for (int k = 1; k < LOG; k++)
+        for (int k = 1; (1 << k) <= (int)a.size(); k++)
         {
-            for (int i{}; i + (1 << k) - 1 < N; i++)
-                m[i][k] = merge(m[i][k - 1], m[i + (1 << (k - 1))][k - 1]);
+            t.emplace_back(a.size() - (1 << k) + 1);
+            for (int i = 0; i < (int)t[k].size(); i++)
+                t[k][i] = f(t[k - 1][i], t[k - 1][i + (1 << (k - 1))]);
         }
     }
-    SparseTable() {}
-    SparseTable(const vector<ll> &arr)
-    {
-        int n = arr.size();
-        LOG = (ll)(log2l(bitCeil(n)) + 1) + 1;
-        m.resize(n, vector<T>(LOG, 0));
-        build(arr);
-    }
 
-    T query(int L, int R) // 0-based
+    T query(int L, int R) const // f over a[L..R], 0 <= L <= R < n
     {
-        int len = R - L + 1;
-        int k = 31 - __builtin_clz(len);
-        return merge(m[L][k], m[R - (1 << k) + 1][k]);
+        if (L > R)
+            return id;
+        assert(0 <= L && R < (int)t[0].size());
+        int k = __lg(R - L + 1);
+        return f(t[k][L], t[k][R - (1 << k) + 1]);
     }
 };
 
@@ -63,7 +44,7 @@ struct HeavyLightDecomposition
 private:
     int timer = 0;
     vector<int> parent, depth, heavy, head, in, out, size;
-    SparseTable<ll> SPT;
+    SparseTable<ll, std::function<ll(ll, ll)>> SPT;
 
     int dfsSize(const vector<vector<ll>> &Tree, int u)
     {
@@ -115,7 +96,8 @@ public:
         dfsSize(Tree, root);
         vector<ll> baseArray(N);
         dfsHld(Tree, values, baseArray, root, 0);
-        SPT = SparseTable<ll>(baseArray);
+        SPT = decltype(SPT)(baseArray, [](ll a, ll b)
+                            { return min(a, b); }, LLONG_MAX);
     }
 
     ll getDepth(ll u) const
@@ -130,12 +112,12 @@ public:
         {
             if (depth[head[u]] < depth[head[v]])
                 swap(u, v);
-            res = SPT.merge(res, SPT.query(in[head[u]], in[u]));
+            res = SPT.f(res, SPT.query(in[head[u]], in[u]));
             u = parent[head[u]];
         }
         if (depth[u] > depth[v])
             swap(u, v);
-        res = SPT.merge(res, SPT.query(in[u], in[v]));
+        res = SPT.f(res, SPT.query(in[u], in[v]));
         return res;
     }
 
