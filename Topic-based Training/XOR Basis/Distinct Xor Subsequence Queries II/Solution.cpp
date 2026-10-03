@@ -49,6 +49,32 @@ struct XORBasis
 	void clear() { *this = {}; }
 };
 
+const ll mod = 998244353;
+#define double_size_t std::conditional_t<(mod > (1LL << 31)), __int128_t, long long>
+
+inline ll mult64(const ll &a, const ll &b)
+{
+	return double_size_t(a) * b % mod;
+}
+
+ll modPow(ll N, ll power)
+{
+	if (N % mod == 0 || N == 0)
+		return 0;
+	if (N == 1 || power == 0)
+		return 1;
+
+	ll res{1};
+	while (power)
+	{
+		if (power & 1)
+			res = mult64(res, N);
+		N = mult64(N, N);
+		power >>= 1;
+	}
+	return res;
+}
+
 int main()
 {
 	ios_base::sync_with_stdio(false);
@@ -58,16 +84,30 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
+	ll N;
 	// cin >> t;
 	while (t--)
 	{
-		ll N;
 		cin >> N;
-		vector<ll> vc(N);
 		XORBasis xb;
+		int currLen{};
 		for (int i{}; i < N; i++)
-			cin >> vc[i], xb.insertVector(vc[i]);
-		cout << (1LL << xb.sz);
+		{
+			ll type, x;
+			cin >> type >> x;
+			if (type == 1)
+			{
+				xb.insertVector(x);
+				currLen++;
+			}
+			else
+			{
+				if (xb.canRepresent(x) == false)
+					cout << 0 << endl;
+				else
+					cout << modPow(2, currLen - xb.sz) << endl;
+			}
+		}
 	}
 	return 0;
 }

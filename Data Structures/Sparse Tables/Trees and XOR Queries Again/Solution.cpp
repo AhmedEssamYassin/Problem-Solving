@@ -12,96 +12,50 @@ A heavy path is the path formed by a collection heavy edges.
 A light path is the path formed by a collection light edges.
 */
 
-const int BITS = 20;
-#define int_type std::conditional_t<(BITS > 31), long long, int>
+constexpr int BITS = 20;
 struct XORBasis
 {
+	using word = conditional_t<(BITS > 32), uint64_t, uint32_t>;
+	array<word, BITS> basis{}; // basis[i] is 0 or has its highest bit at i
 	int sz = 0;
-	array<int_type, BITS> basis{};
-	XORBasis() {}
-	XORBasis(const ll &x)
+
+	XORBasis(word x = 0) { insertVector(x); }
+
+	bool insertVector(word x) // true if x was independent of the basis
 	{
-		insertVector(x);
-	}
-	void insertVector(ll x)
-	{
-		if (sz == BITS)
-			return;
-		for (ll i = __lg(x); x > 0; i = __lg(x))
-		{
-			if (!basis[i])
-				return sz++, void(basis[i] = x);
-			x ^= basis[i];
-		}
+		for (int i = 0; x && sz < BITS; x ^= basis[i])
+			if (!basis[i = __lg(x)])
+				return basis[i] = x, sz++, true;
+		return false;
 	}
 
-	bool canRepresent(ll x)
+	bool canRepresent(word x) const
 	{
-		if (sz == BITS)
-			return true;
-		for (ll i = __lg(x); x > 0; i = __lg(x))
-		{
-			if (basis[i])
-				x ^= basis[i];
-			else
-				return false;
-		}
-		return !x;
+		for (int i = 0; x; x ^= basis[i])
+			if (!basis[i = __lg(x)])
+				return 0;
+		return 1;
 	}
 
-	ll getMaxXor()
+	word getMaxXor() const
 	{
-		if (sz == BITS)
-			return (1LL << BITS) - 1;
-		ll maxXor = 0;
-		for (int i = BITS - 1; i >= 0; i--)
-		{
-			if ((maxXor ^ basis[i]) > maxXor)
-				maxXor ^= basis[i];
-		}
-		return maxXor;
+		word r = 0;
+		for (int i = BITS; i--;)
+			r = max(r, r ^ basis[i]);
+		return r;
 	}
 
-	friend XORBasis operator+(const XORBasis &LHS, const XORBasis &RHS)
+	XORBasis &operator+=(const XORBasis &o)
 	{
-		XORBasis res;
-		if (LHS.sz == BITS)
-			return LHS;
-
-		if (RHS.sz == BITS)
-			return (RHS);
-		res = LHS;
-		for (int i = 0; i < BITS; i++)
-		{
-			if (RHS.basis[i])
-				res.insertVector(RHS.basis[i]);
-		}
-		return res;
-	}
-
-	XORBasis &operator+=(const XORBasis &other)
-	{
-		if (sz == BITS)
-			return *this;
-
-		if (other.sz == BITS)
-			return (*this = other);
-
-		for (int i = 0; i < BITS; i++)
-		{
-			if (other.basis[i])
-				insertVector(other.basis[i]);
-		}
+		if (o.sz == BITS) // Full basis spans everything
+			return *this = o;
+		for (word v : o.basis)
+			insertVector(v);
 		return *this;
 	}
+	friend XORBasis operator+(XORBasis a, const XORBasis &b) { return a += b; }
 
-	void clear()
-	{
-		if (!sz)
-			return;
-		basis.fill(0);
-		sz = 0;
-	}
+	void clear() { *this = {}; }
 };
 
 template <typename T, typename F>

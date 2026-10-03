@@ -5,100 +5,58 @@ using namespace std;
 
 const ll mod = 1e9 + 7;
 
-const int BITS = 1000;
+constexpr int BITS = 1000;
 struct XORBasis
 {
+	using Mask = bitset<BITS>;
+	array<Mask, BITS> basis{}; // basis[i] is 0 or has its highest bit at i
 	int sz = 0;
-	array<bitset<BITS>, BITS> basis{}; // Better to avoid SHALLOW COPYING
-	XORBasis() {}
-	XORBasis(const ll &x)
+
+	XORBasis(const Mask &x = {}) { insertVector(x); }
+
+	bool insertVector(Mask x) // true if x was independent of the basis
 	{
-		insertVector(x);
-	}
-	void insertVector(bitset<BITS> x)
-	{
-		if (sz == BITS)
-			return;
-		for (int i = BITS - 1; i >= 0; i--)
+		for (int i = BITS; i-- && sz < BITS;)
 		{
 			if (x[i])
 			{
-				if (basis[i].count() == 0)
-					return sz++, void(basis[i] = x);
+				if (!basis[i][i])
+					return basis[i] = x, sz++, true;
 				x ^= basis[i];
 			}
 		}
+		return false;
 	}
 
-	bool canRepresent(bitset<BITS> x)
+	bool canRepresent(Mask x) const
 	{
-		if (sz == BITS)
-			return true;
-		for (int i = BITS - 1; i >= 0; i--)
-		{
-			if (x[i])
-			{
-				if (basis[i].count() != 0)
-					x ^= basis[i];
-				else
-					return false;
-			}
-		}
-		return (x.count() == 0);
+		for (int i = BITS; i--;)
+			if (x[i] && (x ^= basis[i])[i]) // still set means no pivot at i
+				return 0;
+		return 1;
 	}
 
-	ll getMaxXor()
+	Mask getMaxXor() const
 	{
-		ll maxXor = 0;
-		for (int i = BITS - 1; i >= 0; i--)
-		{
-			ll b = basis[i].to_ullong(); // Convert bitset to unsigned long long
-			if ((maxXor ^ b) > maxXor)
-				maxXor ^= b;
-		}
-		return maxXor;
+		Mask r;
+		for (int i = BITS; i--;)
+			if (!r[i])
+				r ^= basis[i];
+		return r;
 	}
 
-	friend XORBasis operator+(const XORBasis &LHS, const XORBasis &RHS)
+	XORBasis &operator+=(const XORBasis &o)
 	{
-		XORBasis res;
-		if (LHS.sz == BITS)
-			return LHS;
-
-		if (RHS.sz == BITS)
-			return (RHS);
-		res += LHS;
-		for (int i = BITS - 1; i >= 0; i--)
-		{
-			if (RHS.basis[i].count())
-				res.insertVector(RHS.basis[i]);
-		}
-		return res;
-	}
-
-	XORBasis &operator+=(const XORBasis &other)
-	{
-		if (sz == BITS)
-			return *this;
-
-		if (other.sz == BITS)
-			return (*this = other);
-
-		for (int i = BITS - 1; i >= 0; i--)
-		{
-			if (other.basis[i].count())
-				insertVector(other.basis[i]);
-		}
+		if (o.sz == BITS) // Full basis spans everything
+			return *this = o;
+		for (int i = 0; i < BITS && sz < BITS; i++)
+			if (o.basis[i][i])
+				insertVector(o.basis[i]);
 		return *this;
 	}
+	friend XORBasis operator+(XORBasis a, const XORBasis &b) { return a += b; }
 
-	void clear()
-	{
-		if (!sz)
-			return;
-		basis.fill(bitset<BITS>());
-		sz = 0;
-	}
+	void clear() { *this = {}; }
 };
 
 ll modPow(ll N, ll power, ll mod)
@@ -123,10 +81,10 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N;
 	// cin >> t;
 	while (t--)
 	{
+		ll N;
 		// There are at most 168 distinct primes in all numbers until 1000 (Brute forced)
 		cin >> N;
 		XORBasis xb;
@@ -135,7 +93,7 @@ int main()
 		{
 			ll cur;
 			cin >> cur;
-			bitset<BITS> primeSet;
+			bitset<1000> primeSet;
 			for (ll p = 2; p * p <= cur && cur > 1; p++)
 			{
 				while (cur % p == 0)

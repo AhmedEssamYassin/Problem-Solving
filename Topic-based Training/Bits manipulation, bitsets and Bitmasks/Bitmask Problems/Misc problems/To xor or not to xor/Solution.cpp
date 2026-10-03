@@ -11,14 +11,11 @@ int main()
 	freopen("input.txt", "r", stdin);
 	freopen("Output.txt", "w", stdout);
 #endif
-	/*
-
-	*/
 	int t = 1;
-	ll N;
 	// cin >> t;
 	while (t--)
 	{
+		ll N;
 		cin >> N;
 		vector<ll> A(N);
 		for (int i{}; i < N; i++)
