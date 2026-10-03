@@ -6,7 +6,7 @@ using namespace std;
 #include <ext/pb_ds/assoc_container.hpp>
 using namespace __gnu_pbds;
 
-struct custom_hash
+struct CustomHash
 {
 	static uint64_t splitmix64(uint64_t x)
 	{
@@ -105,7 +105,7 @@ int main()
 		}
 
 		ll currAns{};
-		gp_hash_table<ll, ll, custom_hash> freq;
+		gp_hash_table<ll, ll, CustomHash> freq;
 		auto add = [&](int idx)
 		{
 			ll &f = freq[vc[idx]];

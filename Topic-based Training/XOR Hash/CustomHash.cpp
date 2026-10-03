@@ -3,7 +3,7 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-struct custom_hash
+struct CustomHash
 {
     static uint64_t splitMix64(uint64_t x)
     {
@@ -30,9 +30,7 @@ int main()
     freopen("Output.txt", "w", stdout);
 #endif
     int t = 1;
-    ll N, P;
     cin >> t;
-    int T = 1;
     while (t--)
     {
     }
