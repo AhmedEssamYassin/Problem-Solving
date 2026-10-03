@@ -6,22 +6,17 @@ using namespace std;
 const int mod = 1000000007;
 class CoordinateCompression
 {
-private:
-	vector<ll> init;
-	void compress(vector<ll> &vec)
-	{
-		sort(vec.begin(), vec.end());
-		vec.erase(unique(vec.begin(), vec.end()), vec.end());
-	}
-
+	vector<ll> vals; // sorted, unique
 public:
-	CoordinateCompression(const vector<ll> &vec)
+	CoordinateCompression() {}
+	explicit CoordinateCompression(const vector<ll> &v) : vals(v)
 	{
-		init = vec;
-		compress(init);
+		sort(vals.begin(), vals.end());
+		vals.erase(unique(vals.begin(), vals.end()), vals.end());
 	}
-	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
-	ll initialValue(int idx) { return init[idx]; }
+	int size() const { return vals.size(); }
+	int index(ll v) const { return lower_bound(vals.begin(), vals.end(), v) - vals.begin(); }
+	ll value(int i) const { return vals[i]; }
 };
 
 struct SegmentTree
@@ -148,8 +143,8 @@ int main()
 		pref[i] = pref[i - 1] + vc[i];
 	// The problem is that negative numbers cannot be treated as indices
 	CoordinateCompression comp(pref);
-	SegmentTree freqTree(vector<ll>(N + 1, 0));
-	SegmentTree sumTree(vector<ll>(N + 1, 0));
+	SegmentTree freqTree(vector<ll>(comp.size(), 0));
+	SegmentTree sumTree(vector<ll>(comp.size(), 0));
 
 	ll sum{};
 	for (int i{}; i < N; i++)

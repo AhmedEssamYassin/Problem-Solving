@@ -5,23 +5,17 @@ using namespace std;
 
 class CoordinateCompression
 {
-private:
-	vector<ll> init;
-	void compress(vector<ll> &vec)
-	{
-		sort(vec.begin(), vec.end());
-		vec.erase(unique(vec.begin(), vec.end()), vec.end());
-	}
-
+	vector<ll> vals; // sorted, unique
 public:
 	CoordinateCompression() {}
-	CoordinateCompression(const vector<ll> &vec)
+	explicit CoordinateCompression(const vector<ll> &v) : vals(v)
 	{
-		init = vec;
-		compress(init);
+		sort(vals.begin(), vals.end());
+		vals.erase(unique(vals.begin(), vals.end()), vals.end());
 	}
-	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
-	ll initialValue(int idx) { return init[idx]; }
+	int size() const { return vals.size(); }
+	int index(ll v) const { return lower_bound(vals.begin(), vals.end(), v) - vals.begin(); }
+	ll value(int i) const { return vals[i]; }
 };
 
 struct Query
@@ -154,7 +148,7 @@ int main()
 			u.newVal = comp.index(u.newVal);
 		}
 
-		vector<int> freq(n + q + 1), C(n + 1);
+		vector<int> freq(comp.size() + 1), C(n + 1);
 		auto add = [&](int idx)
 		{
 			int &f = freq[vc[idx]];

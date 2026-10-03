@@ -5,22 +5,17 @@ using namespace std;
 
 class CoordinateCompression
 {
-private:
-	vector<ll> init;
-	void compress(vector<ll> &vec)
-	{
-		sort(vec.begin(), vec.end());
-		vec.erase(unique(vec.begin(), vec.end()), vec.end());
-	}
-
+	vector<ll> vals; // sorted, unique
 public:
-	CoordinateCompression(const vector<ll> &vec)
+	CoordinateCompression() {}
+	explicit CoordinateCompression(const vector<ll> &v) : vals(v)
 	{
-		init = vec;
-		compress(init);
+		sort(vals.begin(), vals.end());
+		vals.erase(unique(vals.begin(), vals.end()), vals.end());
 	}
-	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
-	ll initialValue(int idx) { return init[idx]; }
+	int size() const { return vals.size(); }
+	int index(ll v) const { return lower_bound(vals.begin(), vals.end(), v) - vals.begin(); }
+	ll value(int i) const { return vals[i]; }
 };
 
 struct SegmentTree
@@ -137,8 +132,6 @@ int main()
 		cin >> N;
 		vector<tuple<ll, ll, int>> intervals(N);
 		vector<ll> Rs;
-		SegmentTree segTree(vector<ll>(4e5 + 1, 0));
-
 		int pos = 0;
 		for (auto &[L, R, idx] : intervals)
 		{
@@ -149,6 +142,7 @@ int main()
 		CoordinateCompression comp(Rs);
 		for (auto &[L, R, idx] : intervals)
 			R = comp.index(R);
+		SegmentTree segTree(vector<ll>(comp.size(), 0));
 
 		map<ll, ll> ans;
 		sort(intervals.begin(), intervals.end()); // Sorting on basis of `L`

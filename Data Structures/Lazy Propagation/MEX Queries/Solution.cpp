@@ -5,22 +5,17 @@ using namespace std;
 
 class CoordinateCompression
 {
-private:
-	vector<ll> init;
-	void compress(vector<ll> &vec)
-	{
-		sort(vec.begin(), vec.end());
-		vec.erase(unique(vec.begin(), vec.end()), vec.end());
-	}
-
+	vector<ll> vals; // sorted, unique
 public:
-	CoordinateCompression(const vector<ll> &vec)
+	CoordinateCompression() {}
+	explicit CoordinateCompression(const vector<ll> &v) : vals(v)
 	{
-		init = vec;
-		compress(init);
+		sort(vals.begin(), vals.end());
+		vals.erase(unique(vals.begin(), vals.end()), vals.end());
 	}
-	int index(ll val) { return lower_bound(init.begin(), init.end(), val) - init.begin(); }
-	ll initialValue(int idx) { return init[idx]; }
+	int size() const { return vals.size(); }
+	int index(ll v) const { return lower_bound(vals.begin(), vals.end(), v) - vals.begin(); }
+	ll value(int i) const { return vals[i]; }
 };
 
 struct LazySegmentTree
@@ -207,7 +202,7 @@ int main()
 			L = comp.index(L);
 			R = comp.index(R);
 		}
-		LazySegmentTree segTree(vector<ll>(vc.size(), 0));
+		LazySegmentTree segTree(vector<ll>(comp.size(), 0));
 		for (const auto &[type, L, R] : queries)
 		{
 			if (type == 1)
@@ -216,7 +211,7 @@ int main()
 				segTree.update(L, R, 1, 0);
 			else // 3
 				segTree.update(L, R, 2, 1);
-			cout << comp.initialValue(segTree.query()) << endl;
+			cout << comp.value(segTree.query()) << endl;
 		}
 	}
 	return 0;

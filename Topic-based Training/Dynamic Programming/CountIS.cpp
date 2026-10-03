@@ -29,30 +29,19 @@ inline ll mult64(const ll &a, const ll &b)
     return double_size_t(a) * b % mod;
 }
 
-class CompressedRange
+class CoordinateCompression
 {
-private:
-    vector<ll> init;
-    void compress(vector<ll> &vec)
-    {
-        sort(vec.begin(), vec.end());
-        vec.erase(unique(vec.begin(), vec.end()), vec.end());
-    }
-
+    vector<ll> vals; // sorted, unique
 public:
-    CompressedRange(vector<ll> &vec)
+    CoordinateCompression() {}
+    explicit CoordinateCompression(const vector<ll> &v) : vals(v)
     {
-        init = vec;
-        compress(init);
+        sort(vals.begin(), vals.end());
+        vals.erase(unique(vals.begin(), vals.end()), vals.end());
     }
-    int index(ll val)
-    {
-        return lower_bound(init.begin(), init.end(), val) - init.begin();
-    }
-    ll initVal(int idx)
-    {
-        return init[idx];
-    }
+    int size() const { return vals.size(); }
+    int index(ll v) const { return lower_bound(vals.begin(), vals.end(), v) - vals.begin(); }
+    ll value(int i) const { return vals[i]; }
 };
 
 struct Node
@@ -152,9 +141,8 @@ int countIS(vector<ll> const &vc)
     if (n == 0)
         return 1; // Empty subsequence
 
-    vector<ll> temp = vc;
-    CompressedRange cr(temp);
-    SegmentTree seg(temp.size());
+    CoordinateCompression cr(vc);
+    SegmentTree seg(cr.size());
 
     ll res = 0; // 1 if we count the empty subsequence
     for (int i = 0; i < n; i++)
