@@ -3,178 +3,102 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-auto random_address = []
-{ char *p = new char; delete p; return uint64_t(p); };
-const uint64_t SEED = chrono::steady_clock::now().time_since_epoch().count() * (random_address() | 1);
-std::mt19937 rnd(SEED);
-#define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
-/*
-Large Primes for hash
-1000000007
-10000000019
-100000000003
-1000000000039
-10000000000037
-100000000000031
-1000000000000037
-10000000000000061
-2305843009213693951 = (1LL << 61) - 1
-*/
-
-constexpr ll mod = (1LL << 61) - 1; // Large prime,
-// Takes more time, choose a smaller prime and omit mult64() for faster code but higher probability of collision
-// constexpr ll mod = 1e9 + 7; // Is usually sufficient for most of the hashing problems
-
-inline ll mult64(const ll &a, const ll &b)
+using u64 = uint64_t;
+u64 S = chrono::steady_clock::now().time_since_epoch().count() ^ (u64) new char;
+u64 rnd()
 {
-	return __int128_t(a) * b % mod;
+    S += 0xa0761d6478bd642f;
+    __uint128_t t = (__uint128_t)S * (S ^ 0xe7037ed1a0b428db);
+    return t >> 64 ^ t;
 }
-ll modPow(ll N, ll power, ll mod)
+#define rng(l, r) ((l) + (int64_t)((__uint128_t)rnd() * ((r) - (l) + 1) >> 64))
+
+const u64 mod = (1LL << 61) - 1;
+inline u64 add64(u64 a, u64 b)
 {
-	ll res{1};
-	while (power)
-	{
-		if (power & 1)
-			res = mult64(res, N);
-		N = mult64(N, N);
-		power >>= 1;
-	}
-	return res;
+    a += b;
+    return a >= mod ? a - mod : a;
 }
-ll b1 = rng(200, 1000), b2 = rng(b1 + 1, 10000);
-ll b1I = modPow(b1, mod - 2, mod), b2I = modPow(b2, mod - 2, mod);
-vector<ll> Pb1, Pb2, sumB1, sumB2;
-void pre(ll maxSize)
+inline u64 sub64(u64 a, u64 b) { return a >= b ? a - b : a + mod - b; }
+inline u64 mult64(u64 a, u64 b)
 {
-	Pb1 = Pb2 = sumB1 = sumB2 = vector<ll>(maxSize + 1, 1);
-	for (int i = 1; i <= maxSize; i++)
-	{
-		Pb1[i] = mult64(Pb1[i - 1], b1);
-		Pb2[i] = mult64(Pb2[i - 1], b2);
-		sumB1[i] = ((sumB1[i - 1] + Pb1[i]) % mod);
-		sumB2[i] = ((sumB2[i - 1] + Pb2[i]) % mod);
-	}
+    __uint128_t t = (__uint128_t)a * b;
+    u64 r = u64(t & mod) + u64(t >> 61);
+    return r >= mod ? r - mod : r;
 }
-class Hash
+u64 modPow(u64 n, u64 e)
 {
-	using pll = pair<ll, ll>;
-	ll size{};
-	ll plus(const ll &x, const ll &y)
-	{
-		return ((__int128_t(x) + y + mod) % mod);
-	}
+    u64 r = 1;
+    for (; e; e >>= 1, n = mult64(n, n))
+        if (e & 1)
+            r = mult64(r, n);
+    return r;
+}
 
-public:
-	pll code{};
-
-	explicit Hash(pair<ll, ll> x = {}, ll sz = {}) : code(std::move(x)), size(sz) {}
-
-	Hash(const ll &x) : code({x % mod, x % mod}), size(1) {}
-
-	Hash(const string &x) : code(), size(0)
-	{
-		for (const char &c : x)
-			*this = *(this) + c;
-	}
-
-	void pop_front(int x)
-	{
-		code.first = (code.first - mult64(Pb1[--size], x) + mod) % mod;
-		code.second = (code.second - mult64(Pb2[size], x) + mod) % mod;
-	}
-
-	void pop_back(int x)
-	{
-		code.first = mult64((code.first - x + mod), b1I);
-		code.second = mult64((code.second - x + mod), b2I);
-		size--;
-	}
-	void clear()
-	{
-		code = {}, size = 0;
-	}
-	Hash operator+(const Hash &o)
-	{
-		Hash ans;
-		ans.code = {plus(mult64(code.first, Pb1[o.size]), o.code.first),
-					plus(mult64(code.second, Pb2[o.size]), o.code.second)};
-		ans.size = size + o.size;
-		return ans;
-	}
-	friend Hash operator+(const Hash &f, const Hash &o)
-	{
-		return Hash({((mult64(f.code.first, Pb1[o.size]) + o.code.first) % mod),
-					 ((mult64(f.code.second, Pb2[o.size]) + o.code.second) % mod)},
-					f.size + o.size);
-	}
-	bool operator<(const Hash &o) const
-	{
-		if (code == o.code)
-			return size < o.size;
-		return code < o.code;
-	}
-	bool operator==(const Hash &o) const
-	{
-		return size == o.size && code == o.code;
-	}
-	bool operator!=(const Hash &o) const
-	{
-		return size != o.size || code != o.code;
-	}
+// Collision prob ~ n^2 / 2^122 per comparison.
+struct H2
+{
+    u64 a, b;
+    H2 operator+(H2 o) const { return {add64(a, o.a), add64(b, o.b)}; }
+    H2 operator-(H2 o) const { return {sub64(a, o.a), sub64(b, o.b)}; }
+    H2 operator*(H2 o) const { return {mult64(a, o.a), mult64(b, o.b)}; }
+    H2 operator+(u64 x) const { return {add64(a, x), add64(b, x)}; }
+    H2 operator-(u64 x) const { return {sub64(a, x), sub64(b, x)}; }
+    H2 operator*(u64 x) const { return {mult64(a, x), mult64(b, x)}; }
+    auto operator<=>(const H2 &) const = default;
 };
+const H2 B = {(u64)rng(1 << 20, mod - 2), (u64)rng(1 << 20, mod - 2)};
+const H2 BI = {modPow(B.a, mod - 2), modPow(B.b, mod - 2)};
+auto [Pb, sumB] = [](int mx)
+{
+    vector<H2> p(mx + 1, {1, 1}), s(mx + 1, {1, 1});
+    for (int i = 1; i <= mx; i++)
+    {
+        p[i] = p[i - 1] * B;
+        s[i] = s[i - 1] + p[i];
+    }
+    return pair{move(p), move(s)};
+}(1e6);
 
-// Rabin-Karp Algorithm
+struct Hash
+{
+    H2 code = {0, 0};
+    int size = 0;
+    Hash() = default;
+    Hash(H2 c, int s) : code(c), size(s) {}
+    Hash(ll x) : size(1)
+    {
+        u64 xm = ((x % (ll)mod) + mod) % mod;
+        code = {xm, xm};
+    }
+    Hash(string_view s) : size(s.size())
+    {
+        for (uint8_t c : s)
+            code = code * B + c;
+    }
+    void clear() { code = {0, 0}, size = 0; }
+
+    Hash operator+(const Hash &o) const { return {code * Pb[o.size] + o.code, size + o.size}; }
+    auto operator<=>(const Hash &) const = default;
+};
+// Rabin-Karp
 struct HashRange
 {
-	vector<Hash> p, s;
-	HashRange(const string &t) : p(t.size()), s(t.size())
-	{
-		if (t.empty())
-			return;
-		p.front() = t.front();
-		for (int i = 1; i < t.size(); i++)
-			p[i] = p[i - 1] + t[i];
-		s.back() = t.back();
-		for (int i = int(t.size()) - 2; i >= 0; i--)
-			s[i] = s[i + 1] + t[i];
-	}
-	Hash get(int l, int r) const // 0-based indices
-	{
-		if (l > r)
-			return Hash();
-		if (!l)
-			return p[r];
-		return Hash({(p[r].code.first - mult64(p[l - 1].code.first, Pb1[r - l + 1]) + mod) % mod,
-					 (p[r].code.second - mult64(p[l - 1].code.second, Pb2[r - l + 1]) + mod) % mod},
-					r - l + 1);
-	}
-	Hash inv(int l, int r) const // 0-based indices
-	{
-		if (l > r)
-			return Hash();
-		if (r + 1 == s.size())
-			return s[l];
-		return Hash({(s[l].code.first - mult64(s[r + 1].code.first, Pb1[r - l + 1]) + mod) % mod,
-					 (s[l].code.second - mult64(s[r + 1].code.second, Pb2[r - l + 1]) + mod) % mod},
-					r - l + 1);
-	}
-	void concatenate(const string &t)
-	{
-		if (t.empty())
-			return;
-		bool chk = false;
-		if (chk = p.empty())
-			p.push_back(t[0]);
-		for (int i = 0 + chk; i < t.size(); i++)
-			p.push_back(p.back() + t[i]);
-	}
-	void pop_back()
-	{
-		if (!p.empty())
-			p.pop_back();
-	}
+    vector<H2> p, s;
+    HashRange() = default;
+    HashRange(string_view t) : p(t.size() + 1, {0, 0}), s(t.size() + 1, {0, 0})
+    {
+        int n = t.size();
+        for (int i = 0; i < n; i++)
+        {
+            p[i + 1] = p[i] * B + (uint8_t)t[i];
+            s[n - 1 - i] = s[n - i] * B + (uint8_t)t[n - 1 - i];
+        }
+    }
+
+    Hash get(int l, int r) const { return l <= r ? Hash{p[r + 1] - p[l] * Pb[r - l + 1], r - l + 1} : Hash{}; }
+    Hash inv(int l, int r) const { return l <= r ? Hash{s[l] - s[r + 1] * Pb[r - l + 1], r - l + 1} : Hash{}; }
 };
-////////////////////////////////////////////////////////////////////////////////////
 
 struct SegmentTree
 {
@@ -192,7 +116,7 @@ private:
 	};
 	int size;
 	vector<Node> seg;
-	Node merge(Node &leftNode, Node &rightNode)
+	Node merge(const Node &leftNode, const Node &rightNode)
 	{
 		Node res;
 		res.forwardHash = (leftNode.forwardHash + rightNode.forwardHash);
@@ -308,7 +232,6 @@ int main()
 	int t = 1;
 	ll N, Q;
 	cin >> t;
-	pre(1e6);
 	while (t--)
 	{
 		cin >> N;
