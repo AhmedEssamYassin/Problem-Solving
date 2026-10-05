@@ -25,8 +25,8 @@ When this "very close to 4.11" number is multiplied by 100 for example, the ceil
 To overcome this problem we use:
 ll Ceil(ll a, ll b)
 {
-	// For a,b > 0
-	return (a + b - 1) / b;
+    // For a,b > 0
+    return (a + b - 1) / b;
 }
 -------------------------------------------------------------------------------------------------------------------------------------
 First Number to be a multiple of Y after X:
@@ -225,16 +225,16 @@ int main()
 	/*
 	cout << End * (End + 1) / 2 - Start * (Start - 1) / 2 << endl;
 	{
-		ll Y = End / 2;
-		ll K = (Start - 1) / 2;
-		cout << (Y * (Y + 1)) - (K * (K + 1)) << endl;
+	    ll Y = End / 2;
+	    ll K = (Start - 1) / 2;
+	    cout << (Y * (Y + 1)) - (K * (K + 1)) << endl;
 	}
 	{
-		ll Y = Ceil(End, 2);
-		ll K = Ceil(Start - 1, 2);
-		cout << Y * Y - K * K;
+	    ll Y = Ceil(End, 2);
+	    ll K = Ceil(Start - 1, 2);
+	    cout << Y * Y - K * K;
 	}
-		*/
+	    */
 
 	/*
 	Problems:

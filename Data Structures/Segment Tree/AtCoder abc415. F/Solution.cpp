@@ -28,14 +28,14 @@ private:
 		res.lastChar = rightNode.lastChar;
 
 		res.prefLen = (leftNode.prefLen == leftNode.len && leftNode.lastChar == rightNode.firstChar)
-						  ? leftNode.len + rightNode.prefLen
-						  : leftNode.prefLen;
+		                  ? leftNode.len + rightNode.prefLen
+		                  : leftNode.prefLen;
 		res.suffLen = (rightNode.suffLen == rightNode.len && rightNode.firstChar == leftNode.lastChar)
-						  ? rightNode.len + leftNode.suffLen
-						  : rightNode.suffLen;
+		                  ? rightNode.len + leftNode.suffLen
+		                  : rightNode.suffLen;
 
 		res.maxLen = max({leftNode.maxLen, rightNode.maxLen,
-						  (leftNode.lastChar == rightNode.firstChar ? leftNode.suffLen + rightNode.prefLen : 0)});
+		                  (leftNode.lastChar == rightNode.firstChar ? leftNode.suffLen + rightNode.prefLen : 0)});
 		return res;
 	}
 	void build(int left, int right, int node, const string &str)

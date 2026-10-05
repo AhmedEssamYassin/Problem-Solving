@@ -6,7 +6,7 @@ using namespace std;
 bool predicate_func(const pair<string, int> &P1, const pair<string, int> &P2)
 {
 	// {Name, priority}
-	if (P1.second == P2.second)		// Same priority
+	if (P1.second == P2.second)     // Same priority
 		return P1.first < P2.first; // Lexicographical order
 
 	return P1.second > P2.second; // Sort in descending order
@@ -39,7 +39,7 @@ int main()
 			if (action == "posted" || action == "commented")
 			{
 				cin >> name2;
-				cin >> name2;	  // Overwrites "on"
+				cin >> name2;     // Overwrites "on"
 				name2.pop_back(); // removes 's'
 				name2.pop_back(); // removes apostrophe
 			}

@@ -49,7 +49,7 @@ int main()
 			cin >> vc[i];
 
 		SparseTable SPT(vc, [](ll x, ll y)
-						{ return gcd(x, y); }, 0LL);
+		                { return gcd(x, y); }, 0LL);
 		int minLen = 0x7fffffff, L{}, R{};
 		ll g{};
 		while (R < N)

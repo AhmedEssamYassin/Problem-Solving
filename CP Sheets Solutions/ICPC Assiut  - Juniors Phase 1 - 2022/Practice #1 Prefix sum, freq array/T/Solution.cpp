@@ -34,14 +34,14 @@ int main()
 			{
 				ll x2 = min(x1 + k - 1, N);
 				ll y2 = min(y1 + k - 1, M);
-				rightDiffArr[x1][y1] += a;		   // Top-left
+				rightDiffArr[x1][y1] += a;         // Top-left
 				rightDiffArr[x2 + 1][y2 + 1] -= a; // Bottom-right
 			}
 			else // Left diagonal (↙️)
 			{
 				ll x2 = min(x1 + k - 1, N);
 				ll y2 = max(y1 - (k - 1), 1LL);
-				leftDiffArr[x1][y1] += a;		  // Top-right
+				leftDiffArr[x1][y1] += a;         // Top-right
 				leftDiffArr[x2 + 1][y2 - 1] -= a; // Bottom-left
 			}
 		}

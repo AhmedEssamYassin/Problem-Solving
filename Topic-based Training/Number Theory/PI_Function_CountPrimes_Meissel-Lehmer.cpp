@@ -8,10 +8,10 @@ using namespace std;
 struct MeisselLehmer
 {
 	static const int N = 50000010, M = 100000, K = 100, W = N / 128 + 2, PL = 700000; // PL: primes kept, up to ~1e7
-	int pr[PL], cnt[W];																  // primes; cnt[w] = number of odd primes below word w
-	double ip[PL];																	  // ip[k] ~ 1 / pr[k], multiplying is much cheaper than a 64-bit division
-	uint64_t bits[W];																  // bit t <=> 2t + 1 is prime
-	int memo[M][K];																	  // memo[n][k] = phi(n, k): numbers in [1, n] not divisible by any of the first k primes
+	int pr[PL], cnt[W];                                                               // primes; cnt[w] = number of odd primes below word w
+	double ip[PL];                                                                    // ip[k] ~ 1 / pr[k], multiplying is much cheaper than a 64-bit division
+	uint64_t bits[W];                                                                 // bit t <=> 2t + 1 is prime
+	int memo[M][K];                                                                   // memo[n][k] = phi(n, k): numbers in [1, n] not divisible by any of the first k primes
 
 	MeisselLehmer()
 	{

@@ -54,7 +54,7 @@ bitset<100001> isPrime;
 
 void Sieve_Of_Eratosthenes(int N)
 {
-	isPrime.set();				 // Initially Assuming all numbers to be primes
+	isPrime.set();               // Initially Assuming all numbers to be primes
 	isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
 	for (ll i{2}; i * i <= N; i++)
 	{

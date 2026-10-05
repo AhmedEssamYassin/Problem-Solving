@@ -19,7 +19,7 @@ int main()
 	{
 		cin >> rate;
 		if (find_if(Teams.begin(), Teams.end(), [&](const pair<int, int> &P)
-					{ return (rate == P.first); }) == Teams.end())
+		            { return (rate == P.first); }) == Teams.end())
 			Teams.push_back({rate, i});
 	}
 	if (Teams.size() < K)

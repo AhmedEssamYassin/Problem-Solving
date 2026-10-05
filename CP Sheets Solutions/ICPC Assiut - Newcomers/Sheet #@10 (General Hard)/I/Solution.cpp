@@ -41,9 +41,9 @@ int main()
 
 		// A is denoted as 0, B is denoted as 1 and C is denoted as 2
 		/*
-				0	1	2
-				A	B	C
-				---------
+		        0	1	2
+		        A	B	C
+		        ---------
 	Initially:	0	0	0
 		A > B	1	0	0
 		B > C	1	1	0

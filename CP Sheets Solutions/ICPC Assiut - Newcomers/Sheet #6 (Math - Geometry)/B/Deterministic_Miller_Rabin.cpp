@@ -8,13 +8,13 @@ Fermat's Little Theorem: If N is a prime number, then for every a, 1 <= a < N, a
 
 bool Is_Prime(ll N)
 {
-	if(N < 2)
-	return false;
+    if(N < 2)
+    return false;
 
-	if(N <= 3)
-	return true;
+    if(N <= 3)
+    return true;
 
-	return (pow(2, N-1) % N == 1);
+    return (pow(2, N-1) % N == 1);
 }
 This code actually has some crucial problems:
 
@@ -36,31 +36,31 @@ Thus, we can use Binary Modular exponentiation to calculate pow(2, N-1) so as to
 Code:
 ll binModExp(ll N, ll power, ll mod)
 {
-	if (N % mod == 0 || !N)
-		return 0;
-	if (N == 1 || power == 0)
-		return 1;
-	N %= mod;
-	ll res{1};
-	while (power)
-	{
-		if (power & 1)
-			res = (res % mod * N % mod) % mod;
-		N = (N % mod * N % mod) % mod;
-		power >>= 1;
-	}
-	return res;
+    if (N % mod == 0 || !N)
+        return 0;
+    if (N == 1 || power == 0)
+        return 1;
+    N %= mod;
+    ll res{1};
+    while (power)
+    {
+        if (power & 1)
+            res = (res % mod * N % mod) % mod;
+        N = (N % mod * N % mod) % mod;
+        power >>= 1;
+    }
+    return res;
 }
 
 bool Is_Prime(ll N)
 {
-	if(N < 2)
-	return false;
+    if(N < 2)
+    return false;
 
-	if(N <= 3)
-	return true;
+    if(N <= 3)
+    return true;
 
-	return (binModExp(2, N - 1, N) % N == 1);
+    return (binModExp(2, N - 1, N) % N == 1);
 }
 
 2. This method does NOT work for all numbers

@@ -18,7 +18,7 @@ class DiophantineSolution
 {
 private:
 	DiophantineSolution(ll a, ll b, ll g, ll x0, ll y0, ll c)
-		: a_(a), b_(b), g_(g), x0_(x0), y0_(y0) {}
+	    : a_(a), b_(b), g_(g), x0_(x0), y0_(y0) {}
 
 	// Extended Euclidean algorithm: returns gcd(a, b); sets x, y s.t. ax + by = gcd.
 	static ll extGCD(ll a, ll b, ll &x, ll &y)

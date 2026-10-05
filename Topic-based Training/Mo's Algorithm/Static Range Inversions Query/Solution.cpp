@@ -86,16 +86,16 @@ struct Query
 	uint64_t hilbert;
 
 	Query(int l, int r, int id)
-		: l(l), r(r), id(id), hilbert(hilbertOrder(l, r)) {}
+	    : l(l), r(r), id(id), hilbert(hilbertOrder(l, r)) {}
 
 	bool operator<(const Query &o) const { return hilbert < o.hilbert; }
 };
 
 template <typename AddLeftFn, typename AddRightFn, typename RemoveLeftFn, typename RemoveRightFn, typename AnswerFn>
 vector<ll> runMo(vector<Query> queries,
-				 AddLeftFn addLeft, AddRightFn addRight,
-				 RemoveLeftFn removeLeft, RemoveRightFn removeRight,
-				 AnswerFn getAnswer)
+                 AddLeftFn addLeft, AddRightFn addRight,
+                 RemoveLeftFn removeLeft, RemoveRightFn removeRight,
+                 AnswerFn getAnswer)
 {
 	sort(queries.begin(), queries.end()); // Hilbert order, O(m log m) comparisons, O(1) each
 

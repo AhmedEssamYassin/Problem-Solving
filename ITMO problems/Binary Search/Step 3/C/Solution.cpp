@@ -43,7 +43,7 @@ int main()
 			ll mid = ((L + R) >> 1);
 			if (isOk(vc, K, mid))
 			{
-				ans = mid;	 // Candidate solution
+				ans = mid;   // Candidate solution
 				L = mid + 1; // Search for a better (larger) answer
 			}
 			else

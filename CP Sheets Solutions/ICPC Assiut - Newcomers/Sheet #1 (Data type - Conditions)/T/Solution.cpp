@@ -19,11 +19,11 @@ int main()
 	vector<int> Copy_Vec(Vec);
 	sort(Vec.begin(), Vec.end());
 	cout << Vec[0] << endl
-		 << Vec[1] << endl
-		 << Vec[2] << endl
-		 << endl;
+	     << Vec[1] << endl
+	     << Vec[2] << endl
+	     << endl;
 	cout << Copy_Vec[0] << endl
-		 << Copy_Vec[1] << endl
-		 << Copy_Vec[2];
+	     << Copy_Vec[1] << endl
+	     << Copy_Vec[2];
 	return 0;
 }

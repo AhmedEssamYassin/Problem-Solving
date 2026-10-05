@@ -51,18 +51,18 @@ int main()
 	Prev_Prev = 0;
 	Prev = 1;
 	if (N == 1)
-		cout << Prev_Prev;
+	    cout << Prev_Prev;
 	else if (N == 2)
-		cout << Prev_Prev << " " << Prev << " ";
+	    cout << Prev_Prev << " " << Prev << " ";
 	else
 	{
-		cout << Prev_Prev << " " << Prev << " ";
-		for (int i = 3; i <= N; i++)
-		{
-			cout << (Current = Prev_Prev + Prev) << " ";
-			Prev_Prev = Prev;
-			Prev = Current;
-		}
+	    cout << Prev_Prev << " " << Prev << " ";
+	    for (int i = 3; i <= N; i++)
+	    {
+	        cout << (Current = Prev_Prev + Prev) << " ";
+	        Prev_Prev = Prev;
+	        Prev = Current;
+	    }
 	}
 	*/
 	return 0;

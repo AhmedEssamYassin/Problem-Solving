@@ -23,7 +23,7 @@ int main()
 	int p = 0, q = 0; // To traverse the left and the right segment respectively
 	for (int i = 0; i < N + M; i++)
 	{
-		if (p >= N)			// First segment comes to an end
+		if (p >= N)         // First segment comes to an end
 			vc[q] = N, q++; // Every element now is greater than the whole first array
 
 		else if (q >= M) // Second segment comes to an end

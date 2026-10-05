@@ -118,10 +118,10 @@ ll countSubstrings(const SuffixArray &suffArr, const string &str, const string &
 	const auto &sa = suffArr.sa;
 	// First suffix whose m-prefix is >= subStr
 	auto lo = partition_point(sa.begin(), sa.end(), [&](int pos)
-							  { return str.compare(pos, m, subStr) < 0; });
+	                          { return str.compare(pos, m, subStr) < 0; });
 	// First suffix whose m-prefix is > subStr
 	auto hi = partition_point(lo, sa.end(), [&](int pos)
-							  { return str.compare(pos, m, subStr) <= 0; });
+	                          { return str.compare(pos, m, subStr) <= 0; });
 	return hi - lo;
 }
 

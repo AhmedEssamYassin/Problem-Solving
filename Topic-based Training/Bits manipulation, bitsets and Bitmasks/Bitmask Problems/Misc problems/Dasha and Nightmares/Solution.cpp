@@ -41,7 +41,7 @@ int main()
 			for (ll k = 0; k < 26; k++)
 			{
 				ll cur = (val & ~(1 << k)); // 1 character `off`
-				ll x = (bitmask ^ cur);		// The required string bitmask to be concatenated
+				ll x = (bitmask ^ cur);     // The required string bitmask to be concatenated
 				if (isCleared(h, k) && mp.find(x) != mp.end())
 					cnt += mp[x] - mh[x][k];
 			}

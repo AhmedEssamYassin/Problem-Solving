@@ -29,7 +29,7 @@ int main()
 			ll mid = ((L + R) >> 1);
 			if (Ok(w, h, N, mid))
 			{
-				ans = mid;	 // A candidate answer
+				ans = mid;   // A candidate answer
 				R = mid - 1; // Search for a better answer
 			}
 			else

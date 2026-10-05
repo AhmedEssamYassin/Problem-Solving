@@ -26,12 +26,12 @@ int main()
 	}
 
 	// Accumulate Rows
-	for (size_t i = 0; i < N; i++)	 // To traverse rows
+	for (size_t i = 0; i < N; i++)   // To traverse rows
 		for (size_t j{}; j < M; j++) // To reverse Columns
 			arr[i][j] += (j > 0 ? arr[i][j - 1] : 0);
 
 	// Accumulate Columns
-	for (size_t i = 0; i < M; i++)	 // To traverse columns
+	for (size_t i = 0; i < M; i++)   // To traverse columns
 		for (size_t j{}; j < N; j++) // To traverse rows
 			arr[j][i] += (j > 0 ? arr[j - 1][i] : 0);
 

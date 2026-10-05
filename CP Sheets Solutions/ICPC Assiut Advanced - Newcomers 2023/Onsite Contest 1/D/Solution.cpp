@@ -62,8 +62,8 @@ int main()
 		}
 	}
 
-	if ((pos_S > pos_G && pos_H > pos_G && pos_E > pos_G)	  // If 'S', 'H' and the EXIT door 'E' ALL exist AFTER the ghost 'G'
-		|| (pos_S < pos_G && pos_H < pos_G && pos_E < pos_G)) // If 'S', 'H' and the EXIT door 'E' ALL exist BEFORE the ghost 'G'
+	if ((pos_S > pos_G && pos_H > pos_G && pos_E > pos_G)     // If 'S', 'H' and the EXIT door 'E' ALL exist AFTER the ghost 'G'
+	    || (pos_S < pos_G && pos_H < pos_G && pos_E < pos_G)) // If 'S', 'H' and the EXIT door 'E' ALL exist BEFORE the ghost 'G'
 		cout << "Scooby-Dooby-Doo!";
 	else
 		cout << "Ruh-roh--RAGGY!!!";

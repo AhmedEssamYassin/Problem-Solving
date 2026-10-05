@@ -26,10 +26,10 @@ int main()
 		int min_cost = INT_MAX, l, r;
 		// Handling the case where all the string is '?' such as "????????????"
 		if (all_of(str.begin(), str.end(), [](char i)
-				   { return i == '?'; }))
+		           { return i == '?'; }))
 			return cout << "0\n"
-						<< string(str.length(), 'a'),
-				   0;
+			            << string(str.length(), 'a'),
+			       0;
 		//----------------------------------------------------------------------------------------------------------------------------
 		// Handling the case where the first one or more characters are '?' (but there are other characters) such as "?????????abds"
 		if (str.front() == '?')
@@ -99,7 +99,7 @@ int main()
 		for (int i{1}; i < str.length(); i++)
 			total_cost += abs(arr[str[i] - 97] - arr[str[i - 1] - 97]);
 		cout << total_cost << endl
-			 << str;
+		     << str;
 	}
 	return 0;
 }

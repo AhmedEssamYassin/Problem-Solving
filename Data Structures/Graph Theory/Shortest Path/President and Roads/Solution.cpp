@@ -100,7 +100,7 @@ int main()
 			cin >> u >> v >> w;
 			adj[u].push_back({v, w});
 			revAdj[v].push_back({u, w}); // To be able to calculate SSSP from T to S
-			edges.push_back({u, v, w});	 // To traverse edges in order
+			edges.push_back({u, v, w});  // To traverse edges in order
 		}
 		vector<ll> distFromS;
 		vector<ll> distFromT;

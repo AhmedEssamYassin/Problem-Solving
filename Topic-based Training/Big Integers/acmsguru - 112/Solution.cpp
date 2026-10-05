@@ -303,7 +303,7 @@ struct bigint
 			for (;; --q)
 			{
 				bigint r1 = (r - (res * 2 * base + q) * q) * base * base +
-							(j > 0 ? (long long)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
+				            (j > 0 ? (long long)a.z[2 * j - 1] * base + a.z[2 * j - 2] : 0);
 				if (r1 >= 0)
 				{
 					r = r1;
@@ -499,7 +499,7 @@ struct bigint
 		bigint res;
 		res.sign = sign * v.sign;
 		res.z = multiply_bigint(convert_base(z, base_digits, fft_base_digits),
-								convert_base(v.z, base_digits, fft_base_digits), fft_base);
+		                        convert_base(v.z, base_digits, fft_base_digits), fft_base);
 		res.z = convert_base(res.z, fft_base_digits, base_digits);
 		res.trim();
 		return res;

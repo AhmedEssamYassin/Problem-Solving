@@ -143,7 +143,7 @@ public:
 		vector<XORBasis> baseArray(N);
 		dfsHld(Tree, values, baseArray, root, 0);
 		SPT = decltype(SPT)(baseArray, [](const XORBasis &a, const XORBasis &b)
-							{ return (a + b); }, XORBasis());
+		                    { return (a + b); }, XORBasis());
 	}
 
 	ll getDepth(ll u) const

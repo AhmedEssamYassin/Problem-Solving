@@ -47,7 +47,7 @@ int main()
 			cout << -1;
 		else
 			cout << x << " " << y << "\n"
-				 << z << " " << w;
+			     << z << " " << w;
 	}
 	return 0;
 }

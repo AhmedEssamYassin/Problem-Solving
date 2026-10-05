@@ -30,8 +30,8 @@ int main()
 				bool neg = false; // Assumed to be initially a positive sign
 				ll left = -1, right = -1;
 				ll cnt = 0; // count 2's on the while segment
-				ll cl = 0;	// count 2's to delete from the left
-				ll cr = 0;	// count 2's to delete from the right
+				ll cl = 0;  // count 2's to delete from the left
+				ll cr = 0;  // count 2's to delete from the right
 
 				// Traversing the segment between two zeros, the beginning and one zero or one zero and the end
 				for (int j = L + 1; j < i; j++)

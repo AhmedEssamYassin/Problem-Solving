@@ -33,8 +33,8 @@ int main()
 		{
 			ll L, R;
 			cin >> L >> R;
-			diffArr[1]++;	  // Mark start
-			diffArr[L]--;	  // Remove at L
+			diffArr[1]++;     // Mark start
+			diffArr[L]--;     // Remove at L
 			diffArr[R + 1]++; // Add at R+1
 			diffArr[N + 1]--; // End limit
 		}

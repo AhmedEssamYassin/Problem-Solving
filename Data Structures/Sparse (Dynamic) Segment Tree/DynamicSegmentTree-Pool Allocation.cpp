@@ -29,7 +29,7 @@ private:
 	void merge(int curr)
 	{
 		tree[curr].value = (tree[curr].L ? tree[tree[curr].L].value : 0) +
-						   (tree[curr].R ? tree[tree[curr].R].value : 0);
+		                   (tree[curr].R ? tree[tree[curr].R].value : 0);
 	}
 	void update(ll left, ll right, int &curr, ll idx, const ll &newValue)
 	{

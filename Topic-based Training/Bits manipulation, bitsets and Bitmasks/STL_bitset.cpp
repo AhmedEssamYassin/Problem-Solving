@@ -9,33 +9,33 @@ using namespace std;
 
 void STL()
 {
-	const int N = 20; // const
-	string s = "000111";
-	bitset<N> x(s); // 00000000000000000111
-	x.set();        // 11111111111111111111
-	x.flip();       // 00000000000000000000
+    const int N = 20; // const
+    string s = "000111";
+    bitset<N> x(s); // 00000000000000000111
+    x.set();        // 11111111111111111111
+    x.flip();       // 00000000000000000000
 
-	x = 10;       // 00000000000000001010
-	x |= 3;       // 00000000000000001011
-	x = (x << 3); // 00000000000001011000
-	x = ~x;       // 11111111111110100111
-	x.set(15, 0); // 11110111111110100111
-	x.set(15);    // 11111111111110100111
-	x.flip(0);    // 11111111111110100110
-	x.count();    // Returns the number of bits that are set.
-	x.any();      // Returns true if ANY bits are set.
-	x.none();     // Returns true if NO bits are set.
-	x.test(15);
-	x.to_ulong(); // Returns an unsigned long represent mask
+    x = 10;       // 00000000000000001010
+    x |= 3;       // 00000000000000001011
+    x = (x << 3); // 00000000000001011000
+    x = ~x;       // 11111111111110100111
+    x.set(15, 0); // 11110111111110100111
+    x.set(15);    // 11111111111110100111
+    x.flip(0);    // 11111111111110100110
+    x.count();    // Returns the number of bits that are set.
+    x.any();      // Returns true if ANY bits are set.
+    x.none();     // Returns true if NO bits are set.
+    x.test(15);
+    x.to_ulong(); // Returns an unsigned long represent mask
 
-	// The most interesting
-	if (x[2] == 0)
-		;
+    // The most interesting
+    if (x[2] == 0)
+        ;
 
-	x[0] = 1;     // Set bit from most right to 1
-	x[N - 1] = 0; // Set bit from most left to 0
+    x[0] = 1;     // Set bit from most right to 1
+    x[N - 1] = 0; // Set bit from most left to 0
 
-	cout << x << "\n"; // display a string of N bits
+    cout << x << "\n"; // display a string of N bits
 }
 */
 int main()

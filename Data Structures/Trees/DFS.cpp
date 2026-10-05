@@ -9,41 +9,41 @@ In DFS on a Tree, we simply avoid revisiting the parent node (previous node).
 */
 void DFS(vector<vector<ll>> &Tree, int u, int prev)
 {
-    for (const auto &v : Tree[u])
-    {
-        if (v != prev)
-            DFS(Tree, v, u);
-    }
+	for (const auto &v : Tree[u])
+	{
+		if (v != prev)
+			DFS(Tree, v, u);
+	}
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N;
-    // cin >> t;
-    while (t--)
-    {
-        cin >> N;
-        vector<vector<ll>> Tree(N + 1);
-        int anyNode = 1;
-        for (int i{}; i < N - 1; i++)
-        {
-            ll u, v;
-            cin >> u >> v;
-            anyNode = u;
-            Tree[u].push_back(v);
-            Tree[v].push_back(u);
-        }
-        ll root = 1;
-        // If the tree is not rooted
-        // root = anyNode;
-        DFS(Tree, root, -1);
-    }
-    return 0;
+	int t = 1;
+	ll N;
+	// cin >> t;
+	while (t--)
+	{
+		cin >> N;
+		vector<vector<ll>> Tree(N + 1);
+		int anyNode = 1;
+		for (int i{}; i < N - 1; i++)
+		{
+			ll u, v;
+			cin >> u >> v;
+			anyNode = u;
+			Tree[u].push_back(v);
+			Tree[v].push_back(u);
+		}
+		ll root = 1;
+		// If the tree is not rooted
+		// root = anyNode;
+		DFS(Tree, root, -1);
+	}
+	return 0;
 }

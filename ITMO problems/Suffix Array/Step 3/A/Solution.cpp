@@ -118,7 +118,7 @@ bool findSubstring(const SuffixArray &suffArr, const string &str, const string &
 	int m = subStr.size();
 	const auto &sa = suffArr.sa;
 	auto it = partition_point(sa.begin(), sa.end(), [&](int pos)
-							  { return str.compare(pos, m, subStr) < 0; });
+	                          { return str.compare(pos, m, subStr) < 0; });
 	return it != sa.end() && str.compare(*it, m, subStr) == 0;
 }
 

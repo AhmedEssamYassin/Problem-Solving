@@ -30,7 +30,7 @@ int main()
 
 			if (ans != line.end() and *ans < b + 2 * sqrt(a * c))
 				cout << "YES\n"
-					 << *ans << endl;
+				     << *ans << endl;
 			else
 				cout << "NO\n";
 		}

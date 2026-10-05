@@ -17,7 +17,7 @@ public:
 	Node(ll _val) : val(_val), left(nullptr), right(nullptr), next(nullptr) {}
 
 	Node(ll _val, Node *_left, Node *_right, Node *_next)
-		: val(_val), left(_left), right(_right), next(_next) {}
+	    : val(_val), left(_left), right(_right), next(_next) {}
 };
 
 void BFS(Node *root)

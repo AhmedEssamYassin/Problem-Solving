@@ -5,31 +5,31 @@ using namespace std;
 
 void primeFactorize(ll N, vector<ll> &primeFactors)
 {
-    while (!(N & 1))
-        primeFactors.push_back(2), N >>= 1;
-    for (ll i{3}; i * i <= N; i += 2)
-    {
-        while (N % i == 0)
-            primeFactors.push_back(i), N /= i;
-    }
-    if (N > 1) // N is prime
-        primeFactors.push_back(N);
-    sort(primeFactors.begin(), primeFactors.end());
+	while (!(N & 1))
+		primeFactors.push_back(2), N >>= 1;
+	for (ll i{3}; i * i <= N; i += 2)
+	{
+		while (N % i == 0)
+			primeFactors.push_back(i), N /= i;
+	}
+	if (N > 1) // N is prime
+		primeFactors.push_back(N);
+	sort(primeFactors.begin(), primeFactors.end());
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N;
-    cin >> t;
-    while (t--)
-    {
-    }
-    return 0;
+	int t = 1;
+	ll N;
+	cin >> t;
+	while (t--)
+	{
+	}
+	return 0;
 }

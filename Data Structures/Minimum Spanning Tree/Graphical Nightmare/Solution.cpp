@@ -77,7 +77,7 @@ struct DSU
 pair<vector<vector<ll>>, ll> buildMST(vector<Edge> &edges, ll N)
 {
 	DSU disjointSet(N + 1);
-	vector<vector<ll>> mst(N + 1);	  // Adjacency list for MST
+	vector<vector<ll>> mst(N + 1);    // Adjacency list for MST
 	sort(edges.begin(), edges.end()); // Sort edges by cost
 	ll mstCost{};
 	for (const auto &[u, v, cost] : edges)

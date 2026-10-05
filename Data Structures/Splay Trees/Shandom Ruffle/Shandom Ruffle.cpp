@@ -214,8 +214,8 @@ public:
 	{
 		// Always navigate left until we can't anymore
 		return find(tree, [&](const SplayTree *temp)
-					{ return 1; })
-			.first;
+		            { return 1; })
+		    .first;
 	}
 
 	/**
@@ -227,8 +227,8 @@ public:
 	{
 		// Always navigate right until we can't anymore
 		return find(tree, [&](const SplayTree *temp)
-					{ return -1; })
-			.first;
+		            { return -1; })
+		    .first;
 	}
 
 	static SplayTree *merge(SplayTree *LHS, SplayTree *RHS)
@@ -376,14 +376,14 @@ public:
 		// Now merge in the new order:
 		// [1, i - 1] + [k, l] + [j + 1, k - 1] + [i, j] + rest
 		spTree = SplayTree::merge(
-			leftPart,
-			SplayTree::merge(
-				secondRange,
-				SplayTree::merge(
-					middle2,
-					SplayTree::merge(
-						firstRange,
-						lastPart))));
+		    leftPart,
+		    SplayTree::merge(
+		        secondRange,
+		        SplayTree::merge(
+		            middle2,
+		            SplayTree::merge(
+		                firstRange,
+		                lastPart))));
 	}
 	// Helper function to free memory of deleted nodes
 	void freeNodes(SplayTree *treeNode)

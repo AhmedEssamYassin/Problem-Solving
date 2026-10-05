@@ -44,7 +44,7 @@ int main()
 				Minimum_number_of_soldiers += number_of_needed_soldiers - number_of_remaining_soldiers; // Recruiting more soldiers to reach the number_of_needed_soldiers
 				number_of_remaining_soldiers = V[i].first;
 			}
-			else													// Remaining soldiers are enough to win the battle so we don't have to recruit more soldiers
+			else                                                    // Remaining soldiers are enough to win the battle so we don't have to recruit more soldiers
 				number_of_remaining_soldiers -= V[i].second.second; // Subtracting the number of killed soldiers
 		}
 		cout << Minimum_number_of_soldiers;

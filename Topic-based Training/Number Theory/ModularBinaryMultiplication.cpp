@@ -6,35 +6,35 @@ using namespace std;
 template <typename T>
 T mult128(T a, T b, T mod)
 {
-    T result = 0; // Initialize result
+	T result = 0; // Initialize result
 
-    for (a %= mod; b > 0; a <<= 1, b >>= 1)
-    {
-        if (a >= mod)
-            a -= mod;
-        if (b & 1) // b is ODD
-        {
-            result += a;
-            if (result >= mod)
-                result -= mod;
-        }
-    }
-    return result;
+	for (a %= mod; b > 0; a <<= 1, b >>= 1)
+	{
+		if (a >= mod)
+			a -= mod;
+		if (b & 1) // b is ODD
+		{
+			result += a;
+			if (result >= mod)
+				result -= mod;
+		}
+	}
+	return result;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N;
-    cin >> t;
-    while (t--)
-    {
-    }
-    return 0;
+	int t = 1;
+	ll N;
+	cin >> t;
+	while (t--)
+	{
+	}
+	return 0;
 }

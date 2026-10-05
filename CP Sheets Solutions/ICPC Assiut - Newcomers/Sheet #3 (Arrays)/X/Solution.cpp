@@ -51,13 +51,13 @@ int main()
 		cin >> X >> Y;
 		X--, Y--;
 		if (Is_OK(X, Y, UP) &&
-			Is_OK(X, Y, UP_RIGHT) &&
-			Is_OK(X, Y, RIGHT) &&
-			Is_OK(X, Y, DOWN_RIGHT) &&
-			Is_OK(X, Y, DOWN) &&
-			Is_OK(X, Y, DOWN_LEFT) &&
-			Is_OK(X, Y, LEFT) &&
-			Is_OK(X, Y, UP_LEFT))
+		    Is_OK(X, Y, UP_RIGHT) &&
+		    Is_OK(X, Y, RIGHT) &&
+		    Is_OK(X, Y, DOWN_RIGHT) &&
+		    Is_OK(X, Y, DOWN) &&
+		    Is_OK(X, Y, DOWN_LEFT) &&
+		    Is_OK(X, Y, LEFT) &&
+		    Is_OK(X, Y, UP_LEFT))
 			cout << "yes";
 		else
 			cout << "no";

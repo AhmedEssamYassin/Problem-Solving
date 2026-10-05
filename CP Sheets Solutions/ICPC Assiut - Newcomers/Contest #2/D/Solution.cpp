@@ -25,8 +25,8 @@ When this "very close to 4.11" number is multiplied by 100 for example, the ceil
 To overcome this problem we use:
 ll Ceil(ll a, ll b)
 {
-	// For a,b > 0
-	return (a + b - 1) / b;
+    // For a,b > 0
+    return (a + b - 1) / b;
 }
 -------------------------------------------------------------------------------------------------------------------------------------
 First Number to be a multiple of Y after X:

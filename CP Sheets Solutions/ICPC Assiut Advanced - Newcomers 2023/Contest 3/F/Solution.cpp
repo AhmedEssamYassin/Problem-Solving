@@ -14,21 +14,21 @@ Solutions to this problem:
 
 ll Mod_Mult(ll a, ll b, ll mod) //(a*b)%mod
 {
-	ll res = 0; // Initialize result
+    ll res = 0; // Initialize result
 
-	for (a %= mod; b > 0; a <<= 1, b >>= 1)
-	{
-		if (a >= mod)
-			a -= mod;
-		if (b & 1)
-		{
-			res += a;
-			if (res >= mod)
-				res -= mod;
-		}
-	}
+    for (a %= mod; b > 0; a <<= 1, b >>= 1)
+    {
+        if (a >= mod)
+            a -= mod;
+        if (b & 1)
+        {
+            res += a;
+            if (res >= mod)
+                res -= mod;
+        }
+    }
 
-	return res;
+    return res;
 }
 -----------------------------------------------------
 2. Multiplication via type __int128
@@ -133,8 +133,8 @@ ll Ans{1};
 ll mod=pow(10,k);
 while(N--)
 {
-	cin>>num;
-	Ans = (Ans%mod * num%mod)%mod;
+    cin>>num;
+    Ans = (Ans%mod * num%mod)%mod;
 }
 if(Ans==0)
 cout<<string(k,'0')<<endl;
@@ -186,39 +186,39 @@ The concept of cyclicity of numbers can be learned by figuring out the unit digi
 These numbers can be broadly classified and listed as follows:
 
 Number		d^1		d^2		d^3		d^4		Cyclicity
-	0			0		0		0		0			1
-	1			1		1		1		1			1
-	2			2		4		8		16			4
-	3			3		9		27		81			4
-	4			4		16		64		256			2
-	5			5		25		125		625			1
-	6			6		36		216		1296		1
-	7			7		49		343		2401		4
-	8			8		64		512		4096		4
-	9			9		81		729		6561		2
+    0			0		0		0		0			1
+    1			1		1		1		1			1
+    2			2		4		8		16			4
+    3			3		9		27		81			4
+    4			4		16		64		256			2
+    5			5		25		125		625			1
+    6			6		36		216		1296		1
+    7			7		49		343		2401		4
+    8			8		64		512		4096		4
+    9			9		81		729		6561		2
 
 Let's define a function that gets the last digit of a number (N^X),
 int Get_Last_Digit(ll N, ll X)
 {
-	if(X==0)
-	return 1;//N^0 = 1
+    if(X==0)
+    return 1;//N^0 = 1
 
-	short int d = N%10;//Last digit of N
-	short int Power;
+    short int d = N%10;//Last digit of N
+    short int Power;
 
-	//If d is of cyclicity 1
-	if(d==1 or d==5 or d==6)
-	return d;
+    //If d is of cyclicity 1
+    if(d==1 or d==5 or d==6)
+    return d;
 
-	//If d is of cyclicity 2
-	if(d==4 or d==9)
-	Power = X%2 == 0? 2 : X%2 ;//Because if (X%2 == 0), Power should be 2 or an equivalent power to 2
+    //If d is of cyclicity 2
+    if(d==4 or d==9)
+    Power = X%2 == 0? 2 : X%2 ;//Because if (X%2 == 0), Power should be 2 or an equivalent power to 2
 
-	//If d is of cyclicity 4
-	if(d==2 or d==3 or d==7 or d==8)
-	Power = X%4 == 0 ? 4 : X%4 ;//Because if (X%4 == 0), Power should be 4 or an equivalent power to 4
+    //If d is of cyclicity 4
+    if(d==2 or d==3 or d==7 or d==8)
+    Power = X%4 == 0 ? 4 : X%4 ;//Because if (X%4 == 0), Power should be 4 or an equivalent power to 4
 
-	return Mod_Bin_Exp(d,Power,10);//returns (N^Power)%10 which is the last digit of (d^X)
+    return Mod_Bin_Exp(d,Power,10);//returns (N^Power)%10 which is the last digit of (d^X)
 }
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Counting numbers with same first and last digits in an interval [L, R]
@@ -248,29 +248,29 @@ Q[L,R] = Q[1,R] - Q[1,L-1]
 //To calculate Q[1,X]
 ll Q(ll X)
 {
-	short int First_Digit, Last_Digit;
-	if(X<10)
-	return X;
+    short int First_Digit, Last_Digit;
+    if(X<10)
+    return X;
 
-	ll Ans = (X/10) + 9;
+    ll Ans = (X/10) + 9;
 
-	First_Digit = X/(long long)pow(10,floor(log10(X)+1) -1);
-	Last_Digit = X%10;
-	if(Last_Digit < First_Digit)
-	Ans--;
+    First_Digit = X/(long long)pow(10,floor(log10(X)+1) -1);
+    Last_Digit = X%10;
+    if(Last_Digit < First_Digit)
+    Ans--;
 
-	return Ans;
+    return Ans;
 }
 
 ll Numbers_in_range(ll L,ll R)
 {
-	//Calculate Q[1,R]
-	ll Query_to_end = Q(R);
+    //Calculate Q[1,R]
+    ll Query_to_end = Q(R);
 
-	//Calculate Q[1,L-1]
-	ll Query_from_start = Q(L-1);
+    //Calculate Q[1,L-1]
+    ll Query_from_start = Q(L-1);
 
-	return (Query_to_end - Query_from_start);
+    return (Query_to_end - Query_from_start);
 }
 */
 int Get_Last_Digit(ll N, ll X)

@@ -19,13 +19,13 @@ int main()
 		int N;
 		cin >> N;
 		int *fallen{new int[N + 1]{0}}; // To mark the fallen snakes; 0 means NOT fallen yet and 1 means it has ALREADY fallen
-		int next_to_print = N;			// Stores the size of the following snake to print
+		int next_to_print = N;          // Stores the size of the following snake to print
 		int j{next_to_print};
 		for (int i{}; i < N; i++)
 		{
 			int x;
 			cin >> x;
-			fallen[x] = 1;		// Mark as fallen
+			fallen[x] = 1;      // Mark as fallen
 			for (; j >= 1; j--) // Didn't put an initialization statement in order to continue on values of j which represents the next_to_print snake's size
 			{
 				if (fallen[j])

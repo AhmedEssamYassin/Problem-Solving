@@ -72,21 +72,21 @@ By observation, in gray code, every bit is Xor of its bit and next one.
 
 int grayCode(int i)
 {
-	return i ^ (i >> 1);
+    return i ^ (i >> 1);
 }
 
 void printAllSubsetsGray(int len)
 {
-	for (int i = 0; i < (1 << len) - 1; ++i)
-	{
-		printNumber(i, len);
-		cout << "\t\t";
+    for (int i = 0; i < (1 << len) - 1; ++i)
+    {
+        printNumber(i, len);
+        cout << "\t\t";
 
-		printNumber(grayCode(i), len);
+        printNumber(grayCode(i), len);
 
-		cout << "\t" << __builtin_popcount(grayCode(i));
-		cout << "\n";
-	}
+        cout << "\t" << __builtin_popcount(grayCode(i));
+        cout << "\n";
+    }
 }
 
 // What about print all subsets of a GIVEN MASK. Easily recursive, let's do it iterative
@@ -95,10 +95,10 @@ void printAllSubsetsGray(int len)
 // Let's first assume, mask was complete and we work on it reverse
 void PrintAllSubsetsAllOnes(int len)
 {
-	int mask = (1 << len) - 1; // mask = 1111 for len = 4;
+    int mask = (1 << len) - 1; // mask = 1111 for len = 4;
 
-	for (int i = mask; i >= 0; i = i - 1)
-		printNumber(i, len);
+    for (int i = mask; i >= 0; i = i - 1)
+        printNumber(i, len);
 }
 
 // So we decrease -1 to get next. Do u remember effect of X-1?

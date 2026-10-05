@@ -83,8 +83,8 @@ ll Ans{1};
 ll mod = pow(10, k);
 while(N--)
 {
-	cin >> num;
-	Ans = (Ans % mod * num % mod) % mod;
+    cin >> num;
+    Ans = (Ans % mod * num % mod) % mod;
 }
 
 cout << setw(k) << setfill('0') << Ans;
@@ -121,16 +121,16 @@ The concept of cyclicity of numbers can be learned by figuring out the unit digi
 These numbers can be broadly classified and listed as follows:
 
 Number		d^1		d^2		d^3		d^4		Cyclicity
-	0			0		0		0		0			1
-	1			1		1		1		1			1
-	2			2		4		8		16			4
-	3			3		9		27		81			4
-	4			4		16		64		256			2
-	5			5		25		125		625			1
-	6			6		36		216		1296		1
-	7			7		49		343		2401		4
-	8			8		64		512		4096		4
-	9			9		81		729		6561		2
+    0			0		0		0		0			1
+    1			1		1		1		1			1
+    2			2		4		8		16			4
+    3			3		9		27		81			4
+    4			4		16		64		256			2
+    5			5		25		125		625			1
+    6			6		36		216		1296		1
+    7			7		49		343		2401		4
+    8			8		64		512		4096		4
+    9			9		81		729		6561		2
 
 Let's define a function that gets the last digit of a number (N^X),
 */

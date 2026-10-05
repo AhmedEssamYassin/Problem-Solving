@@ -24,7 +24,7 @@ struct Query
 	int bL, bR;
 
 	Query(int l, int r, int t, int id, int blockSize)
-		: l(l), r(r), t(t), id(id), bL(l / blockSize), bR(r / blockSize) {}
+	    : l(l), r(r), t(t), id(id), bL(l / blockSize), bR(r / blockSize) {}
 
 	bool operator<(const Query &o) const
 	{
@@ -44,9 +44,9 @@ struct Update
 
 template <typename AddFn, typename RemoveFn, typename AnswerFn>
 vector<ll> runMo(vector<Query> queries, const vector<Update> &updates,
-				 vector<ll> &vc,
-				 AddFn add, RemoveFn remove,
-				 AnswerFn getAnswer)
+                 vector<ll> &vc,
+                 AddFn add, RemoveFn remove,
+                 AnswerFn getAnswer)
 {
 	sort(queries.begin(), queries.end());
 

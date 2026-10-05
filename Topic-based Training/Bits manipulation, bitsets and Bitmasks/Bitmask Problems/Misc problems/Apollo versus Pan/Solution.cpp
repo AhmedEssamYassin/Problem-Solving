@@ -24,11 +24,11 @@ int main()
 	Now, we need to calculate ∑ (a[i] & a[j]) and also ∑ (a[j] | a[k]) fast enough
 	Let's fix a[j] = C, and look carefully at the binary representation of C
 	- If a bit is set (1) in C:
-		- It will be also set (1) when ANDed with every number having this bit set
-		- It will always be set (1) when ORed with every number
+	    - It will be also set (1) when ANDed with every number having this bit set
+	    - It will always be set (1) when ORed with every number
 	- Else if a bit is cleared (0) in C:
-		- It CANNOT be set in when ANDed with any number
-		- It will be set (1) when ORed with every number having this bit set
+	    - It CANNOT be set in when ANDed with any number
+	    - It will be set (1) when ORed with every number having this bit set
 	and since we are adding terms ANDed or ORed with C
 	we need to maintain the frequency of every bit, in how many numbers it was set
 	Then we just add (1LL << i) * (number of terms will have this bit set when ANDed or ORed)

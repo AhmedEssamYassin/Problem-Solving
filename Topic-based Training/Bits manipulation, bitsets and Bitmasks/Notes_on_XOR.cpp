@@ -82,7 +82,7 @@ int Find_The_Missing_Number(vector<int> &arr)
 	/*
 	ll sum{};
 	for (int i{}; i < arr.size(); i++)
-		sum += arr[i];
+	    sum += arr[i];
 	return (N * (N + 1) / 2 - sum);
 	*/
 	int A{}, B{};

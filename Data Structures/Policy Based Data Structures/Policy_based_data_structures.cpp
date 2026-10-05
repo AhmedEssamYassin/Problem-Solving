@@ -16,37 +16,37 @@ using ordered_multiset = tree<T, null_type, less_equal<T>, rb_tree_tag, tree_ord
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N, K;
-    // cin >> t;
-    while (t--)
-    {
-        cin >> N;
-        // a[i] + a[j] > b[i] + b[j]
-        // a[i] - b[i] > b[j] - a[j]
-        vector<ll> a(N), b(N), diff(N);
-        for (int i{}; i < N; i++)
-            cin >> a[i];
-        for (int i{}; i < N; i++)
-            cin >> b[i];
-        for (int i{}; i < N; i++)
-            diff[i] = a[i] - b[i];
-        ll cnt{};
-        ordered_multiset<ll> X;
-        for (int i{}; i < N; i++)
-        {
-            ll lessThanMe = 0;
-            lessThanMe += X.order_of_key(diff[i]);
-            cnt += lessThanMe;
-            X.insert(-diff[i]);
-        }
-        cout << cnt;
-    }
-    return 0;
+	int t = 1;
+	ll N, K;
+	// cin >> t;
+	while (t--)
+	{
+		cin >> N;
+		// a[i] + a[j] > b[i] + b[j]
+		// a[i] - b[i] > b[j] - a[j]
+		vector<ll> a(N), b(N), diff(N);
+		for (int i{}; i < N; i++)
+			cin >> a[i];
+		for (int i{}; i < N; i++)
+			cin >> b[i];
+		for (int i{}; i < N; i++)
+			diff[i] = a[i] - b[i];
+		ll cnt{};
+		ordered_multiset<ll> X;
+		for (int i{}; i < N; i++)
+		{
+			ll lessThanMe = 0;
+			lessThanMe += X.order_of_key(diff[i]);
+			cnt += lessThanMe;
+			X.insert(-diff[i]);
+		}
+		cout << cnt;
+	}
+	return 0;
 }

@@ -139,8 +139,8 @@ int main()
 		Going through the suffixes in sorted order, the first lcp[i - 1] prefixes of
 		SA[i] already appeared as prefixes of SA[i - 1], so only the rest are new:
 
-			new(i) = (n - SA[i]) - lcp[i - 1]    for i >= 1
-			new(0) = n - SA[0]
+		    new(i) = (n - SA[i]) - lcp[i - 1]    for i >= 1
+		    new(0) = n - SA[0]
 
 		Any earlier suffix that shares a prefix with SA[i] shares it with SA[i - 1] too,
 		because sorted order makes the shared prefixes nested. That is why subtracting

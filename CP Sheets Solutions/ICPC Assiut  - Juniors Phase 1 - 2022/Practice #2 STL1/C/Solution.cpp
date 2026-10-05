@@ -24,10 +24,10 @@ int main()
 		{
 			cin >> tag;
 			if (i == 0 && tag != "Header") //"Header" should be the first tag
-				Valid = false;			   // Don't break until you parse all input, it's a bad practice
+				Valid = false;             // Don't break until you parse all input, it's a bad practice
 
 			if (i == N - 1 && tag != "EndHeader") //"EndHeader" should be the last tag
-				Valid = false;					  // Don't break until you parse all input, it's a bad practice
+				Valid = false;                    // Don't break until you parse all input, it's a bad practice
 
 			if ((i > 0 && tag == "Header") || (i < N - 1 && tag == "EndHeader"))
 				Valid = false;

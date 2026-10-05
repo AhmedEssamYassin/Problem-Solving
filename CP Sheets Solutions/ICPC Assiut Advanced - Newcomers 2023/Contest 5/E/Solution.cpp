@@ -59,7 +59,7 @@ int main()
 		if (Input[i] != Input[N - i - 1])
 		{
 			if (L == -1) // Didn't move yet
-				L = i;	 // Stores the position of the First character to mismatch
+				L = i;   // Stores the position of the First character to mismatch
 
 			R = i; // Stores the position of the Last character to mismatch
 		}

@@ -52,7 +52,7 @@ vector<int> primes;
 bitset<3001> isPrime;
 void linearSieveOfEratosthenes(int N)
 {
-	isPrime.set();				 // Initially Assuming all numbers to be primes
+	isPrime.set();               // Initially Assuming all numbers to be primes
 	isPrime[0] = isPrime[1] = 0; // 0 and 1 are NOT primes
 	for (long long i{2}; i <= N; i++)
 	{

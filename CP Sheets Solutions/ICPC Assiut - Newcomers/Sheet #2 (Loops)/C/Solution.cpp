@@ -28,9 +28,9 @@ int main()
 			Odd++;
 	}
 	cout << "Even: " << Even << endl
-		 << "Odd: " << Odd << endl
-		 << "Positive: " << Pos << endl
-		 << "Negative: " << Neg << endl;
+	     << "Odd: " << Odd << endl
+	     << "Positive: " << Pos << endl
+	     << "Negative: " << Neg << endl;
 
 	return 0;
 }

@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
-#include <algorithm>
 using namespace std;
 #define ll long long
 #define endl "\n"

@@ -23,8 +23,8 @@ int main()
 		map<char, char> closing = {{'(', ')'}, {'{', '}'}, {'[', ']'}, {'<', '>'}};
 		map<char, char> opening = {{')', '('}, {'}', '{'}, {']', '['}, {'>', '<'}};
 
-		vector<ll> d(N, -1);		// Position of corresponding open bracket, or -1 if it doesn't exist.
-		vector<ll> c(N, -1);		// Position of earliest open bracket, such that substring s[c[j], j] is a regular bracket sequence.
+		vector<ll> d(N, -1);        // Position of corresponding open bracket, or -1 if it doesn't exist.
+		vector<ll> c(N, -1);        // Position of earliest open bracket, such that substring s[c[j], j] is a regular bracket sequence.
 		stack<pair<char, int>> stk; // Stores (bracket, index)
 		for (int i{}; i < N; i++)
 		{

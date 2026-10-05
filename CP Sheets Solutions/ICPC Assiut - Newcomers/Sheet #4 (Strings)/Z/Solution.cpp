@@ -30,7 +30,7 @@ int main()
 				/*
 				--> Now we start to be inside a comment --> Not_inside_comment = false
 				// --> This is a comment that is inside a multi-line comment
-					   Do NOT ignore the whole line, it's possible to contain the comment closing */
+				       Do NOT ignore the whole line, it's possible to contain the comment closing */
 				if (Line[i] == '/' && Line[i + 1] == '/' && Not_inside_comment)
 					break;
 				else if (Line[i] == '/' && Line[i + 1] == '*')

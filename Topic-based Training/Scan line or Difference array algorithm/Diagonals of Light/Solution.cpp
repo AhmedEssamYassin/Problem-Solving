@@ -35,10 +35,10 @@ int main()
 			{
 				if (vc[i][j] == 1)
 				{
-					rightDiffArr[i - min(i, j) + 1][j - min(i, j) + 1] += 1;				 // Top-left
+					rightDiffArr[i - min(i, j) + 1][j - min(i, j) + 1] += 1;                 // Top-left
 					rightDiffArr[i + min(N - i, M - j) + 1][j + min(N - i, M - j) + 1] -= 1; // Bottom-right
 
-					leftDiffArr[i - min(i - 1LL, M - j)][j + min(i - 1LL, M - j)] += 1;			// Top-right
+					leftDiffArr[i - min(i - 1LL, M - j)][j + min(i - 1LL, M - j)] += 1;         // Top-right
 					leftDiffArr[i + min(N - i, j - 1LL) + 1][j - min(N - i, j - 1LL) - 1] -= 1; // Bottom-left
 				}
 			}

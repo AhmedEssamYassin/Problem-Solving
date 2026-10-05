@@ -174,80 +174,80 @@ it simply clears the rightmost set bit and counts it iteratively until the numbe
 template <typename T>
 void setIthBit(T &N, uint16_t i) // 0-based
 {
-    // 11100101(0)11 | 00000000(1)00 = 11100101(1)11
-    N = (N | (T(1) << i));
+	// 11100101(0)11 | 00000000(1)00 = 11100101(1)11
+	N = (N | (T(1) << i));
 }
 
 template <typename T>
 void flipIthBit(T &N, uint16_t i) // 0-based
 {
-    // 111001010(1)1 ^ 000000000(1)0 = 111001010(0)1
-    N = (N ^ (T(1) << i));
+	// 111001010(1)1 ^ 000000000(1)0 = 111001010(0)1
+	N = (N ^ (T(1) << i));
 }
 
 template <typename T>
 void clearIthBit(T &N, uint16_t i) // 0-based
 {
-    // 1110010(1)011 & 1111111(0)111 = 1110010(0)011
-    N = (N & ~(T(1) << i));
+	// 1110010(1)011 & 1111111(0)111 = 1110010(0)011
+	N = (N & ~(T(1) << i));
 }
 
 template <typename T>
 bool checkIthBitSet(T &N, uint16_t i) // 0-based
 {
-    // 11100101(0)11 & 00000000(1)00 = 00000000000 (it's a cleared bit)
-    return (N & (T(1) << i));
-    // return ((N >> i) & 1) == 1; // 110100, i = 4  -->  110 & 1 = 0
+	// 11100101(0)11 & 00000000(1)00 = 00000000000 (it's a cleared bit)
+	return (N & (T(1) << i));
+	// return ((N >> i) & 1) == 1; // 110100, i = 4  -->  110 & 1 = 0
 }
 
 template <typename T>
 void clearRightmostSetBit(T &N)
 {
-    // 11100101(1)00 & 11100101(0)11 = 11100101(0)00
-    N = (N & (N - 1));
+	// 11100101(1)00 & 11100101(0)11 = 11100101(0)00
+	N = (N & (N - 1));
 }
 
 template <typename T>
 int countSetBits(T N)
 {
-    int cnt{};
+	int cnt{};
 
-    while (N)
-    {
-        clearRightmostSetBit(N);
-        cnt++;
-    }
-    return cnt;
+	while (N)
+	{
+		clearRightmostSetBit(N);
+		cnt++;
+	}
+	return cnt;
 }
 
 template <typename T>
 int countClearedBits(T N)
 {
-    int MSB = 31 - __builtin_clz(N); // For signed integers
-    return __builtin_popcount(N ^ ((T(1) << ++MSB) - 1));
+	int MSB = 31 - __builtin_clz(N); // For signed integers
+	return __builtin_popcount(N ^ ((T(1) << ++MSB) - 1));
 }
 
 template <typename T>
 void clearTrailingOnes(T &N)
 {
-    // 111001010(11) & 111001011(00) = 111001010(00)
-    N = (N & (N + 1));
+	// 111001010(11) & 111001011(00) = 111001010(00)
+	N = (N & (N + 1));
 }
 
 template <typename T>
 void setLastClearedBit(T &N)
 {
-    // 11100101(0)11 | 11100101(1)00 = 11100101(1)11
-    N = (N | (N + 1));
+	// 11100101(0)11 | 11100101(1)00 = 11100101(1)11
+	N = (N | (N + 1));
 }
 
 template <typename T>
 int getRightmostSetBitNumber(const T &N)
 {
-    // 11100101(1)00 & ~(11100101(0)11) = 11100101(1)00 & 00011010(1)00 = 00000000(1)00
-    return (N & ~(N - 1));
-    // return (N & (-N));
-    // return log2(N & (N - 1)) + 1; // gives the index of the rightmost set bit (0-indexed)
+	// 11100101(1)00 & ~(11100101(0)11) = 11100101(1)00 & 00011010(1)00 = 00000000(1)00
+	return (N & ~(N - 1));
+	// return (N & (-N));
+	// return log2(N & (N - 1)) + 1; // gives the index of the rightmost set bit (0-indexed)
 }
 
 /*
@@ -316,12 +316,12 @@ Then add 1 to count N itself
 template <typename T>
 int countKthBitSet(const T &N, const int &K)
 {
-    int res = (N >> (K + 1)) << K;
+	int res = (N >> (K + 1)) << K;
 
-    if (N & (T(1) << K))
-        res += (N & ((T(1) << K) - 1)) + 1; // Adds 1 to count N itself
+	if (N & (T(1) << K))
+		res += (N & ((T(1) << K) - 1)) + 1; // Adds 1 to count N itself
 
-    return res;
+	return res;
 }
 
 /*
@@ -336,8 +336,8 @@ It's also a way to count the  number of times a number N can be divided by 2
 template <typename T>
 bool isDivisibleBy2pK(const T &N, const int &K)
 {
-    int Val = __builtin_ctz(N); // Number of times a number N can be divided by 2
-    return (Val >= K);
+	int Val = __builtin_ctz(N); // Number of times a number N can be divided by 2
+	return (Val >= K);
 }
 
 /*
@@ -530,12 +530,12 @@ bool isVisited(int i)
 */
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
 
-    return 0;
+	return 0;
 }

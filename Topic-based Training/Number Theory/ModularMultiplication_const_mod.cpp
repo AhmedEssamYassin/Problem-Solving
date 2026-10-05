@@ -8,40 +8,40 @@ const ll mod = 1000000007; // 1e9 + 7
 
 inline ll add64(const ll &a, const ll &b)
 {
-    double_size_t res = double_size_t(a) + b;
-    if (res >= mod)
-        res -= mod;
-    return res;
+	double_size_t res = double_size_t(a) + b;
+	if (res >= mod)
+		res -= mod;
+	return res;
 }
 
 inline ll sub64(const ll &a, const ll &b)
 {
-    double_size_t res = double_size_t(a) - b;
-    if (res < 0)
-        res += mod;
-    if (res >= mod)
-        res -= mod;
-    return res;
+	double_size_t res = double_size_t(a) - b;
+	if (res < 0)
+		res += mod;
+	if (res >= mod)
+		res -= mod;
+	return res;
 }
 
 inline ll mult64(const ll &a, const ll &b)
 {
-    return double_size_t(a) * b % mod;
+	return double_size_t(a) * b % mod;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N;
-    cin >> t;
-    while (t--)
-    {
-    }
-    return 0;
+	int t = 1;
+	ll N;
+	cin >> t;
+	while (t--)
+	{
+	}
+	return 0;
 }

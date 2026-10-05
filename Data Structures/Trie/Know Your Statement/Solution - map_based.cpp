@@ -8,7 +8,7 @@ struct Trie
 	struct Node
 	{
 		map<char, Node *> character;
-		set<int> idxPref;			 // Indices of strings having a prefix at this node
+		set<int> idxPref;            // Indices of strings having a prefix at this node
 		unique_ptr<set<int>> idxEnd; // Indices of strings ending at this node, created on first use
 	};
 

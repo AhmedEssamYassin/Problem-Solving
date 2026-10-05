@@ -368,14 +368,14 @@ int main()
 		cin >> p >> q >> r;
 
 		/*
-			[    a[i]     ]     [ c1  c2  c3  ...  cn   r   q   p ] [ a[i - 1]  ]
-			[   a[i - 1]  ]     [  1   0   0  ...   0   0   0   0 ] [ a[i - 2]  ]
-			[   a[i - 2]  ]     [  0   1   0  ...   0   0   0   0 ] [ a[i - 3]  ]
-			[      ...    ]  =  [  0   0   1  ...   0   0   0   0 ] [    ...    ]
-			[ a[i - n + 1]]     [  0   0   0  ...   1   0   0   0 ] [ a[i - n]  ]
-			[   (i + 1)²  ]     [  0   0   0  ...   0   1   2   1 ] [    i²     ]
-			[    i + 1    ]     [  0   0   0  ...   0   0   1   1 ] [    i      ]
-			[      1      ]     [  0   0   0  ...   0   0   0   1 ] [    1      ]
+		    [    a[i]     ]     [ c1  c2  c3  ...  cn   r   q   p ] [ a[i - 1]  ]
+		    [   a[i - 1]  ]     [  1   0   0  ...   0   0   0   0 ] [ a[i - 2]  ]
+		    [   a[i - 2]  ]     [  0   1   0  ...   0   0   0   0 ] [ a[i - 3]  ]
+		    [      ...    ]  =  [  0   0   1  ...   0   0   0   0 ] [    ...    ]
+		    [ a[i - n + 1]]     [  0   0   0  ...   1   0   0   0 ] [ a[i - n]  ]
+		    [   (i + 1)²  ]     [  0   0   0  ...   0   1   2   1 ] [    i²     ]
+		    [    i + 1    ]     [  0   0   0  ...   0   0   1   1 ] [    i      ]
+		    [      1      ]     [  0   0   0  ...   0   0   0   1 ] [    1      ]
 		*/
 		// Handle base cases
 		if (k < n)
@@ -387,7 +387,7 @@ int main()
 		Matrix14by14 mat;
 		for (int j = 0; j < n; j++)
 			mat[0][j] = c[j];
-		mat[0][n] = r;	   // coefficient for i²
+		mat[0][n] = r;     // coefficient for i²
 		mat[0][n + 1] = q; // coefficient for i
 		mat[0][n + 2] = p; // coefficient for constant 1
 
@@ -396,7 +396,7 @@ int main()
 			mat[i][i - 1] = 1;
 
 		// Row n: transition for i² -> (i + 1)² = i² + 2i + 1
-		mat[n][n] = 1;	   // i²
+		mat[n][n] = 1;     // i²
 		mat[n][n + 1] = 2; // 2 * i
 		mat[n][n + 2] = 1; // +1 (constant)
 
@@ -412,10 +412,10 @@ int main()
 		for (int i = 0; i < n; i++)
 			state[i][0] = a[n - i - 1]; // a[n - 1], a[n - 2], ..., a[0]
 
-		ll idx = n;					   // current index (0-based)
+		ll idx = n;                    // current index (0-based)
 		state[n][0] = Mint(idx * idx); // (n - 1)²
 		state[n + 1][0] = Mint(idx);   // (n - 1)
-		state[n + 2][0] = Mint(1);	   // constant 1
+		state[n + 2][0] = Mint(1);     // constant 1
 
 		// Apply transition (k - n + 1) times to get to position k
 		auto result = mat.matrixPower(k - n + 1) * state;

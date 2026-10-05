@@ -36,10 +36,10 @@ int main()
 		}
 		if (!EVENs.empty())
 			cout << 1 << endl
-				 << EVENs[0].second << endl;
+			     << EVENs[0].second << endl;
 		else if (ODDs.size() >= 2)
 			cout << 2 << endl
-				 << ODDs[0].second << " " << ODDs.back().second << endl;
+			     << ODDs[0].second << " " << ODDs.back().second << endl;
 		else
 			cout << -1 << endl;
 	}

@@ -115,7 +115,7 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 		{
 			// Update the lazy value
-			if (type == 1)				   // Assign
+			if (type == 1)                 // Assign
 				lazy[node] = {val, false}; // Assignment overwrites Flipping
 
 			else if (type == 2) // Flip

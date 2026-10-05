@@ -19,8 +19,8 @@ In other words, the prime number N is a positive integer greater than 1 that has
 3. Two and Three are the ONLY two consecutive natural numbers that are primes.
 4. Every EVEN integer greater than 2 can be expressed as the sum of two primes (Goldbach's conjecture).
 5. Fermat's Little Theorem:
-	If N is a prime number, then for every a, where 1 <= a < N,
-	a^(N-1) % N = 1
+    If N is a prime number, then for every a, where 1 <= a < N,
+    a^(N-1) % N = 1
 
 |---------------------------|
 |Properties of prime numbers|
@@ -57,12 +57,12 @@ If N is divisible by any of them, then N is NOT prime. Otherwise, N is prime
 
 bool isPrime(ll N)
 {
-	for(ll i=2,i<N;i++)
-	{
-		if(N%i==0)
-		return false;
-	}
-	return true;
+    for(ll i=2,i<N;i++)
+    {
+        if(N%i==0)
+        return false;
+    }
+    return true;
 }
 
 Time Complexity: O(N) which is very slow
@@ -91,12 +91,12 @@ a * b > N , So b CANNOT be any positive integer >= 2; thus ( (N/2) < a < N ) is 
 
 bool isPrime(ll N)
 {
-	for(ll i=2,i <= N/2;i++)
-	{
-		if(N % i == 0)
-		return false;
-	}
-	return true;
+    for(ll i=2,i <= N/2;i++)
+    {
+        if(N % i == 0)
+        return false;
+    }
+    return true;
 }
 
 but still Time Complexity is O(0.5 N) which is === O(N)
@@ -135,12 +135,12 @@ because the numbers [2, sqrt(N)] are way less than the numbers [sqrt(N), N]
 
 bool isPrime(ll N)
 {
-	for(ll i=2;i <= sqrt(N);i++)
-	{
-		if(N % i == 0)
-		return false;
-	}
-	return true;
+    for(ll i=2;i <= sqrt(N);i++)
+    {
+        if(N % i == 0)
+        return false;
+    }
+    return true;
 }
 Time Complexity: O(sqrt(N))
 

@@ -26,54 +26,54 @@ Final Answer:
 
 string LCS(const string &S, const string &T)
 {
-    int n = S.length();
-    int m = T.length();
-    vector<vector<ll>> dp(n + 1, vector<ll>(m + 1));
-    for (int i = 1; i <= n; i++)
-    {
-        for (int j = 1; j <= m; j++)
-        {
-            if (S[i - 1] == T[j - 1]) // Match
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-            else // Mismatch
-                dp[i][j] = max(dp[i][j - 1], dp[i - 1][j]);
-        }
-    }
-    // Backtrack to find LCS string
-    string lcs;
-    int i = n, j = m;
-    while (i > 0 && j > 0)
-    {
-        if (S[i - 1] == T[j - 1])
-        {
-            lcs += S[i - 1];
-            i--;
-            j--;
-        }
-        else if (dp[i - 1][j] > dp[i][j - 1])
-            i--;
-        else
-            j--;
-    }
-    reverse(lcs.begin(), lcs.end());
-    return lcs;
+	int n = S.length();
+	int m = T.length();
+	vector<vector<ll>> dp(n + 1, vector<ll>(m + 1));
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= m; j++)
+		{
+			if (S[i - 1] == T[j - 1]) // Match
+				dp[i][j] = dp[i - 1][j - 1] + 1;
+			else // Mismatch
+				dp[i][j] = max(dp[i][j - 1], dp[i - 1][j]);
+		}
+	}
+	// Backtrack to find LCS string
+	string lcs;
+	int i = n, j = m;
+	while (i > 0 && j > 0)
+	{
+		if (S[i - 1] == T[j - 1])
+		{
+			lcs += S[i - 1];
+			i--;
+			j--;
+		}
+		else if (dp[i - 1][j] > dp[i][j - 1])
+			i--;
+		else
+			j--;
+	}
+	reverse(lcs.begin(), lcs.end());
+	return lcs;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    // cin >> t;
-    while (t--)
-    {
-        string S, T;
-        cin >> S >> T;
-        cout << LCS(S, T);
-    }
-    return 0;
+	int t = 1;
+	// cin >> t;
+	while (t--)
+	{
+		string S, T;
+		cin >> S >> T;
+		cout << LCS(S, T);
+	}
+	return 0;
 }

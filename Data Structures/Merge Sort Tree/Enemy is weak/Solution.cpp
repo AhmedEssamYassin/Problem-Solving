@@ -65,7 +65,7 @@ private:
 		if (left >= leftQuery && right <= rightQuery)
 			return pred(seg[node].range.begin(), seg[node].range.end(), x);
 		return countPred(left, mid, L, leftQuery, rightQuery, x, pred) +
-			   countPred(mid + 1, right, R, leftQuery, rightQuery, x, pred);
+		       countPred(mid + 1, right, R, leftQuery, rightQuery, x, pred);
 	}
 
 public:
@@ -85,22 +85,22 @@ public:
 	int countLess(int leftQuery, int rightQuery, ll x)
 	{
 		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
-						 { return std::lower_bound(begin, end, x) - begin; });
+		                 { return std::lower_bound(begin, end, x) - begin; });
 	}
 	int countLessEq(int leftQuery, int rightQuery, ll x)
 	{
 		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
-						 { return std::upper_bound(begin, end, x) - begin; });
+		                 { return std::upper_bound(begin, end, x) - begin; });
 	}
 	int countGreater(int leftQuery, int rightQuery, ll x)
 	{
 		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
-						 { return end - std::upper_bound(begin, end, x); });
+		                 { return end - std::upper_bound(begin, end, x); });
 	}
 	int countGreaterEq(int leftQuery, int rightQuery, ll x)
 	{
 		return countPred(0, size - 1, 0, leftQuery, rightQuery, x, [](auto begin, auto end, ll x)
-						 { return end - std::lower_bound(begin, end, x); });
+		                 { return end - std::lower_bound(begin, end, x); });
 	}
 #undef L
 #undef R

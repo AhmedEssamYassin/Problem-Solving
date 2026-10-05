@@ -9,113 +9,113 @@ const ll L1D_CACHE_SIZE = 32768;
 template <typename T>
 void getPrimesInRange(T L, T R, vector<T> &res)
 {
-    if (L > R || R < 2)
-        return;
+	if (L > R || R < 2)
+		return;
 
-    // Handle special case for 2
-    if (L <= 2 && R >= 2)
-        res.push_back(2);
+	// Handle special case for 2
+	if (L <= 2 && R >= 2)
+		res.push_back(2);
 
-    // Make L odd if it's even (we only check odd numbers)
-    if (L % 2 == 0)
-        L++;
+	// Make L odd if it's even (we only check odd numbers)
+	if (L % 2 == 0)
+		L++;
 
-    ll sqrtR = sqrtl(R);
-    ll segSize = max(sqrtR, L1D_CACHE_SIZE);
+	ll sqrtR = sqrtl(R);
+	ll segSize = max(sqrtR, L1D_CACHE_SIZE);
 
-    // Generate base primes up to sqrt(R) using simple sieve
-    vector<bool> isPrime(sqrtR + 1, true);
-    isPrime[0] = isPrime[1] = false;
+	// Generate base primes up to sqrt(R) using simple sieve
+	vector<bool> isPrime(sqrtR + 1, true);
+	isPrime[0] = isPrime[1] = false;
 
-    // Only sieve odd numbers for base primes
-    for (ll i = 3; i * i <= sqrtR; i += 2)
-    {
-        if (isPrime[i])
-        {
-            for (ll j = i * i; j <= sqrtR; j += 2 * i)
-                isPrime[j] = false;
-        }
-    }
+	// Only sieve odd numbers for base primes
+	for (ll i = 3; i * i <= sqrtR; i += 2)
+	{
+		if (isPrime[i])
+		{
+			for (ll j = i * i; j <= sqrtR; j += 2 * i)
+				isPrime[j] = false;
+		}
+	}
 
-    // Collect odd primes >= 3 for sieving
-    vector<T> primes;
-    vector<T> multiples;
+	// Collect odd primes >= 3 for sieving
+	vector<T> primes;
+	vector<T> multiples;
 
-    for (ll low = L; low <= R; low += segSize)
-    {
-        ll high = min<ll>(low + segSize - 1, R);
+	for (ll low = L; low <= R; low += segSize)
+	{
+		ll high = min<ll>(low + segSize - 1, R);
 
-        // Use char array for better cache performance
-        vector<char> sieve((high - low) / 2 + 1, true);
+		// Use char array for better cache performance
+		vector<char> sieve((high - low) / 2 + 1, true);
 
-        // Add new primes to our sieving list as needed
-        for (ll p = 3; p * p <= high; p += 2)
-        {
-            if (isPrime[p] && (primes.empty() || p > primes.back()))
-            {
-                primes.push_back(p);
+		// Add new primes to our sieving list as needed
+		for (ll p = 3; p * p <= high; p += 2)
+		{
+			if (isPrime[p] && (primes.empty() || p > primes.back()))
+			{
+				primes.push_back(p);
 
-                // Find first odd multiple of p in range [low, high]
-                ll mult = max(p * p, ((low + p - 1) / p) * p);
-                if (mult % 2 == 0)
-                    mult += p;
+				// Find first odd multiple of p in range [low, high]
+				ll mult = max(p * p, ((low + p - 1) / p) * p);
+				if (mult % 2 == 0)
+					mult += p;
 
-                multiples.push_back((mult - low) / 2);
-            }
-        }
+				multiples.push_back((mult - low) / 2);
+			}
+		}
 
-        // Sieve current segment (only odd numbers)
-        for (size_t i = 0; i < primes.size(); i++)
-        {
-            ll p = primes[i];
-            ll j = multiples[i];
-            ll segLimit = (high - low) / 2;
+		// Sieve current segment (only odd numbers)
+		for (size_t i = 0; i < primes.size(); i++)
+		{
+			ll p = primes[i];
+			ll j = multiples[i];
+			ll segLimit = (high - low) / 2;
 
-            // Mark multiples of p in current segment
-            while (j <= segLimit)
-            {
-                sieve[j] = false;
-                j += p; // Skip by p (since we're dealing with odd numbers only)
-            }
+			// Mark multiples of p in current segment
+			while (j <= segLimit)
+			{
+				sieve[j] = false;
+				j += p; // Skip by p (since we're dealing with odd numbers only)
+			}
 
-            // Update multiple for next segment
-            multiples[i] = j - (segLimit + 1);
-        }
+			// Update multiple for next segment
+			multiples[i] = j - (segLimit + 1);
+		}
 
-        // Collect primes from current segment
-        for (ll i = 0; i <= (high - low) / 2; i++)
-        {
-            if (sieve[i])
-            {
-                ll cand = low + 2 * i;
-                if (cand >= L && cand <= R && cand > 1)
-                    res.push_back(cand);
-            }
-        }
-    }
+		// Collect primes from current segment
+		for (ll i = 0; i <= (high - low) / 2; i++)
+		{
+			if (sieve[i])
+			{
+				ll cand = low + 2 * i;
+				if (cand >= L && cand <= R && cand > 1)
+					res.push_back(cand);
+			}
+		}
+	}
 
-    return;
+	return;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    cin >> t;
-    while (t--)
-    {
-        int L, R;
-        cin >> L >> R;
-        vector<int> primes;
-        getPrimesInRange(L, R, primes);
-        for (const auto &p : primes)
-            cout << p << endl;
-        cout << endl;
-    }
-    return 0;
+	int t = 1;
+	cin >> t;
+	while (t--)
+	{
+		int L, R;
+		cin >> L >> R;
+		vector<int> primes;
+		getPrimesInRange(L, R, primes);
+		for (const auto &p : primes)
+			cout << p << endl;
+		cout << endl;
+	}
+	return 0;
 }

@@ -29,43 +29,43 @@ Time Complexity: O(N * K)
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    // cin >> t;
-    while (t--)
-    {
-        int n;
-        cin >> n;
-        vector<int> vc(n);
-        for (int i = 0; i < n; i++)
-            cin >> vc[i];
+	int t = 1;
+	// cin >> t;
+	while (t--)
+	{
+		int n;
+		cin >> n;
+		vector<int> vc(n);
+		for (int i = 0; i < n; i++)
+			cin >> vc[i];
 
-        if (n <= 1)
-            return cout << n, 0;
+		if (n <= 1)
+			return cout << n, 0;
 
-        // dp[i][0/1] = max zigzag length ending at i
-        // 0 = last transition was decreasing (curr < prev)
-        // 1 = last transition was increasing (curr > prev)
-        vector<vector<int>> dp(n, vector<int>(2, 1));
-        int maxLen = 1;
-        for (int i = 1; i < n; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                if (vc[i] > vc[j])
-                    dp[i][1] = max(dp[i][1], dp[j][0] + 1);
-                else if (vc[i] < vc[j])
-                    dp[i][0] = max(dp[i][0], dp[j][1] + 1);
-            }
-            maxLen = max(maxLen, max(dp[i][0], dp[i][1]));
-        }
+		// dp[i][0/1] = max zigzag length ending at i
+		// 0 = last transition was decreasing (curr < prev)
+		// 1 = last transition was increasing (curr > prev)
+		vector<vector<int>> dp(n, vector<int>(2, 1));
+		int maxLen = 1;
+		for (int i = 1; i < n; i++)
+		{
+			for (int j = 0; j < i; j++)
+			{
+				if (vc[i] > vc[j])
+					dp[i][1] = max(dp[i][1], dp[j][0] + 1);
+				else if (vc[i] < vc[j])
+					dp[i][0] = max(dp[i][0], dp[j][1] + 1);
+			}
+			maxLen = max(maxLen, max(dp[i][0], dp[i][1]));
+		}
 
-        cout << maxLen;
-    }
-    return 0;
+		cout << maxLen;
+	}
+	return 0;
 }

@@ -48,7 +48,7 @@ int main()
 			{
 				auto &vc = mp[suffix_sum];
 				if (find_if(vc.begin(), vc.end(), [&](int j)
-							{ return (j < i); }) != vc.end())
+				            { return (j < i); }) != vc.end())
 					ans = max(ans, suffix_sum);
 			}
 		}

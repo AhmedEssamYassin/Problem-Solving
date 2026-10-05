@@ -42,7 +42,7 @@ int main()
 				return true; // Always place 1 first
 			if (b == 1 && a != 1)
 				return false; // Push non-1s after 1s
-			return a > b;	  // Sort all other numbers in descending order
+			return a > b;     // Sort all other numbers in descending order
 		};
 		sort(m.begin(), m.end(), pred);
 		for (int i{}; i < K; i++)

@@ -18,10 +18,10 @@ int main()
 
 	- If S <= 1000'000'000, then it's possible to build an array with just one element = S and nullify ALL remaining elements
 	- Otherwise, if S > 1000'000'000
-			   - If (N * 1000'000'000 < S) which means that the maximum possible sum to obtain is less than required S
-				 then, it's impossible to obtain such array
-			   - Otherwise, it's possible, print (S / 1000'000'000) times of 1000'000'000 then print (S % 1000'000'000)
-				 and nullify ALL remaining elements
+	           - If (N * 1000'000'000 < S) which means that the maximum possible sum to obtain is less than required S
+	             then, it's impossible to obtain such array
+	           - Otherwise, it's possible, print (S / 1000'000'000) times of 1000'000'000 then print (S % 1000'000'000)
+	             and nullify ALL remaining elements
 	*/
 	int N;
 	ll S;
@@ -30,7 +30,7 @@ int main()
 	if (S <= MAX_VAL)
 	{
 		cout << "YES\n"
-			 << S << " ";
+		     << S << " ";
 		for (int i{1}; i <= N - 1; i++)
 			cout << 0 << " ";
 	}

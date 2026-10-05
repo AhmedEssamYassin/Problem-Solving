@@ -4,7 +4,7 @@ using namespace std;
 #define endl "\n"
 
 int a[1000000]; // To store input numbers
-int b[10];		// To store the input numbers after converting
+int b[10];      // To store the input numbers after converting
 // Index is the input number in binary bits
 // Value is the input number in decimal representation
 
@@ -91,8 +91,8 @@ int main()
 	MSB
 	|
 	100100101
-			|
-			LSB
+	        |
+	        LSB
 	*/
 	int t = 1;
 	ll N;
@@ -104,14 +104,14 @@ int main()
 		cin >> k;
 		for (int i{}; i < k; i++)
 		{
-			cin >> a[i];		   // Example: 100 10 1 0
+			cin >> a[i];           // Example: 100 10 1 0
 			int x = Convert(a[i]); // 100 10 1 0 when converted to int : 4 2 1 0
 
-			if (b[x] == -1)	 // If NOT calculated
+			if (b[x] == -1)  // If NOT calculated
 				b[x] = a[i]; // b[4] = 100, b[2] = 10, b[1] = 1, b[0] = 0
 		}
 
-		vector<int> res;			// To store the desired subset
+		vector<int> res;            // To store the desired subset
 		for (int i{}; i < 256; i++) // To traverse all possible patterns
 		{
 			/*
@@ -119,7 +119,7 @@ int main()
 			i.e. we check that 		(i & {1, 2, 4, 8, 16, 32, 64, 128} > 0 )
 			which, in base 2, is 	(i & {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000} > 0 )
 			-----------------
-				i	: State
+			    i	: State
 			-----------------
 			0 (0)	: Excludes ALL numbers because (0 & ( 1 << j)) = 0 whatever the value of j is
 			1 (1)	: Includes ONLY j = 0 because (1 & (1 << 0)) = 1

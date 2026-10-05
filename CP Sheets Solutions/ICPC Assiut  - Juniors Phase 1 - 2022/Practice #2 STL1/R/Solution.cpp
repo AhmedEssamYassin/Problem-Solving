@@ -23,7 +23,7 @@ int main()
 
 		// Elements can repeat but indices can NEVER, so instead of storing elements, store indices!
 		stack<int> stk;
-		vector<int> NSE(N, N);	// Next Smaller Element, default to N (beyond the end)
+		vector<int> NSE(N, N);  // Next Smaller Element, default to N (beyond the end)
 		vector<int> PSE(N, -1); // Previous Smaller Element, default to -1 (before the beginning)
 		// Values of NSE[] and PSE[] are the index of their NSE, PSE
 

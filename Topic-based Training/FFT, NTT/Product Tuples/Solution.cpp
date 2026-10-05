@@ -98,7 +98,7 @@ ll findPrimitiveRoot(ll mod)
 template <typename T>
 void NTT(vector<T> &coeff, bool inverse = false)
 {
-	T n = (T)coeff.size();			   // arraySize
+	T n = (T)coeff.size();             // arraySize
 	T logSize = 31 - __builtin_clz(n); // log2(arraySize)
 
 	// Precompute roots of unity for efficient NTT
@@ -148,8 +148,8 @@ vector<T> convolute(vector<T> P1, vector<T> P2)
 
 	T resultSize = (T)P1.size() + (T)P2.size() - 1;
 	// T paddedSize = __bit_ceil(resultSize);           // Next power of 2
-	T logSize = 32 - __builtin_clz(resultSize - 1);	 // Ceiling of log2(resultSize)
-	T paddedSize = 1 << logSize;					 // Next power of 2
+	T logSize = 32 - __builtin_clz(resultSize - 1);  // Ceiling of log2(resultSize)
+	T paddedSize = 1 << logSize;                     // Next power of 2
 	T inverseSize = modPow(paddedSize, NTT_MOD - 2); // Modular inverse
 
 	// Prepare padded copies for NTT

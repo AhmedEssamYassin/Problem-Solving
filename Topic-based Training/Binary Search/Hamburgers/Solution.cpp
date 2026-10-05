@@ -60,7 +60,7 @@ int main()
 			mid = L + ((R - L) >> 1);
 			if (isOk(mid)) // All before mid is also OK.
 			{
-				ans = mid;	 // A candidate solution
+				ans = mid;   // A candidate solution
 				L = mid + 1; // Search for a better (larger) answer
 			}
 			else // All after mid is NOT OK, either.

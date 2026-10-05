@@ -25,8 +25,8 @@ int main()
 			mp[S]++;
 		}
 		cout << max_element(mp.begin(), mp.end(), [&](const auto &x, const auto &y)
-							{ return x.second < y.second; }) // Sorting on basis of number of goals
-					->first;								 // Getting the name of the winner
+		                    { return x.second < y.second; }) // Sorting on basis of number of goals
+		            ->first;                                 // Getting the name of the winner
 	}
 	return 0;
 }

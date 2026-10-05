@@ -47,7 +47,7 @@ int main()
 			pair<ll, ll> cur = dist(X, T, mid);
 			if (cur.first <= cur.second)
 			{
-				ans = mid;	 // A candidate solution
+				ans = mid;   // A candidate solution
 				R = mid - 1; // Search for a better (smaller) answer
 			}
 			else

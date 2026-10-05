@@ -13,9 +13,9 @@ int main()
 		cout << "IS DIGIT";
 	else if (ch >= 65 && ch <= 90)
 		cout << "ALPHA" << endl
-			 << "IS CAPITAL";
+		     << "IS CAPITAL";
 	else if (ch >= 97 && ch <= 122)
 		cout << "ALPHA" << endl
-			 << "IS SMALL";
+		     << "IS SMALL";
 	return 0;
 }

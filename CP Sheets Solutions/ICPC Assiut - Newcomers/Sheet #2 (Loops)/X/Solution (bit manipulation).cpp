@@ -44,22 +44,22 @@ int main()
 	cin >> t;
 	while (t--)
 	{
-		cin >> N;
-		int cnt{};
-		while (N)
-		{
-			cnt += (N % 2); // Counting ones
-			N /= 2;
-		}
-		int ans = 0;
-		int T = 1;
-		// 111111111
-		for (int i = 0; i < cnt; i++)
-		{
-			ans += T; // 1 + 2 + 4 + 8 + 16 ...
-			T *= 2;
-		}
-		cout << ans << endl;
+	    cin >> N;
+	    int cnt{};
+	    while (N)
+	    {
+	        cnt += (N % 2); // Counting ones
+	        N /= 2;
+	    }
+	    int ans = 0;
+	    int T = 1;
+	    // 111111111
+	    for (int i = 0; i < cnt; i++)
+	    {
+	        ans += T; // 1 + 2 + 4 + 8 + 16 ...
+	        T *= 2;
+	    }
+	    cout << ans << endl;
 	}
 	*/
 	return 0;

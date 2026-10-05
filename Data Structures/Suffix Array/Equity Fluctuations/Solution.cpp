@@ -124,10 +124,10 @@ ll countSubstrings(const SuffixArray &suffArr, int u, int v)
 	};
 	// First suffix whose len-prefix is >= s[u..v]
 	auto lo = partition_point(sa.begin(), sa.end(), [&](int p)
-							  { return cmp(p) < 0; });
+	                          { return cmp(p) < 0; });
 	// First suffix whose len-prefix is > s[u..v]
 	auto hi = partition_point(lo, sa.end(), [&](int p)
-							  { return cmp(p) <= 0; });
+	                          { return cmp(p) <= 0; });
 	return hi - lo;
 }
 

@@ -6,70 +6,70 @@ using namespace std;
 template <typename T>
 T mult64(const T &a, const T &b, T mod)
 {
-    return (__int128_t)a * b % mod;
+	return (__int128_t)a * b % mod;
 }
 
 template <typename T>
 T modPow(T N, T power, T mod)
 {
-    if (N % mod == 0 || N == 0)
-        return 0;
-    if (N == 1 || power == 0)
-        return 1;
-    T res{1};
-    while (power)
-    {
-        if (power & 1)
-            res = mult64(res, N, mod);
-        N = mult64(N, N, mod);
-        power >>= 1;
-    }
-    return res;
+	if (N % mod == 0 || N == 0)
+		return 0;
+	if (N == 1 || power == 0)
+		return 1;
+	T res{1};
+	while (power)
+	{
+		if (power & 1)
+			res = mult64(res, N, mod);
+		N = mult64(N, N, mod);
+		power >>= 1;
+	}
+	return res;
 }
 
 template <typename T>
 bool isPrime(T N)
 {
-    constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
-    constexpr uint32_t WHEEL30 = 0x208A2882;
-    if (N < 64)
-        return (MASK >> N) & 1;
-    if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
-        return false;
+	constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+	constexpr uint32_t WHEEL30 = 0x208A2882;
+	if (N < 64)
+		return (MASK >> N) & 1;
+	if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+		return false;
 
-    T d = N - 1;
-    int s{};
-    while (!(d & 1))
-        d >>= 1, ++s;
-    for (const T &a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022})
-    {
-        T p = modPow(a % N, d, N), i = s;
-        while (p != 1 && p != N - 1 && a % N && i--)
-            p = mult64(p, p, N);
-        if (p != N - 1 && i != s)
-            return false;
-    }
-    return true;
+	T d = N - 1;
+	int s{};
+	while (!(d & 1))
+		d >>= 1, ++s;
+	for (const T &a : {2, 325, 9375, 28178, 450775, 9780504, 1795265022})
+	{
+		T p = modPow(a % N, d, N), i = s;
+		while (p != 1 && p != N - 1 && a % N && i--)
+			p = mult64(p, p, N);
+		if (p != N - 1 && i != s)
+			return false;
+	}
+	return true;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N;
-    cin >> t;
-    while (t--)
-    {
-        cin >> N;
-        if (isPrime(N))
-            cout << "YES" << endl;
-        else
-            cout << "NO" << endl;
-    }
-    return 0;
+	int t = 1;
+	ll N;
+	cin >> t;
+	while (t--)
+	{
+		cin >> N;
+		if (isPrime(N))
+			cout << "YES" << endl;
+		else
+			cout << "NO" << endl;
+	}
+	return 0;
 }

@@ -68,7 +68,7 @@ int main()
 		for (int i{}; i < N; i++)
 			cin >> vc[i];
 		SparseTable ST(vc, [](ll a, ll b)
-					   { return (a | b); }, 0LL);
+		               { return (a | b); }, 0LL);
 		ll L{1}, R = N, ans = N;
 		while (L <= R)
 		{

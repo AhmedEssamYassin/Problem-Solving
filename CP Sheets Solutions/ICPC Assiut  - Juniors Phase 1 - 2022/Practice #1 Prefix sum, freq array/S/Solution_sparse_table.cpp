@@ -60,7 +60,7 @@ int main()
 			cin >> a[i];
 
 		SparseTable ST(a, [](ll x, ll y)
-					   { return min(x, y); }, LLONG_MAX);
+		               { return min(x, y); }, LLONG_MAX);
 		while (Q--)
 		{
 			ll L, R;

@@ -52,82 +52,82 @@ https://codeforces.com/contest/1946/problem/B --> Kaden's
 
 int cutRodIter(vector<int> &price)
 {
-    int n = price.size();
-    vector<int> dp(price.size() + 1, 0);
+	int n = price.size();
+	vector<int> dp(price.size() + 1, 0);
 
-    for (int i = 1; i <= n; i++)
-    {
-        for (int j = 1; j <= i; j++)
-            dp[i] = max(dp[i], price[j - 1] + dp[i - j]);
-    }
+	for (int i = 1; i <= n; i++)
+	{
+		for (int j = 1; j <= i; j++)
+			dp[i] = max(dp[i], price[j - 1] + dp[i - j]);
+	}
 
-    return dp[n];
+	return dp[n];
 }
 
 int cutRodRecur(vector<int> &price, vector<int> &memo, int len)
 {
-    // Base case
-    if (len == 0)
-        return 0;
-    int &ret = memo[len - 1];
-    // If value is memoized
-    if (~ret)
-        return ret;
+	// Base case
+	if (len == 0)
+		return 0;
+	int &ret = memo[len - 1];
+	// If value is memoized
+	if (~ret)
+		return ret;
 
-    int ans = 0;
+	int ans = 0;
 
-    for (int j = 1; j <= len; j++)
-        ans = max(ans, price[j - 1] + cutRodRecur(price, memo, len - j));
+	for (int j = 1; j <= len; j++)
+		ans = max(ans, price[j - 1] + cutRodRecur(price, memo, len - j));
 
-    return ret = ans;
+	return ret = ans;
 }
 
 // Push loop to parameter
 int cutRodRecur(vector<int> &price, vector<vector<int>> &memo, int j, int len)
 {
-    // Base case
-    if (len <= 0 || j > price.size())
-        return 0;
-    int &ret = memo[j][len - 1];
-    // If value is memoized
-    if (~ret)
-        return ret;
+	// Base case
+	if (len <= 0 || j > price.size())
+		return 0;
+	int &ret = memo[j][len - 1];
+	// If value is memoized
+	if (~ret)
+		return ret;
 
-    int cut = 0;
-    if (len >= j)
-        cut = price[j - 1] + cutRodRecur(price, memo, j, len - j);
-    int notCut = cutRodRecur(price, memo, j + 1, len);
+	int cut = 0;
+	if (len >= j)
+		cut = price[j - 1] + cutRodRecur(price, memo, j, len - j);
+	int notCut = cutRodRecur(price, memo, j + 1, len);
 
-    return ret = max(cut, notCut);
+	return ret = max(cut, notCut);
 }
 int cutRod(vector<int> &price)
 {
-    int n = price.size();
-    vector<vector<int>> memo(n + 1, vector<int>(n + 1, -1));
-    return cutRodRecur(price, memo, 1, n);
+	int n = price.size();
+	vector<vector<int>> memo(n + 1, vector<int>(n + 1, -1));
+	return cutRodRecur(price, memo, 1, n);
 }
 
 int cutRod(vector<int> &price)
 {
-    int n = price.size();
-    vector<int> memo(price.size(), -1);
-    return cutRodRecur(price, memo, n);
+	int n = price.size();
+	vector<int> memo(price.size(), -1);
+	return cutRodRecur(price, memo, n);
 }
 
 const int mod = 1e9 + 7;
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N, m;
-    // cin >> t;
-    while (t--)
-    {
-    }
-    return 0;
+	int t = 1;
+	ll N, m;
+	// cin >> t;
+	while (t--)
+	{
+	}
+	return 0;
 }

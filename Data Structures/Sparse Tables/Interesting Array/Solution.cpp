@@ -69,7 +69,7 @@ int main()
 			}
 		}
 		SparseTable ST(arr, [](ll x, ll y)
-					   { return (x & y); }, -1LL);
+		               { return (x & y); }, -1LL);
 		for (auto &[l, r, q] : queries)
 			if (ST.query(l, r) != q)
 				return cout << "NO", 0;

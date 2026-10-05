@@ -50,7 +50,7 @@ int main()
 		for (int i{1}; i < N; i++)
 			diff.push_back(abs(vc[i] - vc[i - 1]));
 		SparseTable SPT(diff, [](ll x, ll y)
-						{ return gcd(x, y); }, 0LL);
+		                { return gcd(x, y); }, 0LL);
 		while (Q--)
 		{
 			int L, R;

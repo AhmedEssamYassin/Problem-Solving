@@ -21,10 +21,10 @@ int main()
 	i.e.,
 	void F(int arr[], int N)
 	{
-		if (N == 0)//because we represent the permutation in an array which is 0-based
-			return;
-		F(arr, N - 1);
-		swap(arr[N - 1], arr[N]);
+	    if (N == 0)//because we represent the permutation in an array which is 0-based
+	        return;
+	    F(arr, N - 1);
+	    swap(arr[N - 1], arr[N]);
 	}
 
 	The Little Elephant's teacher believes that this function does NOT work correctly.

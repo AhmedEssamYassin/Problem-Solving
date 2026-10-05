@@ -35,9 +35,9 @@ int main()
 		int Col_Transition[] = {1, 0, -1, 0};
 
 		int x = 0, y = 0; // To traverse the cells
-		int dir = 0;	  // To traverse (0, 1), (1, 0), (0,-1) and (-1,0)
+		int dir = 0;      // To traverse (0, 1), (1, 0), (0,-1) and (-1,0)
 
-		vector<ll> Spiral_Order;							 // To store elements in a spiral order
+		vector<ll> Spiral_Order;                             // To store elements in a spiral order
 		vector<vector<bool>> Vis(N, vector<bool>(M, false)); // To mark visited elements in order NOT to print them again
 
 		// Iterate from 0 to N * M - 1

@@ -28,7 +28,7 @@ int main()
 			for (int j = i + 1; j < N; j++)
 			{
 				vector<ll> swapped = vc;
-				swap(swapped[i], swapped[j]);	  // Swap elements
+				swap(swapped[i], swapped[j]);     // Swap elements
 				unique_sequences.insert(swapped); // Store in set
 			}
 		}

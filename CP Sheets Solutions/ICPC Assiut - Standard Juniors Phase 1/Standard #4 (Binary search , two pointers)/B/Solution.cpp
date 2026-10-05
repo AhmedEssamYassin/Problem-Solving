@@ -46,7 +46,7 @@ int main()
 		ll mid = L + (R - L) / 2;
 		if (Is_possible(Vec, mid, C))
 		{
-			ans = mid;	 // A candidate answer
+			ans = mid;   // A candidate answer
 			L = mid + 1; // Search for a better (greater) minimum distance
 		}
 		else

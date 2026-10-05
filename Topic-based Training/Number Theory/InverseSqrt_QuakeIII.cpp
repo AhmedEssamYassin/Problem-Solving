@@ -7,9 +7,9 @@ double inverseSqrt(double x)
 {
 	// absolute error < 1e-16
 	double xHalf = 0.5 * x;
-	long long i = *(long long *)&x;		 // store double bits in 64-bit integer
+	long long i = *(long long *)&x;      // store double bits in 64-bit integer
 	i = 0x5fe6ec85e7de30daLL - (i >> 1); // magic constant for double precision
-	x = *(double *)&i;					 // convert bits back to double
+	x = *(double *)&i;                   // convert bits back to double
 
 	// 4 rounds of Newton's method
 	x = x * (1.5 - xHalf * x * x);

@@ -47,7 +47,7 @@ int main()
 		cin >> S[i], idx[S[i]].push_back(i + 1); // Map elements to their indices (1-based)
 
 	SparseTable ST(S, [](ll x, ll y)
-				   { return gcd(x, y); }, 0LL);
+	               { return gcd(x, y); }, 0LL);
 	cin >> t;
 	while (t--)
 	{

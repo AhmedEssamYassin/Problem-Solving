@@ -21,7 +21,7 @@ int minLength_maxOR(vector<int> &nums, int &max_OR)
 
 		for (int k = 0; k < 30; ++k) // Traversing ALL bits
 		{
-			if (bitmask[k])		// If that bit is set
+			if (bitmask[k])     // If that bit is set
 				OR |= (1 << k); // set that bit in OR
 		}
 

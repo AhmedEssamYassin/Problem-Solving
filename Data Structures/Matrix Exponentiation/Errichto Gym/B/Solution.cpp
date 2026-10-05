@@ -371,8 +371,8 @@ int main()
 		cin >> n;
 		Matrix2by2 mat;
 		mat[0][0] = 19; // Happy -> Happy
-		mat[0][1] = 7;	// Happy -> Sad
-		mat[1][0] = 6;	// Sad -> Happy
+		mat[0][1] = 7;  // Happy -> Sad
+		mat[1][0] = 6;  // Sad -> Happy
 		mat[1][1] = 20; // Sad -> Sad
 		cout << mat.matrixPower(n)[0][0];
 	}

@@ -6,79 +6,79 @@ using namespace std;
 
 struct Edge
 {
-    ll node = -1;
-    ll cost = INF;
-    ll par = -1; // parent
-    Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
-    bool operator<(const Edge &E) const
-    {
-        return cost > E.cost;
-    }
+	ll node = -1;
+	ll cost = INF;
+	ll par = -1; // parent
+	Edge(ll node, ll weight, ll par = -1) : node(node), cost(weight), par(par) {}
+	bool operator<(const Edge &E) const
+	{
+		return cost > E.cost;
+	}
 };
 
 void Dijkstra(const vector<vector<Edge>> &adj, vector<ll> &dist, int N, int src, int dest)
 {
-    dist.assign(N + 1, INF);
-    vector<ll> parent(N + 1, -1);
-    priority_queue<Edge> prQue;
-    prQue.emplace(src, 0);
-    while (!prQue.empty())
-    {
-        auto [curNode, curCost, par] = prQue.top();
-        prQue.pop();
+	dist.assign(N + 1, INF);
+	vector<ll> parent(N + 1, -1);
+	priority_queue<Edge> prQue;
+	prQue.emplace(src, 0);
+	while (!prQue.empty())
+	{
+		auto [curNode, curCost, par] = prQue.top();
+		prQue.pop();
 
-        if (dist[curNode] != INF)
-            continue;
-        dist[curNode] = curCost;
-        parent[curNode] = par;
-        for (const Edge &v : adj[curNode])
-            if (dist[v.node] == INF)
-                prQue.emplace(v.node, v.cost + curCost, curNode);
-    }
-    vector<ll> path;
-    ll temp = dest;
-    while (parent[temp] != -1)
-    {
-        path.push_back(parent[temp]);
-        temp = parent[temp];
-    }
-    if (path.empty())
-        return void(cout << "-1" << endl);
-    // Print the nodes on the shortest path themselves.
-    reverse(path.begin(), path.end());
-    path.push_back(dest);
-    for (const ll &i : path)
-        cout << i << " ";
-    cout << endl;
+		if (dist[curNode] != INF)
+			continue;
+		dist[curNode] = curCost;
+		parent[curNode] = par;
+		for (const Edge &v : adj[curNode])
+			if (dist[v.node] == INF)
+				prQue.emplace(v.node, v.cost + curCost, curNode);
+	}
+	vector<ll> path;
+	ll temp = dest;
+	while (parent[temp] != -1)
+	{
+		path.push_back(parent[temp]);
+		temp = parent[temp];
+	}
+	if (path.empty())
+		return void(cout << "-1" << endl);
+	// Print the nodes on the shortest path themselves.
+	reverse(path.begin(), path.end());
+	path.push_back(dest);
+	for (const ll &i : path)
+		cout << i << " ";
+	cout << endl;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    int t = 1;
-    ll N, M;
-    // cin >> t;
-    while (t--)
-    {
-        cin >> N >> M;
-        vector<vector<Edge>> adj(N + 1);
-        while (M--)
-        {
-            ll u, v, w;
-            cin >> u >> v >> w;
-            adj[u].push_back({v, w});
-            // If the Graph is Undirected
-            adj[v].push_back({u, w});
-        }
-        ll A, B;
-        vector<ll> dist;
-        cin >> A >> B;
-        Dijkstra(adj, dist, N, A, B);
-    }
-    return 0;
+	int t = 1;
+	ll N, M;
+	// cin >> t;
+	while (t--)
+	{
+		cin >> N >> M;
+		vector<vector<Edge>> adj(N + 1);
+		while (M--)
+		{
+			ll u, v, w;
+			cin >> u >> v >> w;
+			adj[u].push_back({v, w});
+			// If the Graph is Undirected
+			adj[v].push_back({u, w});
+		}
+		ll A, B;
+		vector<ll> dist;
+		cin >> A >> B;
+		Dijkstra(adj, dist, N, A, B);
+	}
+	return 0;
 }

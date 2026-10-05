@@ -93,7 +93,7 @@ int main()
 				if (Msg[i] == '?')
 				{
 					Msg.erase(Msg.begin() + i);
-					candy_cones--;							 // Decrement the frequency of '?' by 1 because we deleted it
+					candy_cones--;                           // Decrement the frequency of '?' by 1 because we deleted it
 					if (Msg.length() - 1 - candy_cones >= k) // Can we delete the preceding character?
 						Msg.erase(Msg.begin() + i - 1), i--; // because we erased 1 character, now the subscript i is ahead by 1, that's why we subtract 1
 				}

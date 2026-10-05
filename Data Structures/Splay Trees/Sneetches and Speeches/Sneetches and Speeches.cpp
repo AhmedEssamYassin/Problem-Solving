@@ -10,14 +10,14 @@ public:
 	ll value;
 	// For consecutive counting
 	ll pref0, pref1; // Length of prefix of 0s and 1s
-	ll suf0, suf1;	 // Length of suffix of 0s and 1s
-	ll ans0, ans1;	 // Maximum consecutive 0s and 1s
-	ll c0, c1;		 // Count of 0s and 1s
+	ll suf0, suf1;   // Length of suffix of 0s and 1s
+	ll ans0, ans1;   // Maximum consecutive 0s and 1s
+	ll c0, c1;       // Count of 0s and 1s
 	// Lazy propagation flags
 	bool flipProp = false;
 	bool reverseProp = false;
 	bool assignProp = false; // New flag for assignment
-	ll assignValue = 0;		 // Value to assign
+	ll assignValue = 0;      // Value to assign
 	SplayTree *left = nullptr;
 	SplayTree *right = nullptr;
 	SplayTree *parent = nullptr;
@@ -120,7 +120,7 @@ public:
 		else // Assignment
 		{
 			value = x;
-			flipProp = false;	 // Assignment cancels XOR
+			flipProp = false;    // Assignment cancels XOR
 			reverseProp = false; // Assignment cancels reverse
 			assignProp = true;
 			assignValue = x;
@@ -316,8 +316,8 @@ public:
 	{
 		// Always navigate left until we can't anymore
 		return find(tree, [&](const SplayTree *temp)
-					{ return 1; })
-			.first;
+		            { return 1; })
+		    .first;
 	}
 
 	/**
@@ -329,8 +329,8 @@ public:
 	{
 		// Always navigate right until we can't anymore
 		return find(tree, [&](const SplayTree *temp)
-					{ return -1; })
-			.first;
+		            { return -1; })
+		    .first;
 	}
 
 	static SplayTree *merge(SplayTree *LHS, SplayTree *RHS)
@@ -478,14 +478,14 @@ public:
 		// Now merge in the new order:
 		// [1, i - 1] + [k, l] + [j + 1, k - 1] + [i, j] + rest
 		spTree = SplayTree::merge(
-			leftPart,
-			SplayTree::merge(
-				secondRange,
-				SplayTree::merge(
-					middle2,
-					SplayTree::merge(
-						firstRange,
-						lastPart))));
+		    leftPart,
+		    SplayTree::merge(
+		        secondRange,
+		        SplayTree::merge(
+		            middle2,
+		            SplayTree::merge(
+		                firstRange,
+		                lastPart))));
 	}
 	// Helper function to free memory of deleted nodes
 	void freeNodes(SplayTree *treeNode)

@@ -49,15 +49,15 @@ int main()
 			cin >> vc[i];
 
 		SparseTable minSPT(vc, [](ll a, ll b)
-						   { return min(a, b); }, LLONG_MAX);
+		                   { return min(a, b); }, LLONG_MAX);
 		SparseTable maxSPT(vc, [](ll a, ll b)
-						   { return max(a, b); }, LLONG_MIN);
+		                   { return max(a, b); }, LLONG_MIN);
 		ll cnt{}, L{}, R{};
 		ll cur{};
 		while (R < N)
 		{
 			cur = maxSPT.query(L, R) - minSPT.query(L, R); // Expand
-			while (cur > k && L < R)					   // Shrink
+			while (cur > k && L < R)                       // Shrink
 			{
 				L++;
 				cur = maxSPT.query(L, R) - minSPT.query(L, R);

@@ -6,139 +6,139 @@ using namespace std;
 template <typename T>
 inline T mult64(const T &a, const T &b, const T &mod)
 {
-    return __int128_t(a) * b % mod;
+	return __int128_t(a) * b % mod;
 }
 
 template <typename T>
 inline T add64(const T &a, const T &b, const T &mod)
 {
-    __int128_t res = __int128_t(a) + b;
-    if (res >= mod)
-        res -= mod;
-    return res;
+	__int128_t res = __int128_t(a) + b;
+	if (res >= mod)
+		res -= mod;
+	return res;
 }
 
 template <typename T>
 T modPow(T N, T power, T mod)
 {
-    if (N % mod == 0 || N == 0)
-        return 0;
-    if (N == 1 || power == 0)
-        return 1;
-    T res{1};
-    while (power)
-    {
-        if (power & 1)
-            res = mult64(res, N, mod);
-        N = mult64(N, N, mod);
-        power >>= 1;
-    }
-    return res;
+	if (N % mod == 0 || N == 0)
+		return 0;
+	if (N == 1 || power == 0)
+		return 1;
+	T res{1};
+	while (power)
+	{
+		if (power & 1)
+			res = mult64(res, N, mod);
+		N = mult64(N, N, mod);
+		power >>= 1;
+	}
+	return res;
 }
 
 template <typename T>
 bool isPrime(T N)
 {
-    constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
-    constexpr uint32_t WHEEL30 = 0x208A2882;
-    if (N < 64)
-        return (MASK >> N) & 1;
-    if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
-        return false;
-    T d = N - 1;
-    int s{};
-    while (~s & 1)
-        d >>= 1, ++s;
-    for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
-    {
-        T p = modPow(a % N, d, N), i = s;
-        while (p != 1 && p != N - 1 && a % N && i--)
-            p = mult64(p, p, N);
-        if (p != N - 1 && i != s)
-            return false;
-    }
-    return true;
+	constexpr uint64_t MASK = 0x28208A20A08A28ACULL;
+	constexpr uint32_t WHEEL30 = 0x208A2882;
+	if (N < 64)
+		return (MASK >> N) & 1;
+	if (!((WHEEL30 >> (uint32_t)(N % 30)) & 1))
+		return false;
+	T d = N - 1;
+	int s{};
+	while (~s & 1)
+		d >>= 1, ++s;
+	for (const T &a : {2, 3, 5, 7, 11, 17, 19, 325, 9375, 28178, 450775, 9780504, 1795265022})
+	{
+		T p = modPow(a % N, d, N), i = s;
+		while (p != 1 && p != N - 1 && a % N && i--)
+			p = mult64(p, p, N);
+		if (p != N - 1 && i != s)
+			return false;
+	}
+	return true;
 }
 
 template <typename T>
 void primeFactorize(T N, map<T, T> &primeFactors) // Use a vector if generating ALL factors
 {
-    for (ll p = 2; p * p <= N; p++)
-    {
-        while (N % p == 0)
-            primeFactors[p]++, N /= p;
-    }
-    if (N > 1)
-        primeFactors[N]++;
+	for (ll p = 2; p * p <= N; p++)
+	{
+		while (N % p == 0)
+			primeFactors[p]++, N /= p;
+	}
+	if (N > 1)
+		primeFactors[N]++;
 }
 
 // Euler Totient Function
 template <typename T>
 T phi(T N)
 {
-    if (isPrime(N))
-        return (N - 1);
-    map<T, T> pf;
-    primeFactorize(N, pf);
-    T ans = N;
-    for (auto &[p, exp] : pf)
-        ans -= ans / p;
-    return ans;
+	if (isPrime(N))
+		return (N - 1);
+	map<T, T> pf;
+	primeFactorize(N, pf);
+	T ans = N;
+	for (auto &[p, exp] : pf)
+		ans -= ans / p;
+	return ans;
 }
 
 using u64 = uint64_t;
 u64 normalize(u64 x, u64 m)
 {
-    if (x < m)
-        return x;
-    return (m + x % m);
+	if (x < m)
+		return x;
+	return (m + x % m);
 }
 
 template <typename T>
 T Exp(T N, T power, T mod)
 {
-    T res{1};
-    while (power)
-    {
-        if (power & 1)
-            res = normalize((u64)res * N, mod);
+	T res{1};
+	while (power)
+	{
+		if (power & 1)
+			res = normalize((u64)res * N, mod);
 
-        N = normalize((u64)N * N, mod);
-        power >>= 1;
-    }
-    return res;
+		N = normalize((u64)N * N, mod);
+		power >>= 1;
+	}
+	return res;
 }
 
 int main()
 {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("input.txt", "r", stdin);
-    freopen("Output.txt", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	freopen("Output.txt", "w", stdout);
 #endif
-    // freopen("calc.in", "r", stdin);
-    // freopen("calc.out", "w", stdout);
-    int t = 1;
-    u64 N, k;
-    // cin >> t;
-    while (t--)
-    {
-        cin >> N >> k;
-        if (N == 0)
-            return cout << add64<u64>(2 % k, 1, k), 0;
+	// freopen("calc.in", "r", stdin);
+	// freopen("calc.out", "w", stdout);
+	int t = 1;
+	u64 N, k;
+	// cin >> t;
+	while (t--)
+	{
+		cin >> N >> k;
+		if (N == 0)
+			return cout << add64<u64>(2 % k, 1, k), 0;
 
-        u64 w[] = {0, 2, 2, N}; // 0 is padding
-        function<u64(u64, u64, u64)> solve = [&](u64 l, u64 r, u64 m) -> u64
-        {
-            if (l == r + 1 || m == 1)
-                return 1;
+		u64 w[] = {0, 2, 2, N}; // 0 is padding
+		function<u64(u64, u64, u64)> solve = [&](u64 l, u64 r, u64 m) -> u64
+		{
+			if (l == r + 1 || m == 1)
+				return 1;
 
-            u64 power = solve(l + 1, r, phi(m));
-            u64 res = Exp(w[l], power, m);
-            return res; // Don't take mod here
-        };
-        cout << add64(solve(1, 3, k) % k, 1ULL, k);
-    }
-    return 0;
+			u64 power = solve(l + 1, r, phi(m));
+			u64 res = Exp(w[l], power, m);
+			return res; // Don't take mod here
+		};
+		cout << add64(solve(1, 3, k) % k, 1ULL, k);
+	}
+	return 0;
 }

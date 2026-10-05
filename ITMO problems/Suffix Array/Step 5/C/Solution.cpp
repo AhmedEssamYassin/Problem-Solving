@@ -138,10 +138,10 @@ int main()
 		}
 
 		sort(vc.begin(), vc.end(), [&](const pair<int, int> &a, const pair<int, int> &b)
-			 {
-				 int c = suffArr.compare(a.first, a.second, b.first, b.second);
-				 return c != 0 ? c < 0 : a < b; // Pairs compare by l, then r
-			 });
+		     {
+			     int c = suffArr.compare(a.first, a.second, b.first, b.second);
+			     return c != 0 ? c < 0 : a < b; // Pairs compare by l, then r
+		     });
 
 		for (auto &[l, r] : vc)
 			cout << l + 1 << " " << r + 1 << endl;
