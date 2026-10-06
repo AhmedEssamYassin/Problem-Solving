@@ -3,15 +3,15 @@ using namespace std;
 #define ll long long int
 #define endl "\n"
 
-function<uint64_t()> random_address = []() -> uint64_t
+using u64 = uint64_t;
+u64 S = chrono::steady_clock::now().time_since_epoch().count() ^ (u64) new char;
+u64 rnd()
 {
-	char *p = new char;
-	delete p;
-	return uint64_t(p);
-};
-const uint64_t SEED = chrono::steady_clock::now().time_since_epoch().count() * (random_address() | 1);
-std::mt19937 rnd(SEED);
-#define rng(l, r) uniform_int_distribution<int64_t>(l, r)(rnd)
+	S += 0xa0761d6478bd642f;
+	__uint128_t t = (__uint128_t)S * (S ^ 0xe7037ed1a0b428db);
+	return t >> 64 ^ t;
+}
+#define rng(l, r) ((l) + (int64_t)((__uint128_t)rnd() * ((r) - (l) + 1) >> 64))
 
 typedef array<int, 30> number; // Max number is 5e5 < (1 << 30)
 
