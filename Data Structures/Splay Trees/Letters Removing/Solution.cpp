@@ -124,454 +124,139 @@ public:
 #undef mid
 };
 
-deque<int> indices;
-
-class SplayTree
+struct SplayTree
 {
-public:
-	ll size = 1;
+	int size = 1;
 	ll value;
-	ll lazyAddValue = 0;
-	bool reverseProp = false;
-	SplayTree *left = nullptr;
-	SplayTree *right = nullptr;
-	SplayTree *parent = nullptr;
+	SplayTree *left = nullptr, *right = nullptr, *parent = nullptr;
 
-	// Constructor
-	SplayTree(const ll &value = 0) : value(value) {}
-
-	// Here we merge the nodes in INORDER behaviour (left -> parent -> right)
-	void update()
+	SplayTree(ll v = 0) : value(v) { update(); }
+	static int sz(const SplayTree *t) { return t ? t->size : 0; }
+	void update() // inorder: left -> node -> right
 	{
 		size = 1;
-		if (left != nullptr)
-			size += left->size;
-		if (right != nullptr)
-			size += right->size;
+		for (SplayTree *t : {left, right})
+			if (t)
+				t->parent = this, size += t->size;
 	}
-
-	inline void applyReverse()
+	void rotate() // rotates this node above its parent
 	{
-		reverseProp ^= 1;
-		swap(left, right);
-	}
-	// For lazy propagation
-	inline void applyUpdate(ll x)
-	{
-		value += x;
-		lazyAddValue += x;
-	}
-
-	void push()
-	{
-		if (reverseProp)
-		{
-			if (left != nullptr)
-				left->applyReverse();
-			if (right != nullptr)
-				right->applyReverse();
-			reverseProp = false;
-		}
-		if (lazyAddValue != 0)
-		{
-			if (left != nullptr)
-				left->applyUpdate(lazyAddValue);
-			if (right != nullptr)
-				right->applyUpdate(lazyAddValue);
-			lazyAddValue = 0;
-		}
-	}
-	// Rotates the current node with its parent node
-	// For example, if current node is left child:
-	//     P          N
-	//    / \   =>   / \
-	//   N   C      A   P
-	//  / \            / \
-	// A   B          B   C
-	void rotate()
-	{
-		if (parent == nullptr)
-			return;
-		SplayTree *parent = this->parent;
-		SplayTree *grandparent = parent->parent;
-
-		// Update grandparent's child pointer
-		if (grandparent != nullptr)
-		{
-			if (grandparent->right == parent)
-				grandparent->right = this;
-			else
-				grandparent->left = this;
-		}
-
-		// Push down lazy values before rotation
-		parent->push();
-		this->push();
-
-		// Perform rotation based on whether this node is a left or right child
-		if (parent->left == this)
-		{ // Left child case
-			parent->left = this->right;
-			this->right = parent;
-			if (parent->left != nullptr)
-				parent->left->parent = parent;
-		}
+		SplayTree *p = parent, *g = p->parent;
+		if (g)
+			(g->right == p ? g->right : g->left) = this;
+		if (p->left == this)
+			p->left = right, right = p;
 		else
-		{ // Right child case
-			parent->right = this->left;
-			this->left = parent;
-			if (parent->right != nullptr)
-				parent->right->parent = parent;
-		}
-
-		// Update parent pointers
-		parent->parent = this;
-		this->parent = grandparent;
-
-		// Update subtree information
-		parent->update();
-		this->update();
+			p->right = left, left = p;
+		parent = g, p->update(), update();
 	}
-
-	// Splays the current node to the root of the tree using a sequence of rotations
-	// Uses the standard splay tree rotations:
-	// - Zig: Single rotation when parent is root
-	// - Zig-zig: Double rotation when both node and parent are left/right children
-	// - Zig-zag: Double rotation when node and parent are opposite children
-	void splay()
+	SplayTree *splay()
 	{
-		while (this->parent != nullptr)
+		while (parent)
 		{
-			SplayTree *parent = this->parent;
-			SplayTree *grandparent = parent->parent;
-
-			if (grandparent == nullptr)
-			{
-				// Zig case - single rotation
-				this->rotate();
-			}
-			else
-			{
-				bool isParentRightChild = (grandparent->right == parent);
-				bool isNodeRightChild = (parent->right == this);
-
-				if (isParentRightChild == isNodeRightChild)
-				{
-					// Zig-zig case - rotate parent first, then node
-					parent->rotate();
-				}
-				else
-				{
-					// Zig-zag case - rotate node twice
-					this->rotate();
-				}
-				this->rotate();
-			}
+			SplayTree *p = parent, *g = p->parent;
+			if (g)
+				((g->right == p) == (p->right == this) ? p : this)->rotate();
+			rotate();
 		}
-
-		// Push down any lazy values after splaying
-		this->push();
+		return this;
 	}
-
-	/**
-	 * Traverses the tree according to the provided navigation function and returns the final node
-	 * @param tree The root of the tree to search
-	 * @param goTo Navigation function that returns:
-	 *             1 to go left
-	 *             -1 to go right
-	 *             0 to stop at current node
-	 * @return Pair of (final node reached, last direction taken)
-	 */
-	static std::pair<SplayTree *, int> find(SplayTree *&tree, const std::function<int(const SplayTree *)> &goTo)
+	static SplayTree *merge(SplayTree *L, SplayTree *R)
 	{
-		// Handle empty tree case
-		if (tree == nullptr)
-			return {tree, -1};
-
-		int direction;
-		SplayTree *current = tree;
-
-		// Navigate through the tree based on goTo function
-		while (true)
-		{
-			// Handle lazy propagation before accessing node
-			current->push();
-
-			// Get direction from navigation function
-			direction = goTo(current);
-
-			// Stop if we've reached target node
-			if (direction == 0)
-				break;
-
-			// Determine next node based on direction
-			SplayTree *nextNode = (direction == 1 ? current->left : current->right);
-
-			// Stop if we can't proceed further
-			if (nextNode == nullptr)
-				break;
-
-			current = nextNode;
-		}
-
-		// Bring found node to root
-		current->splay();
-		return {current, direction};
+		if (!L || !R)
+			return L ? L : R;
+		while (L->right)
+			L = L->right;
+		L->splay()->right = R;
+		return L->update(), L;
 	}
-
-	/**
-	 * Finds the leftmost node in the tree
-	 * @param tree Root of the tree
-	 * @return Pointer to the leftmost node
-	 */
-	static SplayTree *getLeftmost(SplayTree *&tree)
+	// kth element (1-based), splayed to root; nullptr if k invalid
+	static SplayTree *findKth(SplayTree *t, int k)
 	{
-		// Always navigate left until we can't anymore
-		return find(tree, [&](const SplayTree *temp)
-		            { return 1; })
-		    .first;
-	}
-
-	/**
-	 * Finds the rightmost node in the tree
-	 * @param tree Root of the tree
-	 * @return Pointer to the rightmost node
-	 */
-	static SplayTree *getRightmost(SplayTree *&tree)
-	{
-		// Always navigate right until we can't anymore
-		return find(tree, [&](const SplayTree *temp)
-		            { return -1; })
-		    .first;
-	}
-
-	static SplayTree *merge(SplayTree *LHS, SplayTree *RHS)
-	{
-		if (LHS == nullptr)
-			return RHS;
-		if (RHS == nullptr)
-			return LHS;
-		SplayTree *temp = getRightmost(LHS);
-		temp->right = RHS;
-		RHS->parent = temp;
-		temp->update();
-		return temp;
-	}
-
-	/**
-	 * Finds the kth element in the tree (1-based indexing)
-	 * @param tree Root of the tree
-	 * @param k Position to find (1-based)
-	 * @return Pointer to the kth node, or nullptr if k is invalid
-	 */
-	static SplayTree *findKth(SplayTree *tree, int k)
-	{
-		// Validate input parameters
-		if (!tree || k <= 0 || k > tree->size)
+		if (k < 1 || k > sz(t))
 			return nullptr;
-
-		SplayTree *current = tree;
-
-		// Navigate through tree using subtree sizes
-		while (current != nullptr)
+		for (;;)
 		{
-			// Handle lazy propagation
-			current->push();
-
-			// Calculate size of left subtree
-			int leftSize = current->left ? current->left->size : 0;
-
-			// Check if current node is kth element
-			if (k == leftSize + 1)
-				break;
-
-			// Navigate left or right based on k
-			if (k <= leftSize)
-				current = current->left;
+			int ls = sz(t->left);
+			if (k == ls + 1)
+				return t->splay();
+			if (k <= ls)
+				t = t->left;
 			else
-			{
-				k -= (leftSize + 1); // Adjust k for right subtree
-				current = current->right;
-			}
+				k -= ls + 1, t = t->right;
 		}
-
-		// Bring found node to root
-		current->splay();
-		return current;
 	}
-
-	// Splits the splay tree into two parts [1, k] and [k + 1, N]
-	static std::pair<SplayTree *, SplayTree *> split(SplayTree *tree, int k)
+	// splits into [1, k] and [k + 1, size]
+	static pair<SplayTree *, SplayTree *> split(SplayTree *t, int k)
 	{
-		if (tree == nullptr)
-			return {nullptr, nullptr};
-		if (k <= 0)
-			return {nullptr, tree};
-		SplayTree *middle = findKth(tree, k);
-		if (middle == nullptr)
-			return {nullptr, tree};
-		SplayTree *R = middle->right;
-		if (R != nullptr)
+		if (k <= 0 || !t)
+			return {nullptr, t};
+		if (k >= t->size)
+			return {t, nullptr};
+		t = findKth(t, k);
+		SplayTree *R = t->right;
+		R->parent = t->right = nullptr;
+		return t->update(), pair{t, R};
+	}
+	static SplayTree *build(const vector<ll> &v, int l, int r)
+	{
+		if (l > r)
+			return nullptr;
+		int m = (l + r) / 2;
+		SplayTree *t = new SplayTree(v[m]);
+		t->left = build(v, l, m - 1), t->right = build(v, m + 1, r);
+		return t->update(), t;
+	}
+	// [1, L - 1], [L, R], [R + 1, size]
+	static array<SplayTree *, 3> parts(SplayTree *t, int L, int R)
+	{
+		auto [l, m] = split(t, L - 1);
+		auto [s, r] = split(m, R - L + 1);
+		return {l, s, r};
+	}
+	static void freeNodes(SplayTree *t)
+	{
+		vector<SplayTree *> st{t};
+		while (!st.empty())
 		{
-			middle->right = nullptr;
-			R->parent = nullptr;
+			SplayTree *x = st.back();
+			st.pop_back();
+			if (x)
+				st.push_back(x->left), st.push_back(x->right), delete x;
 		}
-		middle->update();
-		return {middle, R};
 	}
-
-	// Erase elements in range [L, R]
-	SplayTree *eraseRange(SplayTree *tree, int L, int R)
+	template <class F>
+	static void inorder(SplayTree *t, F f) // visits values left -> node -> right
 	{
-		if (!tree || L > R)
-			return tree;
-
-		// Split into three parts: [1, L - 1], [L, R], [R + 1, end]
-		auto [leftPart, middle] = SplayTree::split(tree, L - 1);
-		auto [toDelete, rightPart] = SplayTree::split(middle, R - L + 1);
-
-		// Free the memory of deleted nodes
-		freeNodes(toDelete);
-
-		// Merge remaining parts
-		return SplayTree::merge(leftPart, rightPart);
-	}
-	// Insert elements at position pos
-	SplayTree *insert(SplayTree *tree, int pos, const vector<ll> &values)
-	{
-		int currentSize = (tree ? tree->size : 0);
-
-		// Clamp position to valid range [1, size + 1]
-		// Any position > size + 1 becomes size + 1
-		pos = max(1, min(pos, currentSize + 1));
-
-		auto [leftPart, rightPart] = SplayTree::split(tree, pos - 1);
-
-		// Create new nodes for values to insert
-		SplayTree *newNodes = nullptr;
-		for (ll value : values)
+		vector<SplayTree *> st;
+		for (; t || !st.empty(); t = t->right)
 		{
-			SplayTree *newNode = new SplayTree(value);
-			if (!newNodes)
-				newNodes = newNode;
-			else
-			{
-				newNodes = SplayTree::merge(newNodes, newNode);
-				if (newNodes)
-					newNodes->update(); // Update hash after each merge
-			}
+			for (; t; t = t->left)
+				st.push_back(t);
+			t = st.back(), st.pop_back(), f(t->value);
 		}
-
-		// Merge everything back together
-		auto result = leftPart;
-		if (newNodes)
-		{
-			result = SplayTree::merge(result, newNodes);
-			if (result)
-				result->update();
-		}
-		if (rightPart)
-		{
-			result = SplayTree::merge(result, rightPart);
-			if (result)
-				result->update();
-		}
-		return result;
-	}
-	void swapRange(SplayTree *&spTree, ll i, ll j, ll k, ll l)
-	{
-		// First split into three parts: [1, i - 1], [i, j], rest
-		auto [leftPart, middle1] = SplayTree::split(spTree, i - 1);
-		auto [firstRange, rightPart1] = SplayTree::split(middle1, j - i + 1);
-
-		// From the right part, split into: [j + 1, k - 1], [k, l], rest
-		auto [middle2, rightPart2] = SplayTree::split(rightPart1, k - (j + 1));
-		auto [secondRange, lastPart] = SplayTree::split(rightPart2, l - k + 1);
-
-		// Now merge in the new order:
-		// [1, i - 1] + [k, l] + [j + 1, k - 1] + [i, j] + rest
-		spTree = SplayTree::merge(
-		    leftPart,
-		    SplayTree::merge(
-		        secondRange,
-		        SplayTree::merge(
-		            middle2,
-		            SplayTree::merge(
-		                firstRange,
-		                lastPart))));
-	}
-	// Helper function to free memory of deleted nodes
-	void freeNodes(SplayTree *treeNode)
-	{
-		if (!treeNode)
-			return;
-		treeNode->push(); // Ensure lazy propagation is handled
-		freeNodes(treeNode->left);
-		freeNodes(treeNode->right);
-		if (treeNode)
-			delete treeNode;
-	}
-	static void output(SplayTree *treeNode)
-	{
-		if (treeNode == nullptr)
-			return;
-		treeNode->push();
-		// Inorder traversal
-		output(treeNode->left);
-		// cout << treeNode->value << " ";
-		indices.push_front(treeNode->value);
-		output(treeNode->right);
 	}
 };
 
-ll rotationT;
-ll increment;
-
-// Template function
-template <void Process(SplayTree *x)>
-tuple<ll> apply(SplayTree *tree, int L, int R)
+struct Tree
 {
-	// Split into three parts: [1, L - 1], [L, R], [R + 1, end]
-	auto [leftPart, middle] = SplayTree::split(tree, L - 1);
-	auto [seg, rightPart] = SplayTree::split(middle, R - L + 1);
-	tuple<ll> res;
-	if (seg != nullptr)
+	SplayTree *root;
+
+	explicit Tree(SplayTree *r = nullptr) : root(r) {}
+	Tree(const vector<ll> &v) : root(SplayTree::build(v, 0, (int)v.size() - 1)) {}
+	void erase(int L, int R)
 	{
-		res = {seg->value};
-		Process(seg);
+		auto [l, s, r] = SplayTree::parts(root, L, R);
+		SplayTree::freeNodes(s), root = SplayTree::merge(l, r);
 	}
-	tree = SplayTree::merge(leftPart, SplayTree::merge(seg, rightPart));
-	if (tree)
-		tree->update(); // Ensure data is updated after merge
-	return res;
-}
-
-inline void getSubtreeData(SplayTree *x)
-{
-	return;
-}
-
-inline void reverse(SplayTree *x)
-{
-	x->applyReverse();
-}
-
-inline void lazyAdd(SplayTree *x)
-{
-	x->applyUpdate(increment);
-}
-
-inline void shift(SplayTree *x)
-{
-	int N = x->size;
-	if (rotationT >= N)
-		rotationT %= N;
-	if (rotationT == 0)
-		return; // No shift needed
-	// Split the segment into two parts: [1, N - rotationT] and [N - rotationT + 1, N]
-	auto [L, R] = SplayTree::split(x, N - rotationT);
-	x = SplayTree::merge(R, L);
-}
+	SplayTree *findKth(int k)
+	{
+		SplayTree *n = SplayTree::findKth(root, k);
+		return n ? root = n : n;
+	}
+	template <class F>
+	void inorder(F f) { SplayTree::inorder(root, f); }
+};
 
 int main()
 {
@@ -582,11 +267,11 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N, M;
-	char c;
 	// cin >> t;
 	while (t--)
 	{
+		ll N, M;
+		char c;
 		cin >> N >> M;
 		string str;
 		cin >> str;
@@ -596,62 +281,29 @@ int main()
 		iota(vc.begin(), vc.end(), 1);
 		LazySegmentTree segTree(vc);
 
-		pos[str[0]].insert(1);
-		SplayTree *spTree = new SplayTree(1);
-		for (int i{2}; i <= N; i++)
-		{
-			pos[str[i - 1]].insert(i);
-			spTree = SplayTree::merge(spTree, new SplayTree(i));
-		}
+		for (int i = 0; i < N; i++)
+			pos[str[i]].insert(i + 1);
+		Tree tree(vc);
+
 		while (M--)
 		{
 			ll L, R;
 			cin >> L >> R >> c;
-			// Add nullptr checks before accessing values
-			spTree->splay();
-			SplayTree *lNode, *rNode;
-			{
-				auto [leftPart, middle] = SplayTree::split(spTree, L - 1);
-				auto [leftNode, rightPart] = SplayTree::split(middle, 1);
-				lNode = leftNode;
-				// Merge everything back
-				spTree = SplayTree::merge(leftPart, SplayTree::merge(leftNode, rightPart));
-			}
-
-			{
-				auto [leftPart, middle] = SplayTree::split(spTree, R - 1);
-				auto [rightNode, rightPart] = SplayTree::split(middle, 1);
-				rNode = rightNode;
-				// Merge everything back
-				spTree = SplayTree::merge(leftPart, SplayTree::merge(rightNode, rightPart));
-			}
-
-			L = lNode->value;
-			R = rNode->value;
-			// cout << L << " " << R << endl;
+			L = tree.findKth(L)->value;
+			R = tree.findKth(R)->value;
 			while (true)
 			{
 				auto it = pos[c].lower_bound(L);
-				// cout << *it << " <--\n";
 				if (it == pos[c].end() || *it > R)
 					break;
-				// cout << "node = " << nodes[*it]->value << "\n";
 				int curPos = segTree.query(*it - 1, *it - 1);
-				auto [leftPart, middle] = SplayTree::split(spTree, curPos - 1);
-				auto [nodeToDelete, rightPart] = SplayTree::split(middle, 1);
-				// Merge everything back
-				nodeToDelete->freeNodes(nodeToDelete);
-				spTree = SplayTree::merge(leftPart, rightPart);
+				tree.erase(curPos, curPos);
 				segTree.update((*it), N, -1);
 				pos[c].erase(it);
 			}
 		}
-		if (spTree == nullptr)
-			return 0;
-		spTree->splay();
-		spTree->output(spTree);
-		while (indices.size() > 0)
-			cout << str[indices.back() - 1], indices.pop_back();
+		tree.inorder([&](ll v)
+		             { cout << str[v - 1]; });
 		cout << endl;
 	}
 	return 0;
