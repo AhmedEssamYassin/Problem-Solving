@@ -1,0 +1,1125 @@
+\documentclass[10pt]{article}
+
+% --- Geometry & Page Layout ---
+\usepackage[a4paper, margin=0.5in, top=0.5in, bottom=0.5in, headheight=20pt]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{microtype}
+\usepackage{setspace}
+% --- Typography & Math ---
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{array, booktabs}
+\usepackage{caption}
+
+% --- Colors & Theming ---
+\usepackage[svgnames]{xcolor}
+\usepackage{tikz}
+\definecolor{primary}{RGB}{24, 43, 73}        % Deep Slate Navy
+\definecolor{accent}{RGB}{37, 99, 235}        % Clean Royal Blue
+\definecolor{boxbg}{RGB}{248, 250, 252}       % Soft Slate White
+\definecolor{boxframe}{RGB}{226, 232, 240}    % Crisp Subtle Border
+\definecolor{codebg}{RGB}{250, 251, 252}      % Clean Code Background
+\definecolor{codeframe}{RGB}{225, 230, 236}   % Code Frame
+\definecolor{tagbg}{RGB}{238, 242, 255}       % Indigo Tint for Complexity Tag
+\definecolor{tagtext}{RGB}{49, 46, 129}       % Dark Indigo Text
+
+% --- Code Listings & Syntax Highlighting ---
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{listings, skins}
+
+\lstdefinestyle{vslightstyle}{
+    language=C++,
+    basicstyle=\ttfamily\footnotesize\color{black!90},
+    backgroundcolor=\color{codebg},
+    commentstyle=\color{gray!70}\itshape,
+    keywordstyle=\color{accent}\bfseries,
+    keywordstyle={[2]\color{purple!80!black}\bfseries},
+    stringstyle=\color{red!70!black},
+    numberstyle=\tiny\color{gray},
+    numbers=none,
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false,
+    breaklines=true,
+    frame=none,
+    morekeywords={include, define, endif, ifndef, using, namespace, ll, vector, string, bitset},
+    morekeywords=[2]{return, if, else, for, while, switch, case, break, auto}
+}
+
+% Code Listing Box
+\newtcblisting{vscode}[2][]{
+    enhanced,
+    listing only,
+    listing engine=listings,
+    listing options={style=vslightstyle},
+    title={#2},
+    coltitle=primary,
+    fonttitle=\footnotesize\bfseries\ttfamily,
+    colback=codebg,
+    colframe=codeframe,
+    colbacktitle=codeframe!40,
+    boxrule=0.5pt,
+    arc=3pt,
+    left=8pt, right=8pt, top=3pt, bottom=3pt,
+    toptitle=3pt, bottomtitle=3pt,
+    #1
+}
+
+% Inline Complexity Badge
+\newcommand{\complexity}[1]{%
+  \tcbox[on line,
+    colback=tagbg,
+    colframe=tagbg,
+    boxrule=0pt,
+    arc=2pt,
+    boxsep=0pt,
+    left=3.5pt, right=3.5pt, top=1.5pt, bottom=1.5pt
+  ]{\color{tagtext}\scriptsize\bfseries\ensuremath{#1}}%
+}
+
+% --- Section Formatting ---
+\usepackage{titlesec}
+\titleformat{\section}
+  {\color{primary}\Large\bfseries}
+  {\thesection}{0.7em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{12pt}{4pt}
+
+\titleformat{\subsection}
+  {\color{primary}\large\bfseries}
+  {\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{8pt}{3pt}
+
+% --- Custom Environments ---
+% Concept Container (Clean, unshadowed card)
+\newtcolorbox{conceptbox}[2][]{
+  enhanced,
+  title={#2},
+  coltitle=primary,
+  fonttitle=\bfseries\normalsize,
+  colback=boxbg,
+  colframe=boxframe,
+  colbacktitle=boxbg,
+  boxrule=0.6pt,
+  arc=3pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt,
+  toptitle=2pt, bottomtitle=3pt,
+  #1
+}
+
+% Key Formula / Result Callout (Left accent line)
+\newtcolorbox{resultbox}[1][]{
+  enhanced,
+  colback=accent!4!white,
+  colframe=accent!85!black,
+  boxrule=0pt,
+  leftrule=2.5pt,
+  arc=0pt,
+  left=8pt, right=8pt, top=4pt, bottom=4pt,
+  fontupper=\normalsize,
+  #1
+}
+
+% Derivation / Explanation Note
+\newtcolorbox{derivation}{
+  blanker,
+  borderline west={1.5pt}{0pt}{gray!40},
+  left=8pt,
+  top=3pt,
+  bottom=3pt,
+  fontupper=\small\color{black!80}
+}
+
+% --- Math shortcuts ---
+\DeclareMathOperator{\rad}{rad}
+
+% --- Spacing & Formatting ---
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setstretch{1.2}
+
+% --- Header & Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\footnotesize\color{gray!80}\textbf{Competitive Programming} \textbar\ Ad-Hoc Reference}
+\rhead{\footnotesize\color{gray!80}\nouppercase{\leftmark}}
+\cfoot{\footnotesize\color{gray!80}\thepage\ / \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{gray!30}\leaders\hrule height \headrulewidth\hfill}}
+
+\title{\vspace{-1.5em}\textbf{\LARGE Competitive Programming Ad-Hoc Sheet}\vspace{-0.5em}}
+\author{}
+\date{}
+
+% hyperref is loaded last on purpose
+\usepackage[colorlinks=true, linkcolor=primary, urlcolor=accent]{hyperref}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\vspace{0.8em}
+\hrule
+\vspace{0.8em}
+
+% ─────────────────────────────────────────────────────────────
+% PART I — FOUNDATIONS
+% ─────────────────────────────────────────────────────────────
+
+\section{Number Theory}
+
+\subsection{Basic Counting, Legendre \& Harmonic Partitioning}
+
+\begin{conceptbox}{Factorials, Squares \& Legendre's Formula}
+    \textbf{Trailing Zeros in $n!$:}
+    \[
+        \left\lfloor\frac{n}{5}\right\rfloor + \left\lfloor\frac{n}{5^2}\right\rfloor + \left\lfloor\frac{n}{5^3}\right\rfloor + \ldots \text{ until } 0
+    \]
+
+    \textbf{Legendre's Formula (Prime Power in $n!$):} \\
+    The exact exponent $E_p(n!)$ of prime $p$ dividing $n!$ is:
+    \[ E_p(n!) = \sum_{k=1}^{\infty} \left\lfloor \frac{n}{p^k} \right\rfloor = \frac{n - S_p(n)}{p - 1} \]
+    where $S_p(n)$ is the sum of digits of $n$ when written in base $p$.
+
+    \textbf{Number of perfect squares $\leq n$:}
+    \[ \left\lfloor\sqrt{n}\right\rfloor \]
+\end{conceptbox}
+
+\begin{conceptbox}{Maximum Number of Divisors $d(n)$}
+    Worst-case bounds for iterating over all divisors:
+    \begin{itemize}
+        \item $n \le 10^9 \implies d(n) \le 1344$ (at $n = 735{,}134{,}400$)
+        \item $n \le 10^{12} \implies d(n) \le 6720$ (at $n = 963{,}761{,}198{,}400$)
+        \item $n \le 10^{18} \implies d(n) \le 103680$ (at $n = 897{,}612{,}484{,}786{,}617{,}600$)
+    \end{itemize}
+\end{conceptbox}
+
+\begin{vscode}{Square Root Harmonic Partitioning \complexity{O(\sqrt{N})}}
+for (ll l = 1, r; l <= n; l = r + 1) 
+{
+    ll val = n / l;
+    r = n / val;
+}
+\end{vscode}
+\begin{derivation}
+    $\lfloor n / i \rfloor$ takes at most $2\sqrt{n}$ distinct values over $1 \le i \le n$. For each block $[l, r]$, the value \texttt{val} $= \lfloor n / l \rfloor$ is constant, and $r = \lfloor n / \text{val} \rfloor$ is the last index sharing that value. \\
+    \textbf{Use case:} Compute $\sum_{i=1}^n f(i) \cdot \lfloor n / i \rfloor$ with $O(\sqrt{n})$ block evaluations: given prefix sums $F$ of $f$, block $[l, r]$ contributes $\texttt{val} \cdot \big(F(r) - F(l-1)\big)$.
+\end{derivation}
+
+\begin{conceptbox}{Fibonacci Sequence}
+    \textbf{Range of Fibonacci numbers in 64 bits:} with $F_1 = F_2 = 1$, $F_{92}$ is the last Fibonacci number that fits in a signed 64-bit integer.
+    
+    \textbf{Check if $N$ is a Fibonacci number:} \\
+    A positive integer $N$ is a Fibonacci number if and only if either $5N^2 + 4$ or $5N^2 - 4$ is a perfect square (beware that $5N^2$ overflows signed 64-bit for $N \gtrsim 1.36 \cdot 10^9$ (unsigned: $1.9 \cdot 10^9$); use \texttt{\_\_int128}).
+\end{conceptbox}
+
+\subsection{Coprime Properties \& GCD Identities}
+
+\begin{conceptbox}{Euler's Totient \& Coprimes}
+    \textbf{Sum of numbers $< n$ that are coprime to $n$} (for $n > 1$)\textbf{:}
+    \[ \sum_{\substack{k = 1 \\ \gcd(k, n) = 1}}^{n - 1} k = \frac{n \cdot \varphi(n)}{2} \]
+
+    \textbf{Count numbers $\le m$ that are coprime to $n$:}
+    \[ \Phi(n, m) = \sum_{d \mid \rad(n)} \mu(d) \left\lfloor \frac{m}{d} \right\rfloor \]
+    where $\rad(n) = p_1 \cdot p_2 \cdots p_k$ (product of distinct prime factors) and $\mu(d)$ is the Möbius function.
+
+    \textbf{Count ordered coprime pairs $(a, b)$ such that $a \cdot b = m$:}
+    \[ 2^{\omega(m)} \]
+    where $\omega(m)$ is the number of distinct prime factors of $m$.
+\end{conceptbox}
+
+\begin{conceptbox}{Algebraic GCD Identities}
+    \begin{itemize}
+        \item \textbf{Exponential GCD} ($a > 1$): $\gcd(a^n - 1, a^m - 1) = a^{\gcd(n, m)} - 1$
+        \item \textbf{Fibonacci GCD:} $\gcd(F_n, F_m) = F_{\gcd(n, m)}$
+        \item \textbf{Euclidean Difference:} For $a > b > 0$, $\gcd(a, b) = \gcd(a - b, b) = \gcd(a \bmod b, b)$.
+    \end{itemize}
+\end{conceptbox}
+
+\begin{conceptbox}{Frobenius Coin Problem (Chicken McNugget Theorem)}
+    For two coprime positive integers $a$ and $b$ ($\gcd(a, b) = 1$):
+    \begin{resultbox}
+        \textbf{Largest unrepresentable integer:} $a \cdot b - a - b$
+    \end{resultbox}
+    \begin{itemize}
+        \item \textbf{Total unrepresentable positive integers:} $\frac{(a - 1)(b - 1)}{2}$
+        \item Every integer $k > a \cdot b - a - b$ can be expressed as $k = a x + b y$ for non-negative integers $x, y \ge 0$.
+    \end{itemize}
+\end{conceptbox}
+
+\subsection{Prime Factorization}
+
+\begin{vscode}{Count Distinct Prime Factors $\omega(m)$ \complexity{O(N)}}
+for (int i = 2; i <= n; i++)
+{
+    int q = i / lpf[i];
+    omega[i] = omega[q] + (lpf[i] != lpf[q]);
+}
+\end{vscode}
+\begin{derivation}
+    \textbf{Explanation:}
+    \begin{itemize}
+        \item \texttt{lpf[i]}: Smallest prime factor of $i$ (from Sieve).
+        \item \texttt{q}: Removing one factor of the smallest prime.
+        \item Logic: If the smallest prime of $i$ is different from the smallest prime of $q$, we found a new distinct factor.
+    \end{itemize}
+\end{derivation}
+
+\begin{conceptbox}{Totient Divisibility}
+    \textbf{Count number of $x$ such that $\varphi(x) \mid x$ and $x \leq n$:} \\
+    Count $x = 1$, and numbers of the form $x = 2^a \cdot 3^b$ with $a \geq 1,\; b \geq 0$ and $x \leq n$. (Reason: $x/\varphi(x) = \prod_{p \mid x} \frac{p}{p-1}$ is an integer only if the primes of $x$ form $\emptyset$, $\{2\}$ or $\{2, 3\}$.)\\
+    (Pure powers of 3 are excluded: e.g.\ $\varphi(3) = 2 \nmid 3$.)
+\end{conceptbox}
+
+\begin{vscode}{Count $x = 2^a \cdot 3^b \leq n, a \geq 1,\; b \geq 0$ \complexity{O(\log^2 n)}}
+ll cnt = 1; // x = 1
+for (ll p2 = 2; p2 <= n; p2 <<= 1) 
+{
+    for (ll p3 = p2; p3 <= n; ) 
+    {
+        cnt++;
+        if (p3 > n / 3) 
+            break; 
+        p3 *= 3;
+    }
+}
+\end{vscode}
+\subsection{Modular Arithmetic}
+
+\begin{conceptbox}{Wilson's Theorem}
+    For any prime $p$:
+    \[ (p - 1)! \equiv -1 \pmod{p} \implies (p - 1)! \equiv p - 1 \pmod{p} \]
+\end{conceptbox}
+
+\newpage
+\section{Combinatorics}
+
+\begin{conceptbox}{Binomial Identities}
+    \begin{itemize}
+        \item $\sum_{i = 1}^{n} i \binom{n}{i} = n \cdot 2^{n - 1}$
+        \item $\sum_{\substack{0 \le i \le n \\ i \text{ even}}} \binom{n}{i} = 2^{n - 1}$ \quad (for $n \ge 1$)
+        \item $\sum_{\substack{0 \le i \le n \\ i \text{ odd}}} \binom{n}{i} = 2^{n - 1}$ \quad (for $n \ge 1$)
+        \item \textbf{Lucas Theorem (Parity):} $\sum_{i=0}^n \sum_{j=0}^i \left( \binom{i}{j} \bmod 2 \right) = \sum_{i=0}^n 2^{\text{popcount}(i)}$
+        \item $\sum_{i=0}^{2^n-1} 2^{\text{popcount}(i)} = \sum_{k=0}^n \binom{n}{k} 2^k = 3^n$
+    \end{itemize}
+\end{conceptbox}
+
+\begin{vscode}{$\sum_{i=0}^n \sum_{j=0}^i \left( \binom{i}{j} \bmod 2 \right)$ \complexity{O(\log n)}}
+Mint f(ll n)
+{
+    if (n == 0)
+        return 1_m;
+    int k = __lg(n);
+    return pow3[k] + 2 * f(n - (1LL << k));
+}
+\end{vscode}
+
+\begin{conceptbox}{Stars and Bars}
+    \begin{itemize}
+        \item \textbf{Non-negative solutions} to $x_1 + \dots + x_k = n$: $\binom{n+k-1}{k-1}$
+        \item \textbf{Positive integer solutions} ($x_i \ge 1$): $\binom{n-1}{k-1}$
+    \end{itemize}
+\end{conceptbox}
+
+\begin{conceptbox}{Catalan Numbers ($C_n$)}
+    $C_n = \frac{1}{n+1}\binom{2n}{n} = \binom{2n}{n} - \binom{2n}{n+1}$
+    \begin{itemize}
+        \item \textbf{Recurrence:} $C_{n+1} = \sum_{i=0}^n C_i C_{n-i}$
+        \item \textbf{Parity:} $C_n$ is odd $\iff n = 2^k - 1$
+    \end{itemize}
+\end{conceptbox}
+
+\begin{vscode}{Catalan Number \complexity{O(1)}}
+Mint catalan(int n) 
+{
+    return (nCr(2 * n, n) - nCr(2 * n, n + 1));
+}
+\end{vscode}
+
+\begin{vscode}{Derangements (Permutations with $p_i \neq i$) \complexity{O(N)}}
+vector<Mint> D(max(2, n + 1));
+D[0] = 1, D[1] = 0;
+for (int i = 2; i <= n; i++)
+    D[i] = Mint(i - 1) * (D[i - 1] + D[i - 2]);
+\end{vscode}
+
+\newpage
+\section{Mathematical Tricks}
+
+\begin{conceptbox}{Median Trick}
+    To check if a subarray has \textbf{median $\geq m$} (for even length, the median is the lower middle element; use sum $\ge 0$ for the upper one):
+    \begin{enumerate}
+        \item Assign $+1$ if $a[i] \geq m$, $-1$ otherwise.
+        \item If the sum of the subarray $> 0$, the median is at least $m$.
+    \end{enumerate}
+\end{conceptbox}
+
+\begin{conceptbox}{Minimum Check Trick}
+    To verify whether the minimum value in a range is at least $k$:
+    \begin{enumerate}
+        \item Replace each element with $1$ if $a[i] \geq k$, and $0$ otherwise.
+        \item The range minimum is $\geq k$ iff the sum over that range equals the length of the range.
+    \end{enumerate}
+    For a grid, check whether the sum over the submatrix equals its area.
+\end{conceptbox}
+
+\begin{conceptbox}{Maximize Mismatched Items}
+    For quantities $a[1 \ldots n]$:
+    The maximum number of disjoint pairs of items of different kinds is
+    \[ \min\left(\left\lfloor\frac{\text{total}}{2}\right\rfloor, \text{total} - \max(a)\right), \qquad \text{total} = \sum_i a[i]. \]
+\end{conceptbox}
+
+\newpage
+\section{Array \& Invariant Transformations}
+
+\begin{conceptbox}{Kadane's Circular Maximum Subarray Sum}
+    The maximum contiguous sum in a circular array $A$ of size $n$ is:
+    \[ \max\left(\text{maxSubarraySum}(A), \quad \sum_{i=1}^n A[i] - \text{minSubarraySum}(A)\right) \]
+    \textit{Note: If all elements are negative, return $\text{maxSubarraySum}(A)$ to avoid picking an empty subarray.}
+\end{conceptbox}
+
+\begin{vscode}{Circular Maximum Subarray Sum \complexity{O(N)}}
+ll total = 0, curMax = 0, maxSub = -2e18, curMin = 0, minSub = 2e18;
+for (const ll &x : vc) 
+{
+    total += x;
+    curMax = max(x, curMax + x);
+    maxSub = max(maxSub, curMax);
+    curMin = min(x, curMin + x);
+    minSub = min(minSub, curMin);
+}
+ll res = (maxSub < 0) ? maxSub : max(maxSub, total - minSub);
+\end{vscode}
+
+
+\begin{conceptbox}{Difference Array for Range Updates}
+    When an operation allows adding to an interval $[l, r]$:
+    \begin{itemize}
+        \item Transform $A$ to difference array $D[i] = A[i] - A[i-1]$.
+        \item Adding $x$ to $[l, r]$ updates \textbf{only two positions}: $D[l]$ and $D[r+1]$.
+        \item Reduces range manipulations to pairing and matching indices on the difference array.
+    \end{itemize}
+\end{conceptbox}
+
+\begin{conceptbox}{Range Add \& Range GCD via Difference Array}
+    GCD does not distribute over addition, but by the Euclidean property:
+    \[ \gcd(A[l], A[l+1], \dots, A[r]) = \gcd\left( A[l], \; \gcd_{i=l+1}^r |D[i]| \right) \]
+\end{conceptbox}
+
+\begin{vscode}{Range Add \& Range GCD \complexity{O(\log N \log(\max A))}}
+// Update: Add x to range [l, r]  (arrays are 1-indexed, D has size n + 2)
+bit.update(l, x);
+bit.update(r + 1, -x);
+segTree.update(l, D[l] += x);
+if (r + 1 <= n)
+    segTree.update(r + 1, D[r + 1] -= x);
+
+// Query: Range GCD on [l, r]
+auto slv = [&](int l, int r)
+{
+    ll f = A[l] + bit.query(l);
+    if (l == r)
+        return abs(f);
+    return gcd(f, segTree.query(l + 1, r));
+};
+\end{vscode}
+
+
+\begin{conceptbox}{Permutation Inversion Parity \& Reversals}
+    \begin{itemize}
+        \item An \textbf{adjacent swap} strictly changes the number of inversions by $\pm 1$ (toggles parity).
+        \item A \textbf{3-element cyclic shift} $(a, b, c) \to (b, c, a)$ preserves inversion parity.
+        \item \textbf{Reversing a Subsegment of length $k$:} Reverses the order of all $\binom{k}{2}$ pairs. If $x$ of those pairs were inverted, there are now $\binom{k}{2} - x$ inversions. The change in inversions is $\binom{k}{2} - 2x \equiv \binom{k}{2} \pmod 2$:
+        \[ \text{newParity} = \left( \text{oldParity} + \frac{k(k - 1)}{2} \right) \bmod 2 \]
+        \item \textbf{Solvability Invariant} ($n \ge 3$): Using \emph{only} 3-element cyclic shifts, a target permutation is reachable if and only if its inversion parity equals the initial parity. With adjacent swaps every permutation is reachable, and the number of swaps used has the same parity as (initial parity $\oplus$ target parity).
+    \end{itemize}
+\end{conceptbox}
+
+\begin{vscode}{Range Reversal Inversion Parity Queries \complexity{O(N \log N + Q)}}
+ll inv{};
+for (int i{}; i < n; i++)
+{
+    inv += bit.rangeQuery(vc[i] + 1, n);
+    bit.update(vc[i], 1);
+}
+ll par = (inv & 1);
+
+// Query: Reverse range [l, r]
+ll k = r - l + 1;
+par = (par + k * (k - 1) / 2) & 1;
+\end{vscode}
+
+
+\begin{conceptbox}{15-Puzzle / Grid Inversion Invariant}
+    For an $N \times N$ sliding tile grid with a blank cell (inversions are counted over the tiles only, ignoring the blank):
+    \begin{itemize}
+        \item If $N$ is \textbf{odd}: Grid is solvable $\iff$ inversion count of flattened tiles is \textbf{even}.
+        \item If $N$ is \textbf{even}: Grid is solvable $\iff$ $(\text{inversions} + \text{row of the blank counted from the bottom, with the bottom row} = 1)$ is \textbf{odd}.
+    \end{itemize}
+\end{conceptbox}
+
+% ─────────────────────────────────────────────────────────────
+% PART II — BITWISE CLUSTER
+% ─────────────────────────────────────────────────────────────
+\newpage
+\section{Bit Manipulation}
+
+\begin{vscode}{Submask Enumeration of All Masks \complexity{O(3^N)}}
+for (int mask = 0; mask < (1 << n); mask++) 
+{
+    for (int sub = mask; sub > 0; sub = (sub - 1) & mask)
+    { // process non-empty submask `sub` of `mask` (handle sub = 0 separately) }
+}
+\end{vscode}
+
+\begin{vscode}{Bitset \& Number Rotations \complexity{O(1)}}
+// (a shift by BITS is undefined behaviour; C++20 provides std::rotl / std::rotr)
+auto rotl = [&](unsigned long long x, int k) { return (x << k) | (x >> (BITS - k)); };
+auto rotr = [&](unsigned long long x, int k) { return (x >> k) | (x << (BITS - k)); };
+\end{vscode}
+\begin{derivation}
+    For \texttt{std::bitset}, left and right shifts (\texttt{<{}<}, \texttt{>{}>}) fill with zeros, so combine them identically (for $0 < k < \texttt{BITS}$): \\\texttt{(b <{}< k) \textbar\ (b >{}> (BITS - k))}.
+\end{derivation}
+
+\begin{conceptbox}{XOR Identities \& Bitwise Monotonicity}
+    \begin{itemize}
+        \item $a \oplus b = a + b - 2 \cdot (a \mathbin{\&} b)$
+        \item $a \oplus b = 2 \cdot (a \mathbin{|} b) - (a + b)$
+        \item \textbf{SUM = OR Trick:} $a_l + \dots + a_r = a_l \mid \dots \mid a_r$ holds $\iff$ no two elements share a set bit (pairwise $\text{AND} = 0$).
+        \item Hence a segment with $\text{SUM} = \text{OR}$ contains at most 32 (or 64) non-zero elements, allowing brute force over the non-zero elements.
+        \item \textbf{OR/AND/GCD Monotonicity:} For any fixed left endpoint $l$, extending $r$ in $\text{OR}(l, r)$, $\text{AND}(l, r)$, or $\text{GCD}(l, r)$ can change values at most $\approx \log_2(\max A)$ times.
+    \end{itemize}
+\end{conceptbox}
+
+\begin{vscode}{All Subarray ORs/ANDs/GCDs \complexity{O(N \log (\max A))}}
+// groups: (value, largest start index) of every distinct op value over
+// subarrays ending at the current position, ordered by decreasing start
+vector<pair<ll, int>> groups, nxt;
+for (int i = 0; i < n; i++)
+{
+    nxt.clear();
+    nxt.emplace_back(a[i], i);
+    for (const auto &[val, l] : groups)
+    {
+        ll cur = op(val, a[i]);
+        if (cur == nxt.back().first)
+            continue;
+        nxt.emplace_back(cur, l);
+    }
+    swap(groups, nxt);
+    // groups now holds all distinct `op` values of subarrays ending at i
+    // for example: this counts how many subarrays have op == x
+    for (int j = 0; j < (int)groups.size(); j++)
+    {
+        int lo = (j + 1 < (int)groups.size()) ? groups[j + 1].second + 1 : 0;
+        mp[groups[j].first] += groups[j].second - lo + 1;
+    }
+}
+\end{vscode}
+
+\newpage
+\begin{vscode}{Gray Code Generation \complexity{O(N \cdot 2^N)}}
+vector<string> grayCode(int n)
+{
+    vector<string> result;
+    for (int i = 0; i < (1 << n); i++)
+    {
+        int gray = i ^ (i >> 1);
+        string code = "";
+        for (int j = n - 1; j >= 0; j--)
+            code += ((gray >> j) & 1) ? '1' : '0';
+        result.push_back(code);
+    }
+    return result;
+}
+\end{vscode}
+
+\subsection{Range Bit Counting}
+Calculating $\&, |, \oplus$ over the range $[l, r]$ by counting the numbers with the $k$-th bit set.
+
+\begin{vscode}{Count k-th bit set in range \complexity{O(\log(\max A))}}
+auto solve = [&](const ll &n, const int &k)
+{
+    if (n < 0)
+        return 0LL;
+    ll res = (n >> (k + 1)) << k;
+    if ((n >> k) & 1)
+        res += (n & ((1LL << k) - 1)) + 1; // +1 to count `n` itself
+
+    return res;
+};
+
+// Usage loop for [l, r], values below 2^62 (shifts by 64 would be undefined)
+ll andRes{}, orRes{}, xorRes{};
+for (int b = 0; b < 62; b++)
+{
+    ll c = solve(r, b) - solve(l - 1, b); // numbers in [l, r] with bit b set
+    if (c == r - l + 1)
+        andRes |= 1LL << b;
+    if (c > 0)
+        orRes |= 1LL << b;
+    if (c & 1)
+        xorRes |= 1LL << b;
+}
+\end{vscode}
+
+\newpage
+\section{Bitwise Operations over Subsequences}
+\label{sec:subseq}
+
+\smash{\begin{tikzpicture}[remember picture, overlay]
+\node[anchor=north east, xshift=-0.5in, yshift=-0.82in] at (current page.north east) {
+    \tcbox[
+        colback=boxbg,
+        colframe=boxframe,
+        boxrule=0.6pt,
+        arc=3pt,
+        left=5pt, right=5pt, top=3pt, bottom=3pt
+    ]{%
+        \scriptsize
+        \begin{tabular}{@{}l@{}}
+            \textbf{\color{primary}Notation}\\[1pt]
+            $\text{cnt}[b]$: elements with $b$-th bit set\\
+            $z = n - \text{cnt}[b]$: elements with $b$-th bit cleared
+        \end{tabular}%
+    }
+};
+\end{tikzpicture}}
+
+\subsection{XOR Operations}
+\begin{itemize}
+    \item \textbf{Sum of XOR of all non-empty subsequences} ($n \ge 1$; $\bigvee$ is the bitwise OR):
+          \[ 2^{n - 1} \cdot \left( \bigvee_{i=1}^n a_i \right) \]
+    \item \textbf{Sum of XOR of subsequences of length $k$:}
+          \[ \sum_{b = 0}^{\infty} (2^b) \cdot \sum_{j \text{ odd}} \binom{\text{cnt}[b]}{j} \binom{z}{k - j} \]
+\end{itemize}
+
+\begin{vscode}{Sum of XOR Subsequences \complexity{O(N)}}
+ll totOr = 0;
+for (const ll &x : vc) 
+    totOr |= x;
+Mint res = power(2_m, n - 1) * totOr;
+\end{vscode}
+
+\begin{vscode}{Sum of XOR Subsequences of length k \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+Mint res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    int z = n - cnt[b];
+    Mint ways = 0;
+    for (int j = 1; j <= min(k, cnt[b]); j += 2) 
+        ways += nCr(cnt[b], j) * nCr(z, k - j);
+    res += ways * (1ULL << b);
+}
+\end{vscode}
+
+\begin{vscode}{Sum of XOR Subsequences for All k (NTT) \complexity{O(N \log N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+Mint inv2 = 1_m / 2_m;
+vector<Mint> ans(n + 1, 0);
+for (int b = 0; b < maxBits; b++) 
+{
+    int z = n - cnt[b];
+    vector<Mint> P(cnt[b] + 1), Q(z + 1);
+    for (int i = 0; i <= cnt[b]; i++) 
+        P[i] = (i & 1 ? -nCr(cnt[b], i) : nCr(cnt[b], i));
+    for (int i = 0; i <= z; i++) Q[i] = nCr(z, i);
+    vector<Mint> C = convolute(P, Q);
+    for (int k = 1; k <= n; k++) 
+    {
+        Mint oddWays = (nCr(n, k) - C[k]) * inv2;
+        ans[k] += oddWays * (1ULL << b);
+    }
+}
+\end{vscode}
+
+\newpage
+\subsection{OR Operations}
+\begin{itemize}
+    \item \textbf{Sum of OR of all non-empty subsequences:}
+          \[ \sum_{b = 0}^{\infty} (2^b) \cdot (2^n - 2^{z}) \]
+    \item \textbf{Sum of OR of subsequences of length $k$:}
+          \[ \sum_{b = 0}^{\infty} (2^b) \cdot \left( \binom{n}{k} - \binom{z}{k} \right) \]
+\end{itemize}
+
+\begin{vscode}{Sum of OR Subsequences \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+vector<Mint> p2(n + 1, 1);
+for (int i = 1; i <= n; i++) 
+    p2[i] = (p2[i - 1] * 2);
+Mint res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    int z = n - cnt[b];
+    res += (1ULL << b) * (p2[n] - p2[z]);
+}
+\end{vscode}
+
+\begin{vscode}{Sum of OR Subsequences of length k \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+vector<Mint> p2(n + 1, 1);
+for (int i = 1; i <= n; i++) 
+    p2[i] = (p2[i - 1] * 2);
+Mint res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    int z = n - cnt[b];
+    res += (1ULL << b) * (nCr(n, k) - nCr(z, k));
+}
+\end{vscode}
+
+\newpage
+\subsection{AND Operations}
+\begin{itemize}
+    \item \textbf{Sum of AND of all non-empty subsequences:}
+          \[ \sum_{b = 0}^{\infty} (2^b) \cdot (2^{\text{cnt}[b]} - 1) \]
+    \item \textbf{Sum of AND of subsequences of length $k$:}
+          \[ \sum_{b = 0}^{\infty} (2^b) \cdot \binom{\text{cnt}[b]}{k} \]
+\end{itemize}
+
+\begin{vscode}{Sum of AND Subsequences \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+vector<Mint> p2(n + 1, 1);
+for (int i = 1; i <= n; i++) 
+    p2[i] = (p2[i - 1] * 2);
+
+Mint res = 0;
+for (int b = 0; b < maxBits; b++) 
+    res += (1ULL << b) * (p2[cnt[b]] - 1_m);
+\end{vscode}
+
+\begin{vscode}{Sum of AND Subsequences of length k \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+vector<Mint> p2(n + 1, 1);
+for (int i = 1; i <= n; i++) 
+    p2[i] = (p2[i - 1] * 2);
+
+Mint res = 0;
+for (int b = 0; b < maxBits; b++) 
+    res += (1ULL << b) * nCr(cnt[b], k);
+\end{vscode}
+
+\newpage
+\section{Bitwise Operations over Subarrays}
+
+\subsection{XOR Operations}
+
+\begin{conceptbox}{Sum of XOR of all subarrays}
+    Formula: $\sum_{b = 0}^{\infty} (2^b) \cdot f_b(n)$, where $f_b(n)$ counts subarrays where $b$-th bit contributes (parity of prefix counts).
+\end{conceptbox}
+
+\begin{vscode}{Sum XOR All Subarrays \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+
+ll res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    ll c0 = 1, c1 = 0, pref = 0;
+    for (int i = 0; i < n; i++) 
+    {
+        pref ^= ((vc[i] >> b) & 1);
+        res += (1ULL << b) * (pref ? c0 : c1);
+        c1 += !!pref; 
+        c0 += !pref;
+    }
+}
+\end{vscode}
+
+\begin{conceptbox}{Sum of XOR of subarrays of length $k$}
+    Formula: $\sum_{b = 0}^{\infty} (2^b) \cdot f_b(n, k)$ using prefix XOR in $O(N)$.
+\end{conceptbox}
+
+\begin{vscode}{Sum XOR Subarrays Length k \complexity{O(N)}}
+int n = vc.size();
+if (n < k) 
+    return 0;
+ll res = 0;
+vector<ll> pref(n + 1, 0);
+for (int i = 0; i < n; i++) 
+    pref[i + 1] = pref[i] ^ vc[i];
+for (int i = 0; i + k <= n; i++)
+    res += (pref[i + k] ^ pref[i]);
+\end{vscode}
+
+\newpage
+\subsection{OR Operations}
+
+\begin{conceptbox}{Sum of OR of all subarrays}
+    Formula: $\sum_{b = 0}^{\infty} (2^b) \cdot g_b(n)$ based on distance from last occurrence.
+\end{conceptbox}
+
+\begin{vscode}{Sum OR All Subarrays \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+
+ll res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    ll last = -1;
+    for (int i = 0; i < n; i++) 
+    {
+        if ((vc[i] >> b) & 1) 
+            last = i;
+        if (last != -1) 
+            res += (1ULL << b) * (last + 1);
+    }
+}
+\end{vscode}
+
+\begin{conceptbox}{Sum of OR of subarrays of length $k$}
+    Formula: $\sum_{b = 0}^{\infty} (2^b) \cdot g_b(n, k)$
+\end{conceptbox}
+
+\begin{vscode}{Sum OR Subarrays Length k \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+
+ll res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    ll cnt = 0;
+    ll total = n - k + 1;
+    for (int i = 0; i < n; ) 
+    {
+        if ((vc[i] >> b) & 1) 
+        { 
+            i++; 
+            continue; 
+        }
+        int j = i;
+        while (j < n && !((vc[j] >> b) & 1)) 
+            j++;
+        int len = j - i;
+        if (len >= k) 
+            cnt += (len - k + 1);
+        i = j;
+    }
+    res += (1ULL << b) * (total - cnt);
+}
+\end{vscode}
+\newpage
+\subsection{AND Operations}
+
+\begin{conceptbox}{Sum of AND of all subarrays}
+    Formula: $\sum_{b = 0}^{\infty} (2^b) \cdot h_b(n)$ counting consecutive segments with bit set.
+\end{conceptbox}
+
+\begin{vscode}{Sum AND All Subarrays \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+
+ll res = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    ll cnt = 0;
+    for (int i = 0; i < n; i++) 
+    {
+        if ((vc[i] >> b) & 1) 
+            res += (1ULL << b) * ++cnt;
+        else 
+            cnt = 0;
+    }
+}
+\end{vscode}
+
+\begin{conceptbox}{Sum of AND of subarrays of length $k$}
+    Formula: $\sum_{b = 0}^{\infty} (2^b) \cdot h_b(n, k)$
+\end{conceptbox}
+
+\begin{vscode}{Sum AND Subarrays Length k \complexity{O(N \log(\max A))}}
+ll maxA = *max_element(vc.begin(), vc.end());
+int maxBits = maxA ? __lg(maxA) + 1 : 1;
+
+ll ans = 0;
+for (int b = 0; b < maxBits; b++) 
+{
+    ll cnt = 0;
+    for (int i = 0; i < n; ) 
+    {
+        if (!((vc[i] >> b) & 1)) 
+        { 
+            i++; 
+            continue; 
+        }
+        int j = i;
+        while (j < n && ((vc[j] >> b) & 1)) 
+            j++;
+        int len = j - i;
+        if (len >= k) 
+            cnt += (len - k + 1);
+        i = j;
+    }
+    ans += cnt * (1ULL << b);
+}
+\end{vscode}
+
+\section{Range Queries \& Bitwise Operations}
+
+\begin{conceptbox}{Segment Tree with Bit Frequencies}
+    Instead of maintaining the actual values in the segment tree, maintain an array \texttt{cnt[b]} for each node, representing the \textbf{number of elements in the range where the $b$-th bit is set}.
+    
+    This directly provides the frequencies needed for the Subsequence formulas in Section~\ref{sec:subseq}.
+\end{conceptbox}
+
+\subsection{Lazy Propagation Updates}
+
+When performing range updates, processing each bit independently allows updates in $O(\text{bits})$ time:
+\begin{itemize}
+    \item \textbf{Range XOR by $X$:} 
+    For each bit $b$, if the $b$-th bit of $X$ is $1$, it flips the $b$-th bit of every element in the range:
+    \[ \text{newCnt}[b] = \text{lengthOfRange} - \text{cnt}[b] \]
+    
+    \item \textbf{Range OR by $X$:}
+    For each bit $b$, if the $b$-th bit of $X$ is $1$, it forces the $b$-th bit of every element to become $1$:
+    \[ \text{newCnt}[b] = \text{lengthOfRange} \]
+    
+    \item \textbf{Range AND by $X$:}
+    For each bit $b$, if the $b$-th bit of $X$ is $0$, it forces the $b$-th bit of every element to become $0$:
+    \[ \text{newCnt}[b] = 0 \]
+\end{itemize}
+
+\subsection{Querying Subsequences over a Range \texorpdfstring{$[L, R]$}{[L, R]}}
+
+To answer queries like \textit{"What is the sum of XOR/OR/AND of all subsequences in range $[L, R]$?"}:
+\begin{enumerate}
+    \item Query the segment tree to get the combined \texttt{cnt[b]} array for the range $[L, R]$.
+    \item Let $len = R - L + 1$.
+    \item For XOR, apply: \texttt{res += (1ULL <{}< b) * (cnt[b] > 0 ? p2[len - 1] : 0)}.
+    \item For AND/OR, use the respective formulas from Section~\ref{sec:subseq} using $len$ and $\text{cnt}[b]$.
+\end{enumerate}
+
+\subsection{Querying Subarrays over a Range \texorpdfstring{$[L, R]$}{[L, R]}}
+
+Because bitwise $\&, |, \gcd$ are monotonic and take at most $\approx \log_2(\max A)$ distinct values along prefixes and suffixes, each Segment Tree node maintains:
+\begin{itemize}
+    \item \texttt{tot}: Sum of bitwise operations over all subarrays completely within $[l, r]$.
+    \item \texttt{pref}: Vector of pairs $(\text{val}, \text{count})$ of distinct prefixes starting from $l$.
+    \item \texttt{suff}: Vector of pairs $(\text{val}, \text{count})$ of distinct suffixes ending at $r$.
+\end{itemize}
+
+\begin{resultbox}
+    \textbf{Range Subarray XOR Sum via Prefix XOR:} 
+    A subarray $A[i \dots j]$ has bit $b$ set $\iff P[j]$ and $P[i-1]$ have differing $b$-th bits. For a range $[L, R]$, let $c_1[b]$ be the count of prefixes in $\{P[L-1] \dots P[R]\}$ with bit $b$ set, and $c_0[b] = (R - L + 2) - c_1[b]$. The total XOR sum is:
+    \[ \sum_{b=0}^{\infty} (2^b) \cdot c_0[b] \cdot c_1[b] \]
+    Maintained in $O(\log(\max A))$ via prefix bit counts without segment tree node merging.
+\end{resultbox}
+
+\begin{vscode}{Segment Tree Subarray Node Merge \complexity{O(\log^2(\max A))}}
+struct Node
+{
+    ll tot;
+    vector<pair<ll, ll>> pref, suff;
+    Node() { tot = 0; }
+    Node(ll val) 
+    { 
+        tot = val; 
+        pref.emplace_back(val, 1);
+        suff.emplace_back(val, 1);
+    }
+};
+
+Node merge(const Node &leftNode, const Node &rightNode)
+{
+    Node res;
+    res.tot = leftNode.tot + rightNode.tot;
+    for (const auto &[u, cu] : leftNode.suff)
+    {
+        for (const auto &[v, cv] : rightNode.pref)
+            res.tot += op(u, v) * cu * cv;
+    }
+
+    res.pref = leftNode.pref;
+    ll fullL = leftNode.pref.back().first;
+    for (const auto &[v, cv] : rightNode.pref)
+    {
+        ll cur = op(fullL, v);
+        if (cur == res.pref.back().first)
+            res.pref.back().second += cv;
+        else
+            res.pref.emplace_back(cur, cv);
+    }
+
+    res.suff = rightNode.suff;
+    ll fullR = rightNode.suff.back().first;
+    for (const auto &[u, cu] : leftNode.suff)
+    {
+        ll cur = op(u, fullR);
+        if (cur == res.suff.back().first)
+            res.suff.back().second += cu;
+        else
+            res.suff.emplace_back(cur, cu);
+    }
+    return res;
+}
+\end{vscode}
+
+% ─────────────────────────────────────────────────────────────
+% PART III — STRUCTURAL & ALGORITHM THEORY
+% ─────────────────────────────────────────────────────────────
+\newpage
+\section{String Algorithms}
+
+\begin{conceptbox}{Palindrome Parity Mask \& Rearrangeable Substrings}
+    Represent character frequency parities with a bitmask ($c$-th bit is $1$ if character count is odd, $0$ if even).
+    \begin{resultbox}
+        A string can be rearranged into a palindrome $\iff \text{popcount}(\text{mask}) \le 1$.
+    \end{resultbox}
+    \textbf{Prefix Parity Mask:} Let $P[i]$ be the prefix XOR mask of $S[0 \dots i]$. A substring $S[l \dots r]$ is rearrangeable into a palindrome $\iff \text{popcount}(P[r] \oplus P[l - 1]) \le 1$.
+\end{conceptbox}
+
+\begin{vscode}{Count Rearrangeable Palindromic Substrings \complexity{O(|\Sigma| \cdot N \log N)}}
+ll mask = 0, res = 0;
+map<int, int> cnt;
+cnt[0] = 1;
+for (const char &c : str) 
+{
+    mask ^= (1 << (c - 'a'));
+    res += cnt[mask];
+    for (int b = 0; b < 26; b++)
+        res += cnt[mask ^ (1 << b)];
+    cnt[mask]++;
+}
+\end{vscode}
+
+\begin{conceptbox}{String Periodicity \& KMP Border Property}
+    \textbf{Problem 1 --- Find the shortest base $T$ such that $S = T^k$:} Compute $k = n - \pi[n - 1]$. If $n \bmod k = 0$ and $\pi[n - 1] > 0$, then $T = S[0 \dots k - 1]$ and $S = T^{n / k}$. Otherwise, $S$ has no such repetition, and the code sets $\text{period} = n$ (i.e.\ $S$ itself).
+\end{conceptbox}
+
+\begin{vscode}{Smallest Repeating Period \complexity{O(N)}}
+int k = n - b[n]; // b[n] is PI[n - 1]
+int period = (b[n] > 0 && n % k == 0) ? k : n;
+string root = str.substr(0, period);
+int repetitions = n / period;
+\end{vscode}
+
+\begin{conceptbox}{Application --- Shortest string with exactly $k$ copies of $t$}
+    Consecutive occurrences of $t$ can overlap by $\pi[n - 1]$ characters (its longest border). So each new occurrence after the first only requires appending $t\,[\pi[n-1] \dots n-1]$ --- the last $n - \pi[n-1]$ characters. The shortest such string has length $n + (k - 1)(n - \pi[n-1])$.
+\end{conceptbox}
+
+\begin{vscode}{Shortest string with exactly $k$ copies of $t$}
+preprocessKMP(str);
+int l = b[n];
+cout << str;
+for (int i{}; i < k - 1; i++)
+    cout << str.substr(l);
+\end{vscode}
+
+\newpage
+\begin{conceptbox}{Cyclic Shift Equivalence \& Minimal Rotation}
+    \textbf{Core question:} Are two strings $A$ and $B$ the same string written on a circle, just read from a different starting point? Two tools answer this, depending on the situation:
+    \begin{resultbox}
+        \textbf{method 1 --- Pairwise check:} For $|A| = |B|$, $B$ is a rotation of $A$ $\iff B$ appears as a substring in $A + A$. The match index $i$ is also the minimum left shift to transform $A$ into $B$, and $(n - i) \bmod n$ is the equivalent right shift. Use when comparing two specific strings.
+    \end{resultbox}
+    \begin{resultbox}
+        \textbf{method 2 --- Canonical form (\texttt{minRotation}):} Given a circular string, read it from every possible starting point and return the lexicographically smallest result. Since all rotations of the same circle produce the same canonical string, \texttt{minRotation}$(A)$ $=$ \texttt{minRotation}$(B)$ $\iff A$ and $B$ are rotations of each other. Use when grouping or hashing many circular strings --- compute once per string, then use as a map key instead of doing $O(K^2)$ pairwise checks.
+    \end{resultbox}
+    \textbf{Duval's Algorithm} computes \texttt{minRotation} in $O(N)$ time by doubling the string and finding the lexicographically smallest length-$n$ substring via Lyndon factorization.
+\end{conceptbox}
+
+\begin{vscode}{Minimal String Rotation (Duval's Algorithm) \complexity{O(N)}}
+string minRotation(string str)
+{
+    str += str;
+    int n = str.size(), i = 0, res = 0;
+    while (i < n / 2)
+    {
+        res = i;
+        int j = i + 1, k = i;
+        while (j < n && str[k] <= str[j])
+        {
+            if (str[k] < str[j])
+                k = i;
+            else
+                k++;
+            j++;
+        }
+        while (i <= k) // Skip suboptimal candidate starting positions
+            i += j - k;
+    }
+    return str.substr(res, n / 2);
+}
+\end{vscode}
+
+\begin{conceptbox}{Greedy Concatenation Ordering}
+    To arrange strings such that their concatenation is lexicographically smallest (or largest), standard element-wise comparison fails.
+    \begin{resultbox}
+        \textbf{Comparator:} $A \prec B \iff A + B < B + A$ (this defines a strict weak ordering).
+    \end{resultbox}
+\end{conceptbox}
+
+\begin{vscode}{Sort by Concatenation Order \complexity{O(N \log N \cdot L)}}
+sort(vc.begin(), vc.end(), [](const string &a, const string &b) 
+{ return a + b < b + a;});
+\end{vscode}
+
+
+\newpage
+\section{Greedy \& Poset Principles}
+
+\begin{conceptbox}{Dilworth's Theorem \& Sequence Partitions}
+    In any finite partially ordered set:
+    \[ \text{Size of Maximum Antichain} = \text{Minimum Number of Chains to Cover Set} \]
+    \begin{resultbox}
+        The minimum number of non-decreasing subsequences needed to partition an array equals the length of the \textbf{Longest Strictly Decreasing Subsequence}.
+    \end{resultbox}
+\end{conceptbox}
+
+
+% ─────────────────────────────────────────────────────────────
+% PART IV — PUZZLE-STYLE AD-HOCS
+% ─────────────────────────────────────────────────────────────
+
+\section{Chess Problems}
+
+\begin{conceptbox}{Knights on a Chessboard ($n \times m$)}
+    \textbf{Ways two knights attack each other} (for $n, m \ge 2$; the formula counts $2 \times 3$ and $3 \times 2$ rectangles):
+    \begin{resultbox}
+        \[ 2 \cdot (n - 1) \cdot (m - 2) + 2 \cdot (n - 2) \cdot (m - 1) \]
+    \end{resultbox}
+
+    \textbf{Ways two knights do NOT attack each other:}
+    \begin{resultbox}
+        \[
+            \frac{n \cdot m \cdot (n \cdot m - 1)}{2} - \left(2 \cdot (n - 1) \cdot (m - 2) + 2 \cdot (n - 2) \cdot (m - 1)\right)
+        \]
+    \end{resultbox}
+\end{conceptbox}
+
+\newpage
+\section{Geometry}
+
+\begin{conceptbox}{Manhattan to Chebyshev Rotation \& 2D Median}
+    Applying the coordinate rotation $(x', y') = (x + y, x - y)$ transforms 2D Manhattan distance into Chebyshev distance:
+    \[ |x_1 - x_2| + |y_1 - y_2| = \max(|x'_1 - x'_2|, |y'_1 - y'_2|) \]
+    This decouples the two coordinates, turning 2D distance bounds into independent 1D range queries.
+
+    \textbf{Optimal Meeting Point (Minimizing Sum of Distances):}
+    \begin{itemize}
+        \item \textbf{1D Line:} The optimal point is the \textbf{median} of the coordinates.
+        \item \textbf{2D Manhattan Distance:} Independent for axes. Optimal point is $(\text{median}(X), \text{median}(Y))$.
+        \item \textbf{2D Chebyshev Distance} (note $\max(|\Delta x|, |\Delta y|) = \frac{|\Delta u| + |\Delta v|}{2}$): Rotate to Manhattan $(u, v) = (x+y, x-y)$, find the medians $U_{\text{opt}}$ and $V_{\text{opt}}$. Since valid original grid points require $u \equiv v \pmod 2$, if $U_{\text{opt}}$ and $V_{\text{opt}}$ have different parities, test the 4 adjacent points with matching parities, then rotate back.
+    \end{itemize}
+\end{conceptbox}
+
+\begin{conceptbox}{Pick's Theorem for Lattice Polygons}
+    For any simple polygon with vertices on integer grid coordinates:
+    \[ \text{Area} = I + \frac{B}{2} - 1 \]
+    where $I$ is the number of strictly interior points, and $B = \sum_{i=1}^n \gcd(|x_{i+1} - x_i|, |y_{i+1} - y_i|)$ is the number of boundary lattice points.
+\end{conceptbox}
+
+\begin{conceptbox}{Tiling Grid into a Square}
+    Number of $n \cdot m$ grid copies needed to form a square (without intersection nor changing orientation):
+    \[ \frac{n \cdot m}{\gcd(n, m)^2} \]
+\end{conceptbox}
+
+\end{document}
