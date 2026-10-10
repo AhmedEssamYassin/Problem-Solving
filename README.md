@@ -52,6 +52,12 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - [Wavelet Tree and Wavelet Matrix](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Wavelet%20Trees)
 - [Palindromic Tree (Eer Tree)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Palindromic%20Tree%20(Eer%20Tree))
 - [Trie](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Trie)
+- [Convex Hull Trick (CHT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Convex%20Hull%20Trick)
+- [Li Chao Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Li%20Chao%20Tree)
+- [Chtholly Tree (ODT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Chtholly%20Tree%20(ODT))
+- [Lazy Priority Queue](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Lazy%20Priority%20Queue)
+- [Policy Based Data Structures](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Policy%20Based%20Data%20Structures)
+- [Monotonic Stack](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Monotonic%20Stack)
 - [Graph theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Graph%20Theory)
 > - Types of Graphs and Terminologies
 >   - Node and Edge
@@ -79,7 +85,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 > - Maximum Flow
 >   - Maximum Flow using Edmond_Karp
 >   - Maximum Flow Minimum Cut
-> - Maximum Graph Matchings
+>   - Maximum Graph Matchings
 >   - Kuhn
 >   - Hopcroft_Karp
 >   - Artificial Network Solution (Max Flow) 
@@ -93,28 +99,38 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 >   - Kth Ancestor (Binary lifting)
 >   - LCA (Lowest Common Ancestor)
 >   - Static Path Queries
-> - HLD (Heavy Light Decomposition), (Online Path Queries)
-> - Centroid Decomposition
+>   - HLD (Heavy Light Decomposition), (Online Path Queries)
+>   - Centroid Decomposition
 
 ---
 
 ## Advanced Data Structures and Algorithms
 - [Fast Fourier Transform (FFT) and Number Theoretic Transform (NTT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/FFT%2C%20NTT)
 - [Merge Sort Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Merge%20Sort%20Tree)
-- Segment Tree Beats
+- [Segment Tree Beats](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Segment%20Tree%20Beats)
 - [Persistent Segment Trees](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Persistent%20Segment%20Tree)
 - [Splay Trees](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Splay%20Trees)
+- [Matrix Exponentiation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Matrix%20Exponentiation)
 
 ---
 
 ## Miscellaneous Topics
 - [Dynamic Programming](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Dynamic%20Programming)
+- [Combinatorics](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Combinatorics) (Burnside's Lemma, Catalan/Bracket Sequences, Permutation Order & Rank)
+- [Geometry](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Geometry) (Convex Hull)
+- [Ad-Hoc Sheet & Problem-Solving Tricks](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Ad-hoc)
 - [Mo's Algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Mo%27s%20Algorithm)
 - [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory) (Too deep topics, detailed in separate point)
+- [Gaussian Elimination](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Math/Gaussian%20Elimination)
+- [XOR Basis](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/XOR%20Basis)
+- [XOR Hash](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/XOR%20Hash)
+- [Big Integers](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Big%20Integers)
+- [Interactive problems](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Interactive%20problems)
+- [MEX](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/MEX)
 - [Manacher's Algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Manacher%27s%20Algorithm)
 - [Game Theory (Nim game and Sprague-Grundy numbers)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Game%20Theory)
-- [Matrix Exponentiation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Matrix%20Exponentiation)
-
+- [Scan line or Difference array algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Scan%20line%20or%20Difference%20array%20algorithm)
+- [Expression Parsing](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Expression%20Parsing)
 - [KMP (Knuth–Morris–Pratt) algorithm](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Z_Function%20and%20KMP)
 - [String Hashing (single and double hashing)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/String%20Hashing)
 - [Regex in C++](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Regex%20in%20C%2B%2B)
@@ -128,36 +144,50 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - Factorization
 - Greatest common divisor: GCD
 - Least common multiple: LCM
+- Linear Diophantine Equations
+- Modular Square Root (Tonelli-Shanks)
+- Discrete Logarithm (Baby-Step Giant-Step)
 - Prime numbers
 - Prime testing
     - Naïve method
     - Trial division
     - Fermat’s little theorem
-    - Miller-Rabin
-    - Precomputation: Sieve and Linear Sieve
+    - Miller-Rabin (Jim Sinclair 7-base deterministic for 64-bit)
+    - Baillie–PSW (BPSW) for 128-bit
+    - Precomputation: Sieve of Eratosthenes, Linear Sieve, and Wheel Sieve
 - Goldbach conjecture
 - Prime factorization
-    - Naïve method O(N)
-    - Using LPF for multiple queries O(log(N))
+    - Naïve method $O(N)$
+    - Using LPF for multiple queries $O(\log N)$
     - Pollard-rho
     - Birthday paradox
     - Floyd’s cycle detection
     - Brent-Pollard-rho
-    - Brent-Pollard-rho with Montgomery multiplication
+    - Brent-Pollard-rho with Montgomery multiplication (64-bit & 128-bit)
+    - Lenstra's Elliptic Curve Method (ECM)
     - Prime factorization using pollard-rho
 - Generating all factors from prime factorization
 - Prime factorization of $(N^x)$
 - Prime factorization of $N!$
 - Legendre’s theorem
-- Prime number theory $π(N)$
+- Prime counting function $\pi(N)$ (Meissel-Lehmer algorithm)
 - Counting divisors: $σ_0$
-    - Naïve method O(N)
-    - Trial division O($\sqrt{N}$)
+    - Naïve method $O(N)$
+    - Trial division $O(\sqrt{N})$
     - Linear Sieve of Eratosthenes and LPF $O(N^{1/3})$    
-    - Brent-Pollard-rho O($N^{1/4}$)
+    - Brent-Pollard-rho $O(N^{1/4})$
+    - Precomputing divisors (standard and cache-friendly flattened / CSR layout)
+    - Minimum number with target $σ_0$
 - Sum of divisors: $σ_1$
+    - Minimum number with target $σ_1$ (Pollard-Rho / Backtracking)
+    - Multi-query inverse $σ_1$ sieve
 - Product of divisors
+- Divisor Summatory Function (Dirichlet hyperbola method)
 - Minimum multiplier to be a perfect square
+- Sum of Squares Decompositions (Fermat two-squares, Legendre three-squares, Lagrange four-squares)
+- Gauss Eureka Theorem (Sums of Triangular Numbers)
+- Möbius Inversion & Möbius Function $\mu(N)$
+- Summing Multiplicative Functions (Pillai's Function, Double GCD Summation)
 - Euler Totient function: $\phi(N)$
 - Precomputing ETF
 - GCD summation
