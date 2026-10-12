@@ -233,6 +233,7 @@ for (ll l = 1, r; l <= n; l = r + 1)
 \begin{conceptbox}{Algebraic GCD Identities}
     \begin{itemize}
         \item \textbf{Exponential GCD} ($a > 1$): $\gcd(a^n - 1, a^m - 1) = a^{\gcd(n, m)} - 1$
+        \item \textbf{Mersenne / Power Divisibility:} $(2^x - 1) \mid (2^n - 1) \iff x \mid n$ (more generally, for any base $b \ge 2$, $(b^x - 1) \mid (b^n - 1) \iff x \mid n$, as a direct corollary of Exponential GCD).
         \item \textbf{Fibonacci GCD:} $\gcd(F_n, F_m) = F_{\gcd(n, m)}$
         \item \textbf{Euclidean Difference:} For $a > b > 0$, $\gcd(a, b) = \gcd(a - b, b) = \gcd(a \bmod b, b)$.
     \end{itemize}
@@ -493,9 +494,21 @@ auto rotr = [&](unsigned long long x, int k) { return (x >> k) | (x << (BITS - k
     \end{itemize}
 \end{conceptbox}
 
+\begin{conceptbox}{Counting Values with XOR \& Addition for a Fixed $x$}
+    Let $W = \lfloor\log_2 x\rfloor + 1$ be the bit-width of $x$ (in C++: \texttt{\_\_lg(x) + 1}).
+    \begin{itemize}
+        \item \textbf{Count of $a$ such that $a \oplus x > x$ ($0 < a < x$):}
+        \[ 2^W - 1 - x \]
+        \textit{Reason:} Any $y \in (x, 2^W - 1]$ shares the most significant bit (MSB) with $x$, so $a = y \oplus x$ has that bit cleared, ensuring $0 < a < x$ and $a \oplus x = y > x$. The mapping $y \mapsto y \oplus x$ is a bijection between $(x, 2^W - 1]$ and $\{a \in (0, x) : a \oplus x > x\}$, so the count is $(2^W - 1) - x$.
+
+        \item \textbf{Count of $a$ such that $a + x = a \oplus x$ ($0 \le a \le x$):}
+        \[ 2^{\text{zeros}(x)} \]
+        where $\text{zeros}(x)$ is the count of zero bits in the binary representation of $x$ (within width $W$).
+        \textit{Reason:} $a + x = a \oplus x \iff a \mathbin{\&} x = 0$ (no carries). Since the MSB of $x$ is 1, $a$ must have MSB 0, which automatically guarantees $a < x$. Each of the $\text{zeros}(x)$ bit positions where $x$ has 0 can independently be chosen as 0 or 1 in $a$. If strictly positive $a > 0$ is required, the count is $2^{\text{zeros}(x)} - 1$.
+    \end{itemize}
+\end{conceptbox}
+
 \begin{vscode}{All Subarray ORs/ANDs/GCDs \complexity{O(N \log (\max A))}}
-// groups: (value, largest start index) of every distinct op value over
-// subarrays ending at the current position, ordered by decreasing start
 vector<pair<ll, int>> groups, nxt;
 for (int i = 0; i < n; i++)
 {
@@ -519,7 +532,6 @@ for (int i = 0; i < n; i++)
 }
 \end{vscode}
 
-\newpage
 \begin{vscode}{Gray Code Generation \complexity{O(N \cdot 2^N)}}
 vector<string> grayCode(int n)
 {
@@ -542,26 +554,16 @@ Calculating $\&, |, \oplus$ over the range $[l, r]$ by counting the numbers with
 \begin{vscode}{Count k-th bit set in range \complexity{O(\log(\max A))}}
 auto solve = [&](const ll &n, const int &k)
 {
-    if (n < 0)
-        return 0LL;
-    ll res = (n >> (k + 1)) << k;
-    if ((n >> k) & 1)
-        res += (n & ((1LL << k) - 1)) + 1; // +1 to count `n` itself
-
-    return res;
+    ll m = max(n + 1, 0LL);
+    return ((m >> (k + 1)) << k) + max(0LL, (m & ((2LL << k) - 1)) - (1LL << k));
 };
-
-// Usage loop for [l, r], values below 2^62 (shifts by 64 would be undefined)
 ll andRes{}, orRes{}, xorRes{};
 for (int b = 0; b < 62; b++)
 {
     ll c = solve(r, b) - solve(l - 1, b); // numbers in [l, r] with bit b set
-    if (c == r - l + 1)
-        andRes |= 1LL << b;
-    if (c > 0)
-        orRes |= 1LL << b;
-    if (c & 1)
-        xorRes |= 1LL << b;
+    andRes |= (1LL << b) * (c == r - l + 1);
+    orRes  |= (1LL << b) * (c > 0);
+    xorRes |= (1LL << b) * (c & 1);
 }
 \end{vscode}
 
