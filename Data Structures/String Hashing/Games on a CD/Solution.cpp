@@ -4,14 +4,16 @@ using namespace std;
 #define endl "\n"
 
 using u64 = uint64_t;
-u64 S = chrono::steady_clock::now().time_since_epoch().count() ^ (u64) new char;
+static u64 rk = std::chrono::steady_clock::now().time_since_epoch().count() ^ (u64)&rk, rc = 0;
 u64 rnd()
 {
-	S += 0xa0761d6478bd642f;
-	__uint128_t t = (__uint128_t)S * (S ^ 0xe7037ed1a0b428db);
-	return t >> 64 ^ t;
+	u64 in = (rc += 0xa0761d6478bd642f) ^ rk;
+	__uint128_t t = (__uint128_t)in * (in ^ 0xe7037ed1a0b428db);
+	u64 m = (t >> 64) ^ t;
+	__uint128_t u = (__uint128_t)m * (m ^ 0x8ebc6af09c88c6e3);
+	return ((u64)(u >> 64) ^ (u64)u) + in;
 }
-#define rng(l, r) ((l) + (int64_t)((__uint128_t)rnd() * ((r) - (l) + 1) >> 64))
+int64_t rng(int64_t l, int64_t r) { return (int64_t)((u64)l + (u64)(((__uint128_t)rnd() * ((u64)r - (u64)l + 1)) >> 64)); }
 
 const u64 mod = (1LL << 61) - 1;
 inline u64 add64(u64 a, u64 b)
