@@ -100,7 +100,7 @@ int cutRodRecur(vector<int> &price, vector<vector<int>> &memo, int j, int len)
 
 	return ret = max(cut, notCut);
 }
-int cutRod(vector<int> &price)
+int cutRodPushLoop(vector<int> &price)
 {
 	int n = price.size();
 	vector<vector<int>> memo(n + 1, vector<int>(n + 1, -1));
