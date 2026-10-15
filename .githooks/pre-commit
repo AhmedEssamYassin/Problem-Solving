@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+PY=""
+
+# 1. Check standard .venv locations
+for CANDIDATE in "$ROOT/.venv/Scripts/python.exe" "$ROOT/.venv/bin/python"; do
+    if [ -f "$CANDIDATE" ] && "$CANDIDATE" -c "" >/dev/null 2>&1; then
+        PY="$CANDIDATE"
+        break
+    fi
+done
+
+# 2. Check clangformat.python configured in git
+if [ -z "$PY" ]; then
+    CFG_PY="$(git config --get clangformat.python || true)"
+    if [ -n "$CFG_PY" ]; then
+        case "$CFG_PY" in
+            /* | [A-Za-z]:[/\\]* ) CANDIDATE="$CFG_PY" ;;
+            * ) CANDIDATE="$ROOT/$CFG_PY" ;;
+        esac
+        if [ -f "$CANDIDATE" ] && "$CANDIDATE" -c "" >/dev/null 2>&1; then
+            PY="$CANDIDATE"
+        fi
+    fi
+fi
+
+if [ -z "$PY" ]; then
+    echo "Error: a working Python virtual environment (.venv) was not found." >&2
+    echo "Please run 'python tools/setup.py' to initialize the environment." >&2
+    exit 1
+fi
+
+exec "$PY" "$ROOT/tools/format.py" --staged-only
