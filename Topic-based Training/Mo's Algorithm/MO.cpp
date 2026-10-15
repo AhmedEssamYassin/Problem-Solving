@@ -89,7 +89,8 @@ int main()
 
 		auto remove = [&](int idx) {};
 
-		auto getAnswer = [&]() {};
+		auto getAnswer = [&]() -> ll
+		{ return 0; };
 
 		vector<ll> ans = runMo(queries, add, remove, getAnswer);
 		for (const auto &x : ans)
