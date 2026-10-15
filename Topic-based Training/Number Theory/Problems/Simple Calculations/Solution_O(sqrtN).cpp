@@ -138,7 +138,7 @@ int main()
 			u64 res = Exp(w[l], power, m);
 			return res; // Don't take mod here
 		};
-		cout << add64(solve(1, 3, k) % k, 1ULL, k);
+		cout << add64<u64>(solve(1, 3, k) % k, 1, k); // Don't forget mod
 	}
 	return 0;
 }

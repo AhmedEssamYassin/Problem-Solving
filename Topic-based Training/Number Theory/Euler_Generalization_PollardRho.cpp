@@ -223,7 +223,7 @@ int main()
 	{
 		cin >> N >> k;
 		if (N == 0)
-			return cout << add64(2 % k, 1ULL, k), 0;
+			return cout << add64<u64>(2 % k, 1, k), 0;
 		u64 w[] = {0, 2, 2, N}; // 0 is padding
 		function<u64(u64, u64, u64)> solve = [&](u64 l, u64 r, u64 m) -> u64
 		{
@@ -234,7 +234,7 @@ int main()
 			u64 res = Exp(w[l], power, m);
 			return res; // Don't take mod here
 		};
-		cout << add64(solve(1, 3, k) % k, 1ULL, k); // Don't forget mod
+		cout << add64<u64>(solve(1, 3, k) % k, 1, k); // Don't forget mod
 	}
 	return 0;
 }
