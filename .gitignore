@@ -1,0 +1,22 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# CP executable outputs
+*.exe
+*.out
+*.o
+*.obj
+
+# Editor / OS
+.DS_Store
+Thumbs.db
