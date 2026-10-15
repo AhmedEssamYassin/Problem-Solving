@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   format:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout Repo
@@ -47,7 +47,7 @@ jobs:
 
           rogue_configs="$(git ls-files -- '_clang-format' '*/_clang-format' '*/.clang-format')"
           if [[ -n "$rogue_configs" ]]; then
-            echo "::error::Only the root .clang-format is permitted. Remove: $rogue_configs"
+            echo "::error::Only the root .clang-format is permitted. Remove: ${rogue_configs//$'\n'/, }"
             exit 1
           fi
 
@@ -91,8 +91,10 @@ jobs:
             workflow_dispatch)
               if [[ "$REF_NAME" == "$DEFAULT_BRANCH" ]]; then
                 range="HEAD~1..HEAD"
+                log_range="$range"
               else
                 range="origin/$DEFAULT_BRANCH...HEAD"
+                log_range="origin/$DEFAULT_BRANCH..HEAD"
               fi
               ;;
           esac
@@ -107,8 +109,8 @@ jobs:
           reason=""
           if [[ "$EVENT" == workflow_dispatch && "$CHECK_MODE" == all ]]; then
             full=true; reason="manual run with check_mode=all"
-          elif [[ ",$PR_LABELS," == *",full-ci,"* ]]; then
-            full=true; reason="PR label 'full-ci'"
+          elif [[ ",$PR_LABELS," == *",full-ci,"* || ",$PR_LABELS," == *",full-format,"* ]]; then
+            full=true; reason="PR label 'full-ci' or 'full-format'"
           elif [[ -z "$range" ]]; then
             full=true; reason="no usable diff base"
           else
@@ -116,8 +118,8 @@ jobs:
             if [[ -n "$log_range" ]]; then
               msgs="$(git log --format=%B "$log_range" 2>/dev/null || true)"
             fi
-            if [[ "$msgs" == *"[full-ci]"* || "$msgs" == *"[check-all]"* || "$msgs" == *"[format-all]"* ]]; then
-              full=true; reason="[full-ci] / [check-all] / [format-all] in a commit message"
+            if [[ "$msgs" == *"[full-ci]"* || "$msgs" == *"[check-all]"* || "$msgs" == *"[full-format]"* ]]; then
+              full=true; reason="[full-ci] / [check-all] / [full-format] in a commit message"
             else
               git diff -z --name-only "$range" -- > "$RUNNER_TEMP/changed_all.bin"
               if grep -zEq "$FULL_TRIGGER_RE" "$RUNNER_TEMP/changed_all.bin"; then
@@ -162,26 +164,29 @@ jobs:
           set -euo pipefail
           echo "Using: $(clang-format --version)"
 
-          # Format all target files in parallel with explicit root config path
-          xargs -0 -a "$RUNNER_TEMP/targets.bin" -r -P "$(nproc)" -n 50 \
+          # "./" so no argument starts with "-" or "@" (clang-format expands @file even after "--")
+          sed -z 's|^|./|' "$RUNNER_TEMP/targets.bin" > "$RUNNER_TEMP/targets.args.bin"
+
+          xargs -0 -a "$RUNNER_TEMP/targets.args.bin" -r -P "$(nproc)" -n 50 \
             clang-format -i -style="file:$GITHUB_WORKSPACE/.clang-format" -fallback-style=none --
 
-          diff_files="$(git -c core.quotepath=off diff --name-only)"
-          if [[ -n "$diff_files" ]]; then
+          # -z: without it, git C-quotes names with special chars so they no longer match real paths
+          git -c core.quotepath=off diff -z --name-only > "$RUNNER_TEMP/diff_files.bin"
+          if [[ -s "$RUNNER_TEMP/diff_files.bin" ]]; then
             echo "::error::The following files are not properly formatted:"
-            while IFS= read -r f; do
-              [[ -z "$f" ]] && continue
-              p="$(printf '%s' "$f" | sed 's/%/%25/g; s/,/%2C/g; s/:/%3A/g')"
+            while IFS= read -r -d '' f; do
+              # file names can hold anything except NUL; escape for workflow commands
+              p="$(printf '%s' "$f" | sed -z 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g; s/,/%2C/g; s/:/%3A/g')"
               echo "::error file=$p::File is not formatted according to .clang-format. Run 'python tools/format.py' locally."
-            done <<< "$diff_files"
+            done < "$RUNNER_TEMP/diff_files.bin"
 
             {
-              echo "### ❌ Format Check Failed"
+              echo "### Format check failed"
               echo "The following files do not match \`.clang-format\`:"
-              while IFS= read -r f; do
-                [[ -z "$f" ]] && continue
-                echo "- \`$f\`"
-              done <<< "$diff_files"
+              echo ""
+              # indented = code block, so odd file names can't break the markdown
+              # (tr: NUL -> newline between names, and CR/LF inside a name -> '?')
+              tr '\r\n\0' '??\n' < "$RUNNER_TEMP/diff_files.bin" | sed 's/^/    /'
               echo ""
               echo "<details><summary>Click to view diff preview</summary>"
               echo ""
@@ -198,5 +203,5 @@ jobs:
             exit 1
           else
             echo "All checked files are properly formatted."
-            echo "### ✅ Format Check Passed" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Format check passed" >> "$GITHUB_STEP_SUMMARY"
           fi
