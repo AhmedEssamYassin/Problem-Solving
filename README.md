@@ -1,45 +1,62 @@
-<div align = "center" >
-    
+<div align="center">
+
 # Problem solving roadmap for beginners to Advanced!
-![GitHub Repo stars](https://img.shields.io/github/stars/AhmedEssamYassin/Problem-Solving?style=flat?labelColor=#697689)
-![GitHub top language](https://img.shields.io/github/languages/top/AhmedEssamYassin/Problem-Solving?style=flat)
+
+[![Format](https://img.shields.io/github/actions/workflow/status/AhmedEssamYassin/Problem-Solving/format.yml?branch=main&label=format&labelColor=697689&style=flat)](https://github.com/AhmedEssamYassin/Problem-Solving/actions/workflows/format.yml)
+[![Compile and Link](https://img.shields.io/github/actions/workflow/status/AhmedEssamYassin/Problem-Solving/cpp-build-check.yml?branch=main&label=compile%20%26%20link&labelColor=697689&style=flat)](https://github.com/AhmedEssamYassin/Problem-Solving/actions/workflows/cpp-build-check.yml)
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?labelColor=697689&style=flat)
+![GitHub Repo stars](https://img.shields.io/github/stars/AhmedEssamYassin/Problem-Solving?style=flat&labelColor=697689)
+![GitHub top language](https://img.shields.io/github/languages/top/AhmedEssamYassin/Problem-Solving?style=flat&labelColor=697689)
+![GitHub last commit](https://img.shields.io/github/last-commit/AhmedEssamYassin/Problem-Solving?style=flat&labelColor=697689)
+
+<p>
+  <a href="#data-structures">Data Structures</a> &nbsp;|&nbsp;
+  <a href="#advanced-data-structures-and-algorithms">Advanced Topics</a> &nbsp;|&nbsp;
+  <a href="#miscellaneous-topics">Miscellaneous</a> &nbsp;|&nbsp;
+  <a href="#number-theory">Number Theory</a> &nbsp;|&nbsp;
+  <a href="#how-to-follow-up-with-this">How to Follow Up</a> &nbsp;|&nbsp;
+  <a href="#development-setup">Development Setup</a>
+</p>
+
 </div>
 
 This repository is dedicated for students (or anyone) starting to train problem solving for competitions such as XCPC's or similar and contests such that on [codeforces](https://codeforces.com/).
 It contains problems on almost every topic you would like to train on
 
-> [!IMPORTANT]  
-All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
+> [!IMPORTANT]
+> All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 
->[Assiut ICPC sheet Newcomers](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20-%20Newcomers)
+> [Assiut ICPC sheet Newcomers](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20-%20Newcomers)
 >
->[Assiut ICPC sheet Advanced Newcomers](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20Advanced%20-%20Newcomers%202023)
->- Input/Output
->- Conditional statements
->- Loops
->- Arrays
->- Functions
->- Strings
->- Mathematics (sequences, summations, geometry)
->- Recursion
+> [Assiut ICPC sheet Advanced Newcomers](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20Advanced%20-%20Newcomers%202023)
+> - Input/Output
+> - Conditional statements
+> - Loops
+> - Arrays
+> - Functions
+> - Strings
+> - Mathematics (sequences, summations, geometry)
+> - Recursion
 
 ---
 
->[Assiut ICPC standard Juniors training](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20-%20Standard%20Juniors%20Phase%201)
+> [Assiut ICPC standard Juniors training](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20-%20Standard%20Juniors%20Phase%201)
 >
->[Assiut ICPC Juniors  training](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20%20-%20Juniors%20Phase%201%20-%202022)
->- Prefix sum
->- Frequency array
->- Scanline algorithm
->- 2D scanline algorithm
->- Kaden's algorithm
->- STLS (vector, stack, queue, dequeue, set, map, ...etc.)
->- Two pointer technique
->- Binary search
->- Bitmasks
+> [Assiut ICPC Juniors  training](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/CP%20Sheets%20Solutions/ICPC%20Assiut%20%20-%20Juniors%20Phase%201%20-%202022)
+> - Prefix sum
+> - Frequency array
+> - Scanline algorithm
+> - 2D scanline algorithm
+> - Kadane's algorithm
+> - STL (vector, stack, queue, deque, set, map, ...etc.)
+> - Two pointer technique
+> - Binary search
+> - Bitmasks
 
 ---
+
 ## Data Structures
+
 - [Segment Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Segment%20Tree)
 - [Sparse Segment Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Sparse%20(Dynamic)%20Segment%20Tree)
 - [Lazy Propagation](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Lazy%20Propagation)
@@ -48,7 +65,6 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - [Merge Sort](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Merge%20Sort)
 - [Coordinate Compression](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Coordinate%20Compression)
 - [Disjoint Sets Union (Union-Find)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Disjoint%20Sets%20Union%20(DSU))
-- [Persistent Segment Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Persistent%20Segment%20Tree)
 - [Wavelet Tree and Wavelet Matrix](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Wavelet%20Trees)
 - [Palindromic Tree (Eer Tree)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Palindromic%20Tree%20(Eer%20Tree))
 - [Trie](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Trie)
@@ -59,52 +75,66 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - [Policy Based Data Structures](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Policy%20Based%20Data%20Structures)
 - [Monotonic Stack](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Monotonic%20Stack)
 - [Graph theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Graph%20Theory)
-> - Types of Graphs and Terminologies
->   - Node and Edge
->   - Component
->   - Connected and Complete Graphs
->   - Cliques
->   - Sparse and Dense Graphs
->   - Bipartite Graphs
-> - DFS and BFS on graph
-> - Topological Sort
-> - Cycle Detection
-> - (SCC) Strongly Connected Components: Kosaraju
-> - Shortest Path Algorithms:
->   - Bellman_Ford
->   - SPFA (Shortest Path Faster Algorithm)
->   - Dijkstra
->   - Floyd_Warshall
->   - Johnson
->   - DAG shortest path (Using Topological Sort)
->   - Pure BFS Shortest Path
-> - Disjoint Set Unions (Union Find)
-> - Minimum spanning tree (Kruskal and Prim's algorithms)
-> - Bridges in Graphs
-> - Bipartite Graph Checking (Graph Coloring and DSU)
-> - Maximum Flow
->   - Maximum Flow using Edmond_Karp
->   - Maximum Flow Minimum Cut
->   - Maximum Graph Matchings
->   - Kuhn
->   - Hopcroft_Karp
->   - Artificial Network Solution (Max Flow) 
+
+<details>
+<summary>Graph theory topics</summary>
+
+- Types of Graphs and Terminologies
+  - Node and Edge
+  - Component
+  - Connected and Complete Graphs
+  - Cliques
+  - Sparse and Dense Graphs
+  - Bipartite Graphs
+- DFS and BFS on graph
+- Topological Sort
+- Cycle Detection
+- (SCC) Strongly Connected Components: Kosaraju
+- Shortest Path Algorithms:
+  - Bellman_Ford
+  - SPFA (Shortest Path Faster Algorithm)
+  - Dijkstra
+  - Floyd_Warshall
+  - Johnson
+  - DAG shortest path (Using Topological Sort)
+  - Pure BFS Shortest Path
+- Disjoint Set Unions (Union Find)
+- Minimum spanning tree (Kruskal and Prim's algorithms)
+- Bridges in Graphs
+- Bipartite Graph Checking (Graph Coloring and DSU)
+- Maximum Flow
+  - Maximum Flow using Edmond_Karp
+  - Maximum Flow Minimum Cut
+  - Maximum Graph Matchings
+  - Kuhn
+  - Hopcroft_Karp
+  - Artificial Network Solution (Max Flow)
+
+</details>
+
 - [Suffix arrays](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Suffix%20Array)
 - [Trees](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Trees)
-> - DFS
-> - BFS
-> - Tree Diameter
-> - Tree Flattening (Subtree Queries)
-> - Tree Ancestors
->   - Kth Ancestor (Binary lifting)
->   - LCA (Lowest Common Ancestor)
->   - Static Path Queries
->   - HLD (Heavy Light Decomposition), (Online Path Queries)
->   - Centroid Decomposition
+
+<details>
+<summary>Trees topics</summary>
+
+- DFS
+- BFS
+- Tree Diameter
+- Tree Flattening (Subtree Queries)
+- Tree Ancestors
+  - Kth Ancestor (Binary lifting)
+  - LCA (Lowest Common Ancestor)
+  - Static Path Queries
+  - HLD (Heavy Light Decomposition), (Online Path Queries)
+  - Centroid Decomposition
+
+</details>
 
 ---
 
 ## Advanced Data Structures and Algorithms
+
 - [Fast Fourier Transform (FFT) and Number Theoretic Transform (NTT)](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/FFT%2C%20NTT)
 - [Merge Sort Tree](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Merge%20Sort%20Tree)
 - [Segment Tree Beats](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Data%20Structures/Segment%20Tree%20Beats)
@@ -115,6 +145,7 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 ---
 
 ## Miscellaneous Topics
+
 - [Dynamic Programming](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Dynamic%20Programming)
 - [Combinatorics](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Combinatorics) (Burnside's Lemma, Catalan/Bracket Sequences, Permutation Order & Rank)
 - [Geometry](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Geometry) (Convex Hull)
@@ -138,6 +169,10 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 ---
 
 ## [Number Theory](https://github.com/AhmedEssamYassin/Problem-Solving/tree/main/Topic-based%20Training/Number%20Theory)
+
+<details>
+<summary>Number Theory topics</summary>
+
 - Modular arithmetic
 - Modular multiplication
 - Modular exponentiation
@@ -149,38 +184,38 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - Discrete Logarithm (Baby-Step Giant-Step)
 - Prime numbers
 - Prime testing
-    - Naïve method
-    - Trial division
-    - Fermat’s little theorem
-    - Miller-Rabin (Jim Sinclair 7-base deterministic for 64-bit)
-    - Baillie–PSW (BPSW) for 128-bit
-    - Precomputation: Sieve of Eratosthenes, Linear Sieve, and Wheel Sieve
+  - Naïve method
+  - Trial division
+  - Fermat’s little theorem
+  - Miller-Rabin (Jim Sinclair 7-base deterministic for 64-bit)
+  - Baillie–PSW (BPSW) for 128-bit
+  - Precomputation: Sieve of Eratosthenes, Linear Sieve, and Wheel Sieve
 - Goldbach conjecture
 - Prime factorization
-    - Naïve method $O(N)$
-    - Using LPF for multiple queries $O(\log N)$
-    - Pollard-rho
-    - Birthday paradox
-    - Floyd’s cycle detection
-    - Brent-Pollard-rho
-    - Brent-Pollard-rho with Montgomery multiplication (64-bit & 128-bit)
-    - Lenstra's Elliptic Curve Method (ECM)
-    - Prime factorization using pollard-rho
+  - Naïve method $O(N)$
+  - Using LPF for multiple queries $O(\log N)$
+  - Pollard-rho
+  - Birthday paradox
+  - Floyd’s cycle detection
+  - Brent-Pollard-rho
+  - Brent-Pollard-rho with Montgomery multiplication (64-bit & 128-bit)
+  - Lenstra's Elliptic Curve Method (ECM)
+  - Prime factorization using pollard-rho
 - Generating all factors from prime factorization
 - Prime factorization of $(N^x)$
 - Prime factorization of $N!$
 - Legendre’s theorem
 - Prime counting function $\pi(N)$ (Meissel-Lehmer algorithm)
 - Counting divisors: $σ_0$
-    - Naïve method $O(N)$
-    - Trial division $O(\sqrt{N})$
-    - Linear Sieve of Eratosthenes and LPF $O(N^{1/3})$    
-    - Brent-Pollard-rho $O(N^{1/4})$
-    - Precomputing divisors (standard and cache-friendly flattened / CSR layout)
-    - Minimum number with target $σ_0$
+  - Naïve method $O(N)$
+  - Trial division $O(\sqrt{N})$
+  - Linear Sieve of Eratosthenes and LPF $O(N^{1/3})$
+  - Brent-Pollard-rho $O(N^{1/4})$
+  - Precomputing divisors (standard and cache-friendly flattened / CSR layout)
+  - Minimum number with target $σ_0$
 - Sum of divisors: $σ_1$
-    - Minimum number with target $σ_1$ (Pollard-Rho / Backtracking)
-    - Multi-query inverse $σ_1$ sieve
+  - Minimum number with target $σ_1$ (Pollard-Rho / Backtracking)
+  - Multi-query inverse $σ_1$ sieve
 - Product of divisors
 - Divisor Summatory Function (Dirichlet hyperbola method)
 - Minimum multiplier to be a perfect square
@@ -195,7 +230,13 @@ All Solutions are compiled and tested on C++20 (C++20 (GCC 13-64))
 - Depth of ETF to reach 1
 - Euler’s theorem: generalization of Fermat’s little theorem
 - Inverse of ETF
+
+</details>
+
+---
+
 ## How to follow up with this?
+
 Just make sure to try solving each problem first and do not see the solutions until you do your best.
 If you download the PDF of problem statement and press `ctrl` then click on the contest/gym name on the right, it will redirect you the link where this problem exists.
 
@@ -203,3 +244,25 @@ If you download the PDF of problem statement and press `ctrl` then click on the 
 
 Good luck!
 
+---
+
+## Development Setup
+
+Per developer, once per clone, initialize the virtual environment and git hooks:
+
+```bash
+python tools/setup.py
+```
+
+This creates a local `.venv/`, installs `clang-format==18.1.8` inside it, and configures the pre-commit hook to format staged C++ files automatically.
+
+Alternatively, set it up manually:
+
+```bash
+python -m venv .venv
+# Windows:
+.venv\Scripts\pip install clang-format==18.1.8
+# Linux/macOS:
+.venv/bin/pip install clang-format==18.1.8
+git config core.hooksPath .githooks
+```
