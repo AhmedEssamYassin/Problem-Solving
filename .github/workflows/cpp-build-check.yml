@@ -1,0 +1,312 @@
+name: C++ Build Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      check_mode:
+        description: Which files do you want to check?
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - changed
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  # a newer run on the same PR replaces the older one
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # Note: 'standalone' builds and links each .cpp file in isolation.
+  # Any file with main() must be self-contained (cannot depend on symbols in other .cpp files).
+  # For multi-file projects, add a Makefile or CMakeLists.txt.
+  BUILD_SYSTEM: auto       # auto | cmake | make | standalone
+  CXX_STD: c++23           # standalone only
+  CXX_EXTRA_FLAGS: ""      # standalone only, e.g. "-Iinclude -DLOCAL" (quote anything with spaces)
+  # standalone only: dirs whose .cpp files are skipped, at any depth, e.g. "build 'my dir'".
+  # Headers in those dirs still count as changes, since built files may include them.
+  CXX_EXCLUDE_DIRS: "build"
+
+jobs:
+  check-ce:  # id kept for branch protection
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect Build System
+        id: detect
+        run: |
+          set -euo pipefail
+          system="$BUILD_SYSTEM"
+          if [[ "$system" == auto ]]; then
+            if   [[ -f CMakeLists.txt ]]; then system=cmake
+            elif [[ -f Makefile || -f makefile || -f GNUmakefile ]]; then system=make
+            else system=standalone
+            fi
+          fi
+          echo "Build system: $system"
+          echo "system=$system" >> "$GITHUB_OUTPUT"
+
+      - name: Decide Mode & Find Target Files
+        id: targets
+        if: steps.detect.outputs.system == 'standalone'
+        env:
+          EVENT: ${{ github.event_name }}
+          CHECK_MODE: ${{ inputs.check_mode }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          ZERO=0000000000000000000000000000000000000000
+          # these can affect any .cpp, so changing one means a full build
+          FULL_TRIGGER_RE='\.(h|hh|hpp|hxx|h\+\+|inl|ipp|tpp|tcc|inc|def)$|^\.github/workflows/cpp-build-check\.yml$'
+          SRC_RE='\.(cpp|cc|cxx|c\+\+)$'
+
+          range=""
+          log_range=""
+
+          case "$EVENT" in
+            pull_request)
+              range="origin/$BASE_REF...HEAD"
+              log_range="origin/$BASE_REF..HEAD"
+              ;;
+            push)
+              if [[ "$BEFORE" != "$ZERO" ]]; then
+                range="$BEFORE..$SHA"
+                log_range="$range"
+              fi
+              ;;
+            workflow_dispatch)
+              if [[ "$REF_NAME" == "$DEFAULT_BRANCH" ]]; then
+                range="HEAD~1..HEAD"
+                log_range="$range"
+              else
+                range="origin/$DEFAULT_BRANCH...HEAD"
+                log_range="origin/$DEFAULT_BRANCH..HEAD"
+              fi
+              ;;
+          esac
+
+          if [[ -n "$range" ]]; then
+            rc=0
+            git diff --quiet "$range" -- 2>/dev/null || rc=$?  # 0 same, 1 differs, >1 bad range
+            if (( rc > 1 )); then range=""; log_range=""; fi
+          fi
+
+          full=false
+          reason=""
+          if [[ "$EVENT" == workflow_dispatch && "$CHECK_MODE" == all ]]; then
+            full=true; reason="manual run with check_mode=all"
+          elif [[ ",$PR_LABELS," == *",full-ci,"* || ",$PR_LABELS," == *",full-build,"* ]]; then
+            full=true; reason="PR label 'full-ci' or 'full-build'"
+          elif [[ -z "$range" ]]; then
+            full=true; reason="no usable diff base"
+          else
+            msgs=""
+            if [[ -n "$log_range" ]]; then
+              msgs="$(git log --format=%B "$log_range" 2>/dev/null || true)"
+            fi
+            if [[ "$msgs" == *"[full-ci]"* || "$msgs" == *"[check-all]"* || "$msgs" == *"[full-build]"* ]]; then
+              full=true; reason="[full-ci] / [check-all] / [full-build] in a commit message"
+            else
+              git diff -z --name-only "$range" -- > "$RUNNER_TEMP/changed_all.bin"
+              if grep -ziEq "$FULL_TRIGGER_RE" "$RUNNER_TEMP/changed_all.bin"; then
+                full=true; reason="a header or workflow file changed"
+              else
+                # a .cpp that other files #include acts like a header, so rebuild everything
+                while IFS= read -r -d '' changed; do
+                  [[ "${changed,,}" =~ $SRC_RE ]] || continue
+                  # a name with a line break can't be written in an #include (and would split the grep pattern)
+                  [[ "${changed##*/}" == *[$'\r\n']* ]] && continue
+                  base_re="$(printf '%s' "${changed##*/}" | sed 's/[][\.*^$+?(){}|]/\\&/g')"
+                  if git grep -qE '^[[:space:]]*#[[:space:]]*include[[:space:]]*[<"]([^">]*/)?'"$base_re"'[>"]'; then
+                    full=true; reason="changed source file is #included elsewhere: $changed"
+                    break
+                  fi
+                done < "$RUNNER_TEMP/changed_all.bin"
+              fi
+            fi
+          fi
+
+          if [[ "$full" == true ]]; then
+            find . -type f -not -path './.git/*' \
+              \( -iname '*.cpp' -o -iname '*.cc' -o -iname '*.cxx' -o -iname '*.c++' \) \
+              -printf '%P\0' > "$RUNNER_TEMP/targets.bin"
+          else
+            git diff -z --name-only --diff-filter=ACMR "$range" -- \
+              ':(icase)*.cpp' ':(icase)*.cc' ':(icase)*.cxx' ':(icase)*.c++' > "$RUNNER_TEMP/targets.bin"
+          fi
+
+          # drop excluded dirs here so full and incremental runs agree
+          # (xargs does the quote handling, so "my dir" works, and nothing gets glob-expanded)
+          xargs -r printf '%s\0' <<< "$CXX_EXCLUDE_DIRS" > "$RUNNER_TEMP/exclude_dirs.bin"
+          mapfile -d '' -t exclude_dirs < "$RUNNER_TEMP/exclude_dirs.bin"
+          exclude_pats=()
+          for d in "${exclude_dirs[@]}"; do
+            while [[ "$d" == ./* ]]; do d="${d#./}"; done   # "./build" and "build/" both mean build
+            while [[ "$d" == */ ]]; do d="${d%/}"; done
+            [[ -n "$d" ]] && exclude_pats+=("$(printf '%s' "$d" | sed 's/[][\.*^$+?(){}|]/\\&/g')")
+          done
+          if (( ${#exclude_pats[@]} )); then
+            exclude_re="(^|/)($(IFS='|'; echo "${exclude_pats[*]}"))/"
+            # grep exits 1 when nothing is left, which is fine
+            grep -zEv "$exclude_re" "$RUNNER_TEMP/targets.bin" > "$RUNNER_TEMP/targets.kept.bin" || [[ $? -eq 1 ]]
+            mv "$RUNNER_TEMP/targets.kept.bin" "$RUNNER_TEMP/targets.bin"
+          fi
+
+          COUNT=$(tr -cd '\0' < "$RUNNER_TEMP/targets.bin" | wc -c)
+          mode=incremental; [[ "$full" == true ]] && mode=full
+
+          echo "Mode: $mode${reason:+ ($reason)} | range: ${range:-n/a} | files: $COUNT"
+          {
+            echo "### C++ check"
+            echo "- Mode: **$mode**${reason:+ ($reason)}"
+            echo "- Diff range: \`${range:-n/a}\`"
+            echo "- Files to build: **$COUNT**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Precompile Standard Headers
+        # only worth it for bigger batches
+        if: steps.detect.outputs.system == 'standalone' && fromJSON(steps.targets.outputs.count || '0') > 4
+        run: |
+          set -euo pipefail
+          pch="$RUNNER_TEMP/pch_include"
+          mkdir -p "$pch/bits"
+          printf '#include <bits/stdc++.h>\n' > "$RUNNER_TEMP/pch_src.h"
+          # split the flags the way a shell would (quotes work), without glob expansion
+          xargs -r printf '%s\0' <<< "$CXX_EXTRA_FLAGS" > "$RUNNER_TEMP/extra_flags.bin"
+          mapfile -d '' -t extra < "$RUNNER_TEMP/extra_flags.bin"
+
+          if ! g++ -std="$CXX_STD" "${extra[@]}" -x c++-header "$RUNNER_TEMP/pch_src.h" \
+                   -o "$pch/bits/stdc++.h.gch"; then
+            echo "::warning::PCH build failed, continuing without it."
+            rm -rf "$pch"
+            exit 0
+          fi
+
+          printf '#include <bits/stdc++.h>\nint main(){}\n' > "$RUNNER_TEMP/pch_probe.cpp"
+          hdr="$(g++ -std="$CXX_STD" "${extra[@]}" -I"$pch" -H -fsyntax-only \
+                   "$RUNNER_TEMP/pch_probe.cpp" 2>&1 || true)"
+          if grep -q '^!' <<<"$hdr"; then
+            echo "PCH is being used."
+          else
+            echo "::warning::PCH built but not picked up."
+          fi
+
+      - name: Build Target Files
+        if: steps.detect.outputs.system == 'standalone' && steps.targets.outputs.count != '0'
+        env:
+          COUNT: ${{ steps.targets.outputs.count }}
+        run: |
+          set -euo pipefail
+
+          # split the flags once, the way a shell would (quotes work, no glob expansion); build_one.sh reads them back
+          xargs -r printf '%s\0' <<< "$CXX_EXTRA_FLAGS" > "$RUNNER_TEMP/extra_flags.bin"
+
+          cat > "$RUNNER_TEMP/build_one.sh" <<'EOF'
+          #!/usr/bin/env bash
+          name="$1"
+          f="./$name"  # "./" so a name starting with "-" or "@" isn't read as a flag or response file
+          out="$(mktemp -d)"
+          trap 'rm -rf "$out"' EXIT
+          mapfile -d '' -t extra < "$RUNNER_TEMP/extra_flags.bin"
+          stage=compile
+
+          # -x c++: odd extensions like .Cpp would otherwise be silently skipped by g++
+          # -Wno-error=invalid-pch: an unusable PCH only costs time, it shouldn't fail a -Werror build
+          flags=(-std="$CXX_STD" "${extra[@]}" -x c++ -I"$RUNNER_TEMP/pch_include" -Winvalid-pch -Wno-error=invalid-pch)
+
+          fail() {
+            # file names can hold anything except NUL, so escape them before they go into a workflow command
+            p="$(printf '%s' "$name" | sed -z 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g; s/,/%2C/g; s/:/%3A/g')"
+            disp="$(printf '%s' "$name" | tr '\r\n' '??')"
+            # the annotation gets the first few error lines, the full log goes in a collapsed group
+            # (grep -a: compiler output isn't always valid UTF-8)
+            if [[ "$stage" == link ]]; then
+              # ld words its real complaint without "error:" (cannot find -lfoo, multiple definition...),
+              # so keep everything except the "in function" context lines and collect2's summary
+              summary="$(printf '%s\n' "$log" | grep -avE 'in function|^collect2: error: ld returned' | head -n 5)"
+            else
+              summary="$(printf '%s\n' "$log" | grep -aiE 'error:' | head -n 5)"
+            fi
+            [[ -n "$summary" ]] || summary="$(printf '%s\n' "$log" | head -n 5)"
+            msg="$(printf '%s' "$summary" | sed -z 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')"
+            token="$(cat /proc/sys/kernel/random/uuid)"
+            {
+              echo "::error file=$p,title=Build failed::$msg"
+              echo "::group::Full compiler output: $disp"
+              echo "::stop-commands::$token"  # the log echoes file names back, don't let it act as commands
+              printf '%s\n' "$log"
+              echo "::$token::"
+              echo "::endgroup::"
+            } | flock "$RUNNER_TEMP/err.lock" cat
+            # one line per failure for the job summary (annotations stop at 10 per step)
+            first="${summary%%$'\n'*}"
+            printf '%s: %s\n' "$disp" "${first//$'\r'/ }" | cut -c1-300 \
+              | flock "$RUNNER_TEMP/err.lock" tee -a "$RUNNER_TEMP/failed.txt" > /dev/null
+            exit 1
+          }
+
+          log="$(g++ "${flags[@]}" -c -o "$out/a.o" "$f" 2>&1)" || fail
+
+          if nm -g --defined-only "$out/a.o" | grep -q ' T main$'; then
+            stage=link
+            # extra flags here too: -l, -pthread and -fsanitize belong on the link line
+            log="$(g++ "$out/a.o" "${extra[@]}" -o "$out/a.out" 2>&1)" || fail
+          fi
+          EOF
+          chmod +x "$RUNNER_TEMP/build_one.sh"
+
+          echo "Building $COUNT file(s) on $(nproc) core(s)..."
+          rc=0
+          # build everything even if some files fail, then report
+          xargs -0 -a "$RUNNER_TEMP/targets.bin" -r -P "$(nproc)" -n 1 "$RUNNER_TEMP/build_one.sh" || rc=$?
+
+          if [[ -s "$RUNNER_TEMP/failed.txt" ]]; then
+            n=$(wc -l < "$RUNNER_TEMP/failed.txt")
+            {
+              echo "### Build failures: $n"
+              echo
+              # indented = code block, so odd file names can't break the markdown
+              head -n 200 "$RUNNER_TEMP/failed.txt" | sed 's/^/    /'
+              if (( n > 200 )); then echo "    ...and $((n - 200)) more, see the step log"; fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$rc"
+
+      - name: Build (CMake)
+        if: steps.detect.outputs.system == 'cmake'
+        run: |
+          set -euo pipefail
+          cmake -S . -B build
+          gen="$(sed -n 's/^CMAKE_GENERATOR:INTERNAL=//p' build/CMakeCache.txt)"
+          case "$gen" in
+            Ninja*)      keep=(-k 0) ;;
+            *Makefiles*) keep=(-k) ;;
+            *)           keep=() ;;
+          esac
+          cmake --build build --parallel "$(nproc)" -- "${keep[@]}"
+
+      - name: Build (Make)
+        if: steps.detect.outputs.system == 'make'
+        run: make -k -j"$(nproc)"
