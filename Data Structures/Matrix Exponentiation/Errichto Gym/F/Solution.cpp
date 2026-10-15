@@ -36,7 +36,7 @@ public:
 	Matrix &operator=(const Matrix &other) = default;
 
 	// Element access using operator[]
-	ll (&operator[](int row)) [Cols]
+	ll (&operator[](int row))[Cols]
 	{
 		assert(row >= 0 && row < Rows);
 		return data[row];

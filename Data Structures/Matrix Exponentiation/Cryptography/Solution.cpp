@@ -152,7 +152,7 @@ public:
 	Matrix &operator=(const Matrix &other) = default;
 
 	// Element access using operator[]
-	Mint (&operator[](int row)) [Cols]
+	Mint (&operator[](int row))[Cols]
 	{
 		assert(row >= 0 && row < Rows);
 		return data[row];
