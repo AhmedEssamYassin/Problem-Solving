@@ -1,0 +1,202 @@
+name: Format Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+    inputs:
+      check_mode:
+        description: Which files do you want to check?
+        required: true
+        default: changed
+        type: choice
+        options:
+          - changed
+          - all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# The clang-format version is pinned in tools/requirements-format.txt
+# (shared with tools/setup.py and tools/format.py).
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify clang-format config
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f ".clang-format" ]]; then
+            echo "::error::Root .clang-format is missing."
+            exit 1
+          fi
+
+          rogue_configs="$(git ls-files -- '_clang-format' '*/_clang-format' '*/.clang-format')"
+          if [[ -n "$rogue_configs" ]]; then
+            echo "::error::Only the root .clang-format is permitted. Remove: $rogue_configs"
+            exit 1
+          fi
+
+      - name: Decide Mode & Find Target Files
+        id: targets
+        env:
+          EVENT: ${{ github.event_name }}
+          CHECK_MODE: ${{ inputs.check_mode }}
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          ZERO=0000000000000000000000000000000000000000
+          FULL_TRIGGER_RE='^\.clang-format$|^\.github/workflows/format\.ya?ml$|^tools/requirements-format\.txt$'
+
+          # Case-insensitive, so Foo.CPP / Bar.H are checked exactly like tools/format.py does.
+          EXT_SPECS=(
+            ':(icase)*.cpp' ':(icase)*.cc' ':(icase)*.cxx' ':(icase)*.c++'
+            ':(icase)*.h' ':(icase)*.hh' ':(icase)*.hpp' ':(icase)*.hxx'
+          )
+
+          range=""
+          log_range=""
+
+          case "$EVENT" in
+            pull_request)
+              range="origin/$BASE_REF...HEAD"
+              log_range="origin/$BASE_REF..HEAD"
+              ;;
+            push)
+              if [[ "$BEFORE" != "$ZERO" ]]; then
+                range="$BEFORE..$SHA"
+                log_range="$range"
+              fi
+              ;;
+            workflow_dispatch)
+              if [[ "$REF_NAME" == "$DEFAULT_BRANCH" ]]; then
+                range="HEAD~1..HEAD"
+              else
+                range="origin/$DEFAULT_BRANCH...HEAD"
+              fi
+              ;;
+          esac
+
+          if [[ -n "$range" ]]; then
+            rc=0
+            git diff --quiet "$range" -- 2>/dev/null || rc=$?
+            if (( rc > 1 )); then range=""; log_range=""; fi
+          fi
+
+          full=false
+          reason=""
+          if [[ "$EVENT" == workflow_dispatch && "$CHECK_MODE" == all ]]; then
+            full=true; reason="manual run with check_mode=all"
+          elif [[ ",$PR_LABELS," == *",full-ci,"* ]]; then
+            full=true; reason="PR label 'full-ci'"
+          elif [[ -z "$range" ]]; then
+            full=true; reason="no usable diff base"
+          else
+            msgs=""
+            if [[ -n "$log_range" ]]; then
+              msgs="$(git log --format=%B "$log_range" 2>/dev/null || true)"
+            fi
+            if [[ "$msgs" == *"[full-ci]"* || "$msgs" == *"[check-all]"* || "$msgs" == *"[format-all]"* ]]; then
+              full=true; reason="[full-ci] / [check-all] / [format-all] in a commit message"
+            else
+              git diff -z --name-only "$range" -- > "$RUNNER_TEMP/changed_all.bin"
+              if grep -zEq "$FULL_TRIGGER_RE" "$RUNNER_TEMP/changed_all.bin"; then
+                full=true; reason=".clang-format, clang-format version pin or format workflow changed"
+              fi
+            fi
+          fi
+
+          if [[ "$full" == true ]]; then
+            git ls-files -z --cached --others --exclude-standard -- \
+              "${EXT_SPECS[@]}" > "$RUNNER_TEMP/targets.bin"
+          else
+            git diff -z --name-only --diff-filter=ACMR "$range" -- \
+              "${EXT_SPECS[@]}" > "$RUNNER_TEMP/targets.bin"
+          fi
+
+          COUNT=$(tr -cd '\0' < "$RUNNER_TEMP/targets.bin" | wc -c)
+          mode=incremental; [[ "$full" == true ]] && mode=full
+
+          echo "Mode: $mode${reason:+ ($reason)} | range: ${range:-n/a} | files: $COUNT"
+          {
+            echo "### Format check"
+            echo "- Mode: **$mode**${reason:+ ($reason)}"
+            echo "- Diff range: \`${range:-n/a}\`"
+            echo "- Files to check: **$COUNT**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Install clang-format
+        if: steps.targets.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          # Ubuntu 24.04's system Python is "externally managed" (PEP 668), so install into a venv.
+          python3 -m venv "$RUNNER_TEMP/cf-venv"
+          "$RUNNER_TEMP/cf-venv/bin/python" -m pip install --quiet -r tools/requirements-format.txt
+          echo "$RUNNER_TEMP/cf-venv/bin" >> "$GITHUB_PATH"
+
+      - name: Run clang-format Check
+        if: steps.targets.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          echo "Using: $(clang-format --version)"
+
+          # Format all target files in parallel with explicit root config path
+          xargs -0 -a "$RUNNER_TEMP/targets.bin" -r -P "$(nproc)" -n 50 \
+            clang-format -i -style="file:$GITHUB_WORKSPACE/.clang-format" -fallback-style=none --
+
+          diff_files="$(git -c core.quotepath=off diff --name-only)"
+          if [[ -n "$diff_files" ]]; then
+            echo "::error::The following files are not properly formatted:"
+            while IFS= read -r f; do
+              [[ -z "$f" ]] && continue
+              p="$(printf '%s' "$f" | sed 's/%/%25/g; s/,/%2C/g; s/:/%3A/g')"
+              echo "::error file=$p::File is not formatted according to .clang-format. Run 'python tools/format.py' locally."
+            done <<< "$diff_files"
+
+            {
+              echo "### ❌ Format Check Failed"
+              echo "The following files do not match \`.clang-format\`:"
+              while IFS= read -r f; do
+                [[ -z "$f" ]] && continue
+                echo "- \`$f\`"
+              done <<< "$diff_files"
+              echo ""
+              echo "<details><summary>Click to view diff preview</summary>"
+              echo ""
+              echo '```diff'
+              # '|| true': head closing the pipe early makes git exit 141 (SIGPIPE) under pipefail,
+              # which would abort the summary before it is closed properly.
+              git -c core.quotepath=off diff --no-color | head -n 300 || true
+              echo '```'
+              echo "</details>"
+              echo ""
+              echo "> **Fix locally:** Run \`python tools/format.py\` or configure the pre-commit hook via \`python tools/setup.py\`."
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            exit 1
+          else
+            echo "All checked files are properly formatted."
+            echo "### ✅ Format Check Passed" >> "$GITHUB_STEP_SUMMARY"
+          fi
