@@ -3,7 +3,12 @@ UseTab: ForIndentation
 IndentWidth: 4
 TabWidth: 4
 BreakBeforeBraces: Allman
-AllowShortIfStatementsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: All
+AllowShortLambdasOnASingleLine: All
+PointerAlignment: Right
 IndentCaseLabels: false
 ColumnLimit: 0
 AccessModifierOffset: -4
