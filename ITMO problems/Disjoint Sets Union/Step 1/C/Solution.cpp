@@ -5,7 +5,8 @@ using namespace std;
 
 struct DSU
 {
-	vector<ll> parent, size, exp; // Representative
+	vector<int> parent, size; // Representative
+	vector<ll> exp;
 	int N;
 	// The leader should be the parent of itself
 	DSU(int _N)
@@ -16,11 +17,11 @@ struct DSU
 		exp.resize(N + 1, 0);
 		iota(parent.begin(), parent.end(), 0);
 	}
-	ll Find(ll node)
+	int Find(int node)
 	{
 		if (parent[node] == node)
 			return node;
-		ll up = Find(parent[node]);
+		int up = Find(parent[node]);
 		if (parent[node] != up)
 		{
 			exp[node] += exp[parent[node]];
@@ -28,10 +29,10 @@ struct DSU
 		}
 		return parent[node] = Find(parent[node]); // Path compression
 	}
-	void Union(ll u, ll v)
+	void Union(int u, int v)
 	{
-		ll rep1 = Find(u);
-		ll rep2 = Find(v);
+		int rep1 = Find(u);
+		int rep2 = Find(v);
 		if (rep1 == rep2)
 			return;
 		// Small-to-large technique
@@ -41,25 +42,12 @@ struct DSU
 		size[rep2] += size[rep1];
 		exp[rep1] -= exp[rep2];
 	}
-	void add(ll node, ll val)
+	void add(int node, ll val)
 	{
-		ll rep = Find(node);
+		int rep = Find(node);
 		exp[rep] += val;
 	}
-	bool isSameComponent(ll u, ll v)
-	{
-		return (Find(u) == Find(v));
-	}
-	set<ll> findConnectedComponents()
-	{
-		set<ll> st;
-		// Traverse all vertices
-		for (int i = 1; i <= N; i++)
-			st.insert(Find(parent[i]));
-
-		return st;
-	}
-	ll query(ll node)
+	ll query(int node)
 	{
 		if (parent[node] == node)
 			return exp[node];
@@ -76,13 +64,13 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N, M;
 	// cin >> t;
 	while (t--)
 	{
+		int N, M;
 		cin >> N >> M;
 		string query;
-		ll u, v;
+		int u, v;
 		DSU disjointUnion(N);
 		while (M--)
 		{

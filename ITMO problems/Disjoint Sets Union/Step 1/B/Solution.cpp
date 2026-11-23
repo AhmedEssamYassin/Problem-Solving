@@ -5,7 +5,7 @@ using namespace std;
 
 struct DSU
 {
-	vector<ll> parent, size, maximum, minimum; // Representative
+	vector<int> parent, size, maximum, minimum; // Representative
 	int N;
 	// The leader should be the parent of itself
 	DSU(int _N)
@@ -19,17 +19,17 @@ struct DSU
 		iota(maximum.begin(), maximum.end(), 0);
 		iota(minimum.begin(), minimum.end(), 0);
 	}
-	ll Find(ll node)
+	int Find(int node)
 	{
 		if (parent[node] == node)
 			return node;
 
 		return parent[node] = Find(parent[node]); // Path compression
 	}
-	void Union(ll u, ll v)
+	void Union(int u, int v)
 	{
-		ll rep1 = Find(u);
-		ll rep2 = Find(v);
+		int rep1 = Find(u);
+		int rep2 = Find(v);
 		if (rep1 == rep2)
 			return;
 		// Small-to-large technique
@@ -40,22 +40,9 @@ struct DSU
 		maximum[rep2] = max(maximum[rep1], maximum[rep2]);
 		minimum[rep2] = min(minimum[rep1], minimum[rep2]);
 	}
-	bool isSameComponent(ll u, ll v)
+	tuple<int, int, int> query(int node)
 	{
-		return (Find(u) == Find(v));
-	}
-	set<ll> findConnectedComponents()
-	{
-		set<ll> st;
-		// Traverse all vertices
-		for (int i = 1; i <= N; i++)
-			st.insert(Find(parent[i]));
-
-		return st;
-	}
-	tuple<ll, ll, ll> query(ll node)
-	{
-		ll rep = Find(node);
+		int rep = Find(node);
 		return {minimum[rep], maximum[rep], size[rep]};
 	}
 };
@@ -69,13 +56,13 @@ int main()
 	freopen("Output.txt", "w", stdout);
 #endif
 	int t = 1;
-	ll N, M;
 	// cin >> t;
 	while (t--)
 	{
+		int N, M;
 		cin >> N >> M;
 		string query;
-		ll u, v;
+		int u, v;
 		DSU disjointUnion(N);
 		while (M--)
 		{
@@ -88,7 +75,7 @@ int main()
 			else
 			{
 				cin >> v;
-				tuple<ll, ll, ll> ans = disjointUnion.query(v);
+				tuple<int, int, int> ans = disjointUnion.query(v);
 				cout << get<0>(ans) << " " << get<1>(ans) << " " << get<2>(ans) << endl;
 			}
 		}
